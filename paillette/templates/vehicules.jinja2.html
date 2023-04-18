@@ -1,0 +1,33 @@
+{% set title = 'Véhicules' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Véhicules</h2>
+
+  <ul class="actions">
+    <li><a href="{{ url_for('add_vehicule') }}">Ajouter un véhicule</a></li>
+  </ul>
+
+  <dl>
+    <dt>Nom du véhicule</dt>
+    <dd><a href="{{ url_for('vehicule') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du véhicule</dt>
+    <dd><a href="{{ url_for('vehicule') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du véhicule</dt>
+    <dd><a href="{{ url_for('vehicule') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du véhicule</dt>
+    <dd><a href="{{ url_for('vehicule') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du véhicule</dt>
+    <dd><a href="{{ url_for('vehicule') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+  </dl>
+{% endblock %}

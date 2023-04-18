@@ -1,0 +1,43 @@
+{% set title = 'Spectacle du la date' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Spectacle du la date</h2>
+
+  <ul>
+    <li>Date</li>
+    <li>Lieu</li>
+    <li>Temps de transport</li>
+  </ul>
+
+  <ul class="actions">
+    <li><a href="{{ url_for('roadmap') }}">Feuille de route</a></li>
+    <li><a href="{{ url_for('update_show') }}">Éditer le spectacle</a></li>
+  </ul>
+
+  <dl>
+    <dt>Évènement</dt>
+    <dd>Nom de l’évènement</dd>
+
+    <dt>Spectacle</dt>
+    <dd>Nom du spectacle</dd>
+
+    <dt>Date de début</dt>
+    <dd>Date</dd>
+
+    <dt>Date de fin</dt>
+    <dd>Date</dd>
+
+    <dt>Date de départ</dt>
+    <dd>Date</dd>
+
+    <dt>Date de retour</dt>
+    <dd>Date</dd>
+
+    <dt>Participants</dt>
+    <dd>Quelqu’un</dd>
+    <dd>Quelqu’un</dd>
+    <dd>Quelqu’un</dd>
+  </dl>
+{% endblock %}

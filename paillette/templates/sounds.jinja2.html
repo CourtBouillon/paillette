@@ -1,0 +1,33 @@
+{% set title = 'Matériels de Son' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Mtaériels de son</h2>
+
+  <ul class="actions">
+    <li><a href="{{ url_for('add_sound') }}">Ajouter un matériel de son</a></li>
+  </ul>
+
+  <dl>
+    <dt>Nom du matériel</dt>
+    <dd><a href="{{ url_for('sound') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du matériel</dt>
+    <dd><a href="{{ url_for('sound') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du matériel</dt>
+    <dd><a href="{{ url_for('sound') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du matériel</dt>
+    <dd><a href="{{ url_for('sound') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du matériel</dt>
+    <dd><a href="{{ url_for('sound') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+  </dl>
+{% endblock %}

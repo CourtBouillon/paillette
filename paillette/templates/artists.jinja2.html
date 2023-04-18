@@ -1,0 +1,33 @@
+{% set title = 'Artistes' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Artistes</h2>
+
+  <ul class="actions">
+    <li><a href="{{ url_for('add_artist') }}">Ajouter un artiste</a></li>
+  </ul>
+
+  <dl>
+    <dt>Nom de l’artiste</dt>
+    <dd><a href="{{ url_for('artist') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de l’artiste</dt>
+    <dd><a href="{{ url_for('artist') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de l’artiste</dt>
+    <dd><a href="{{ url_for('artist') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de l’artiste</dt>
+    <dd><a href="{{ url_for('artist') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de l’artiste</dt>
+    <dd><a href="{{ url_for('artist') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+  </dl>
+{% endblock %}

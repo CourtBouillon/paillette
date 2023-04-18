@@ -1,0 +1,23 @@
+{% set title = 'Mon Profil' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Mon Profil</h2>
+
+  <form>
+    <label for="firstname">Prénom</label>
+    <input id="firstname" name="firstname" value="" />
+    <label for="lastname">Nom</label>
+    <input id="lastname" name="lastname" value="" />
+    <label for="mail">Email</label>
+    <input id="mail" name="mail" value="" />
+    <label for="password">Mot de passe</label>
+    <input id="password" name="password" value="" />
+    <label for="confirm_password">Confirmez le mot de passe</label>
+    <input id="confirm_password" name="confirm_password" value="" />
+
+    <input type="submit" value="Mettre à jour" />
+  </form>
+{% endblock %}
+    

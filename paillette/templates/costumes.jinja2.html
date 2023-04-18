@@ -1,0 +1,33 @@
+{% set title = 'Costumes' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Costumes</h2>
+
+  <ul class="actions">
+    <li><a href="{{ url_for('add_costume') }}">Ajouter un costume</a></li>
+  </ul>
+
+  <dl>
+    <dt>Nom du costume</dt>
+    <dd><a href="{{ url_for('costume') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du costume</dt>
+    <dd><a href="{{ url_for('costume') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du costume</dt>
+    <dd><a href="{{ url_for('costume') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du costume</dt>
+    <dd><a href="{{ url_for('costume') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom du costume</dt>
+    <dd><a href="{{ url_for('costume') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+  </dl>
+{% endblock %}

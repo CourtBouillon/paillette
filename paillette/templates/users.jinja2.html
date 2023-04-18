@@ -1,0 +1,33 @@
+{% set title = 'Utilisateurs' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Utilisateurs</h2>
+
+  <ul class="actions">
+    <li><a href="{{ url_for('add_user') }}">Ajouter un utilisateur</a></li>
+  </ul>
+
+  <dl>
+    <dt>Nom de l’utilisateur</dt>
+    <dd><a href="{{ url_for('profile') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de l’utilisateur</dt>
+    <dd><a href="{{ url_for('profile') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de l’utilisateur</dt>
+    <dd><a href="{{ url_for('profile') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de l’utilisateur</dt>
+    <dd><a href="{{ url_for('profile') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de l’utilisateur</dt>
+    <dd><a href="{{ url_for('profile') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+  </dl>
+{% endblock %}

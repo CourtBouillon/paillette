@@ -1,0 +1,33 @@
+{% set title = 'Boîtes de Maquillage' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Boîtes de maquillage</h2>
+
+  <ul class="actions">
+    <li><a href="{{ url_for('add_makeup') }}">Ajouter une boîte de maquillage</a></li>
+  </ul>
+
+  <dl>
+    <dt>Nom de la boîte</dt>
+    <dd><a href="{{ url_for('makeup') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de la boîte</dt>
+    <dd><a href="{{ url_for('makeup') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de la boîte</dt>
+    <dd><a href="{{ url_for('makeup') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de la boîte</dt>
+    <dd><a href="{{ url_for('makeup') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+    
+    <dt>Nom de la boîte</dt>
+    <dd><a href="{{ url_for('makeup') }}">Éditer</a></dd>
+    <dd>Supprimer</dd>
+  </dl>
+{% endblock %}
