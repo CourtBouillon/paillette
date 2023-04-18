@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title>Paillette{% if title %} − {{ title }}{% endif %}</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Gestion des spectacles de Mademoiselle Paillette" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body id="page-{{ request.endpoint }}">
+    <header>
+      {% if g.person %}
+        <nav>
+          <a href="{{ url_for('index') }}"><img src=""></a>
+          <ul>
+            <li><a href="{{ url_for('profile') }}">Mon profil</a></li>
+            <li><a href="{{ url_for('users') }}">Utilisateurs</a></li>
+            <li><a href="{{ url_for('artists') }}">Artistes</a></li>
+            <li><a href="{{ url_for('costumes') }}">Costumes</a></li>
+            <li><a href="{{ url_for('makeups') }}">Maquillage</a></li>
+            <li><a href="{{ url_for('sounds') }}">Son</a></li>
+            <li><a href="{{ url_for('vehicules') }}">Véhicules</a></li>
+            <li><a href="{{ url_for('logout') }}">Déconnexion</a></li>
+          </ul>
+        </nav>
+      {% endif %}
+    </header>
+
+    <main>
+      {% block content %}{% endblock content %}
+    </main>
+
+    <footer>
+      {% if g.person %}
+        <ul>
+          <li><a href="{{ url_for('shows') }}">Spectacles</a></li>
+          <li><a href="{{ url_for('followups') }}">Suivis</a></li>
+          <li><a href="{{ url_for('tours') }}">Tournées</a></li>
+        </ul>
+      {% endif %}
+    </footer>
+  </body>
+</html>

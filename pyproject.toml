@@ -1,0 +1,7 @@
+[project]
+name = 'paillette'
+dependencies = ['flask']
+
+[tool.isort]
+default_section = 'FIRSTPARTY'
+multi_line_output = 4
