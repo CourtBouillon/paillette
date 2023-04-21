@@ -7,6 +7,7 @@ app.config.update(
 app.config.from_envvar('PAILLETTE_CONFIG', silent=True)
 
 
+# Common
 @app.route('/')
 def index():
     return redirect(url_for('login'))
@@ -27,14 +28,15 @@ def lost_password():
     return render_template('lost_password.jinja2.html')
 
 
+# Shows
 @app.route('/shows')
 def shows():
     return render_template('shows.jinja2.html')
 
 
-@app.route('/add_show')
-def add_show():
-    return render_template('add_show.jinja2.html')
+@app.route('/show_add')
+def show_add():
+    return render_template('show_add.jinja2.html')
 
 
 @app.route('/show')
@@ -52,6 +54,12 @@ def roadmap():
     return render_template('roadmap.jinja2.html')
 
 
+@app.route('/roadmap_receivers')
+def roadmap_receivers():
+    return render_template('roadmap_receivers.jinja2.html')
+
+
+# Follow-ups
 @app.route('/followups')
 def followups():
     return render_template('followups.jinja2.html')
@@ -67,6 +75,7 @@ def filter_availabilities():
     return render_template('filter_availabilities.jinja2.html')
 
 
+# Tours
 @app.route('/tours')
 def tours():
     return render_template('tours.jinja2.html')
@@ -82,11 +91,12 @@ def update_tour():
     return render_template('update_tour.jinja2.html')
 
 
-@app.route('/add_tour')
-def add_tour():
-    return render_template('add_tour.jinja2.html')
+@app.route('/tour_add')
+def tour_add():
+    return render_template('tour_add.jinja2.html')
 
 
+# Users
 @app.route('/profile')
 def profile():
     return render_template('profile.jinja2.html')
@@ -97,11 +107,12 @@ def users():
     return render_template('users.jinja2.html')
 
 
-@app.route('/add_user')
-def add_user():
-    return render_template('add_user.jinja2.html')
+@app.route('/user_add')
+def user_add():
+    return render_template('user_add.jinja2.html')
 
 
+# Costumes
 @app.route('/costumes')
 def costumes():
     return render_template('costumes.jinja2.html')
@@ -112,11 +123,12 @@ def costume():
     return render_template('costume.jinja2.html')
 
 
-@app.route('/add_costume')
-def add_costume():
-    return render_template('add_costume.jinja2.html')
+@app.route('/costume_add')
+def costume_add():
+    return render_template('costume_add.jinja2.html')
 
 
+# Make-ups
 @app.route('/makeups')
 def makeups():
     return render_template('makeups.jinja2.html')
@@ -127,11 +139,12 @@ def makeup():
     return render_template('makeup.jinja2.html')
 
 
-@app.route('/add_makeup')
-def add_makeup():
-    return render_template('add_makeup.jinja2.html')
+@app.route('/makeup_add')
+def makeup_add():
+    return render_template('makeup_add.jinja2.html')
 
 
+# Sounds
 @app.route('/sounds')
 def sounds():
     return render_template('sounds.jinja2.html')
@@ -142,11 +155,12 @@ def sound():
     return render_template('sound.jinja2.html')
 
 
-@app.route('/add_sound')
-def add_sound():
-    return render_template('add_sound.jinja2.html')
+@app.route('/sound_add')
+def sound_add():
+    return render_template('sound_add.jinja2.html')
 
 
+# Artists
 @app.route('/artists')
 def artists():
     return render_template('artists.jinja2.html')
@@ -157,11 +171,12 @@ def artist():
     return render_template('artist.jinja2.html')
 
 
-@app.route('/artist')
-def add_artist():
-    return render_template('add_artist.jinja2.html')
+@app.route('/artist_add')
+def artist_add():
+    return render_template('artist_add.jinja2.html')
 
 
+# Vehicules
 @app.route('/vehicules')
 def vehicules():
     return render_template('vehicules.jinja2.html')
@@ -172,6 +187,6 @@ def vehicule():
     return render_template('vehicule.jinja2.html')
 
 
-@app.route('/add_vehicule')
-def add_vehicule():
-    return render_template('add_vehicule.jinja2.html')
+@app.route('/vehicule_add')
+def vehicule_add():
+    return render_template('vehicule_add.jinja2.html')
