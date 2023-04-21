@@ -1,0 +1,21 @@
+{% set title = 'Ajouter un matériel de son' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Ajouter un matériel de son</h2>
+
+  <form>
+    <label for="name">Nom</label>
+    <input id="name" name="name" placeholder="Nom">
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description"></textarea>
+
+    <label for"=main_color">Couleur</label>
+    <input id="main_color" name="main_color" value="#ffffff" type="color">
+
+    <a href="">Annuler</a>
+    <input type="submit" value="Ajouter">
+  </form>
+{% endblock %}

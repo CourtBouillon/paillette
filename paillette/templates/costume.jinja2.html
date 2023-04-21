@@ -1,0 +1,25 @@
+{% set title = 'Costume − ' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Costume − </h2>
+
+  <ul class="actions">
+    <li>Supprimer le costume</li>
+  </ul>
+
+  <form>
+    <label for="name">Nom</label>
+    <input id="name" name="name" value="">
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description">Contenu</textarea>
+
+    <label for"=main_color">Couleur</label>
+    <input id="main_color" name="main_color" value="#ffffff" type="color">
+
+    <a href="">Annuler</a>
+    <input type="submit" value="Mettre à jour">
+  </form>
+{% endblock %}

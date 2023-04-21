@@ -1,0 +1,24 @@
+{% set title = 'Ajouter une boîte de maquillage' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Ajouter une boîte de maquillage</h2>
+
+  <form>
+    <label for="number">Numéro</label>
+    <input id="number" name="number" placeholder="Numéro">
+
+    <label for="name">Nom</label>
+    <input id="name" name="name" placeholder="Nom">
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description"></textarea>
+
+    <label for"=main_color">Couleur</label>
+    <input id="main_color" name="main_color" value="#ffffff" type="color">
+
+    <a href="">Annuler</a>
+    <input type="submit" value="Ajouter">
+  </form>
+{% endblock %}

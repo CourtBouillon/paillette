@@ -1,0 +1,24 @@
+{% set title = 'Ajouter un artiste' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Ajouter un artiste</h2>
+
+  <form>
+    <label for="firstname">Prénom</label>
+    <input id="firstname" name="firstname" placeholder="Prénom">
+
+    <label for="lastname">Nom</label>
+    <input id="lastname" name="lastname" placeholder="Nom">
+
+    <label for="mail">Email</label>
+    <input id="mail" name="mail" placeholder="Email">
+
+    <label for="phone">Téléphone</label>
+    <input id="phone" name="phone" placeholder="Téléphone">
+
+    <a href="">Annuler</a>
+    <input type="submit" value="Ajouter">
+  </form>
+{% endblock %}

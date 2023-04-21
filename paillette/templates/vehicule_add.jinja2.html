@@ -1,0 +1,44 @@
+{% set title = 'Ajouter un véhicule' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>Ajouter un véhicule</h2>
+
+  <form>
+    <label for="name">Nom</label>
+    <input id="name" name="name" placeholder="Nom">
+
+    <label for="type">Type</label>
+    <input id="type" name="type" placeholder="Type">
+
+    <label for="registration">Immatriculation</label>
+    <input id="registration" name="registration" placeholder="Immatriculation">
+
+    <fieldset>
+      <input type="radio" id="rental" name="rental_status" value="rental">
+      <label for="rental">Location</label>
+
+      <input type="radio" id="company" name="rental_status" value="company">
+      <label for="company">Mademoiselle Paillette</label>
+    </fieldset>
+
+    <label for="rental_company">Agence de location</label>
+    <input id="rental_company" name="rental_company" placeholder="Nom de l’agence"/>
+
+    <label for="hours_rental_company">Horaires de l’agence de location</label>
+    <input id="hours_rental_company" name="hours_rental_company" placeholder="Horaires de l’agence">
+
+    <label for="address_rental_company">Adresse de l’agence de location</label>
+    <input id="address_rental_company" name="address_rental_company" placeholder="Adresse de l’agence">
+
+    <label for="start_rental">Loué du</label>
+    <input id="start_rental" name="start_rental" type="date">
+
+    <label for="end_rental">au</label>
+    <input id="end_rental" name="end_rental" type="date">
+
+    <a href="">Annuler</a>
+    <input type="submit" value="Ajouter">
+  </form>
+{% endblock %}
