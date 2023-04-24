@@ -24,10 +24,21 @@ CREATE TABLE spectacle (
   trigram TEXT NOT NULL
 );
 
+CREATE TABLE roadmap (
+  id INTEGER PRIMARY KEY,
+  spectacle_id INTEGER UNIQUE REFERENCES spectacle(id)
+);
+
 CREATE TABLE artist (
   id INTEGER PRIMARY KEY,
   person_id INTEGER NOT NULL REFERENCES person(id),
   color TEXT
+);
+
+CREATE TABLE availability (
+  id INTEGER PRIMARY KEY,
+  artist_id INTEGER NOT NULL REFERENCES artist(id),
+  date DATE NOT NULL
 );
 
 CREATE TABLE representation (
