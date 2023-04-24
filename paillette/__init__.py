@@ -29,7 +29,7 @@ def close_connection():
         g.connection.close()
 
 
-def get_user():
+def get_person():
     if 'person_id' not in session:
         return None
     if not hasattr(g, 'person'):
@@ -45,9 +45,7 @@ def get_user():
 # Common
 @app.route('/')
 def index():
-    if get_user():
-        return redirect(url_for(''))
-    return redirect(url_for('login'))
+    return redirect(url_for('spectacles' if get_person() else 'login'))
 
 
 @app.route('/login', methods=('GET', 'POST'))
@@ -63,7 +61,7 @@ def login():
             if app.config['DEBUG'] or check_password_hash(*passwords):
                 session['person_id'] = person['id']
                 return redirect(url_for('index'))
-        flash('L’identifiant ou le mot de passe est incorrect')
+        flash('L’identifiant ou le mot de passe est incorrect.')
         return redirect(url_for('login'))
     return render_template('login.jinja2.html')
 
@@ -74,23 +72,27 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/lost_password', methods=('GET', 'POST'))
-def lost_password():
+@app.route('/password/lost', methods=('GET', 'POST'))
+def password_lost():
     if request.method == 'POST':
         connection = get_connection()
         cursor = connection.cursor()
         uuid = str(uuid4())
+        mail = request.form['mail']
         cursor.execute('''
             UPDATE person
             SET reset_password = ?
             WHERE mail = ?
             RETURNING id, firstname, lastname
-        ''', (uuid, request.form['mail'],))
+        ''', (uuid, mail))
         person = cursor.fetchone()
         connection.commit()
         if person:
+            url = url_for("password_reset", uuid=uuid, _external=True)
+            if app.config['DEBUG']:
+                flash(Markup(f'<a href="{url}">Nouveau mot de passe</a>.'))
+                return redirect(url_for('login'))
             smtp = SMTP_SSL(app.config['SMTP_HOSTNAME'])
-            smtp.set_debuglevel(1)
             smtp.login(app.config['SMTP_LOGIN'], app.config['SMTP_PASSWORD'])
             message = EmailMessage()
             message['From'] = app.config['SMTP_FROM']
@@ -101,19 +103,45 @@ def lost_password():
                 'Vous avez demandé une réinitialisation de mot de passe '
                 'concernant votre compte Paillette. Merci de vous rendre '
                 'sur l’adresse suivante pour changer votre mot de passe :\n\n'
-                f'{url_for("reset_password", uuid=uuid, _external=True)}\n\n'
+                f'{url}\n\n'
                 'Si vous n’êtes pas à l’origine de cette demande, vous pouvez '
                 'ignorer ce message.'
             )
             smtp.send_message(message)
             smtp.quit()
-        flash('Un message vous a été envoyé si votre email est correct')
+        elif app.config['DEBUG']:
+            flash(f'Aucun utilisateur avec l’adresse {mail}.')
+            return redirect(url_for('login'))
+        flash('Un message vous a été envoyé si votre email est correct.')
         return redirect(url_for('login'))
-    return render_template('lost_password.jinja2.html')
+    return render_template('password_lost.jinja2.html')
+
+
+@app.route('/password/reset/<uuid>', methods=('GET', 'POST'))
+def password_reset(uuid):
+    connection = get_connection()
+    cursor = connection.cursor()
+    if request.method == 'POST':
+        password_match = (
+            request.form.get('password') ==
+            request.form.get('confirm_password'))
+        if not password_match:
+            flash('Les deux mots de passe doivent être les mêmes.')
+            return redirect(request.referrer)
+        cursor.execute('''
+            UPDATE person
+            SET password = ?, reset_password = NULL
+            WHERE reset_password = ?
+        ''', (generate_password_hash(request.form['password']), uuid))
+        connection.commit()
+        flash('Le mot de passe a été modifié, merci de vous connecter.')
+        return redirect(url_for('login'))
+    return render_template('password_reset.jinja2.html')
 
 
 # Spectacles
 @app.route('/spectacles')
+@authenticated
 def spectacles():
     return render_template('spectacles.jinja2.html')
 
