@@ -1,2 +1,4 @@
 paillette.db
 *.pyc
+/venv
+*.egg-info
