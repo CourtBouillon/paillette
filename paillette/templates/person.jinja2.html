@@ -1,31 +1,31 @@
-{% set title = 'Profil - Prénom Nom ' %}
+{% set title = 'Profil — {}'.format(person.name) %}
 
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>Profil − Prénom Nom </h2>
+  <h2>{{ title }}</h2>
 
-  <ul class="actions">
-    <li>Supprimer l’utilisateur</li>
-  </ul>
-
-  <form>
+  <form method="post">
     <label for="firstname">Prénom</label>
-    <input id="firstname" name="firstname" value="">
+    <input id="firstname" name="firstname" value="{{ person.firstname }}" required>
 
     <label for="lastname">Nom</label>
-    <input id="lastname" name="lastname" value="">
+    <input id="lastname" name="lastname" value="{{ person.lastname }}" required>
 
     <label for="mail">Email</label>
-    <input id="mail" name="mail" value="">
+    <input id="mail" name="mail" type="email" value="{{ person.mail }}" required>
+
+    <label for="phone">Numéro de téléphone</label>
+    <input id="phone" name="phone" value="{{ person.phone }}" required>
 
     <label for="password">Mot de passe</label>
-    <input id="password" name="password" value="">
+    <input id="password" name="password">
 
     <label for="confirm_password">Confirmez le mot de passe</label>
-    <input id="confirm_password" name="confirm_password" value="">
+    <input id="confirm_password" name="confirm_password">
 
-    <a href="">Annuler</a>
+    {# TODO: define how users are hidden #}
+
     <input type="submit" value="Mettre à jour">
   </form>
 {% endblock %}

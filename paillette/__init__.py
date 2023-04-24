@@ -31,16 +31,20 @@ def close_connection():
         g.connection.close()
 
 
+def get_person_from_id(person_id):
+    cursor = get_connection().cursor()
+    cursor.execute(
+        'SELECT *, person.firstname || " " || person.lastname AS name '
+        'FROM person WHERE id = (?)',
+        (person_id,))
+    return cursor.fetchone()
+
+
 def get_person():
     if 'person_id' not in session:
         return None
     if not hasattr(g, 'person'):
-        cursor = get_connection().cursor()
-        cursor.execute(
-            'SELECT *, person.firstname || " " || person.lastname AS name '
-            'FROM person WHERE id = (?)',
-            (session['person_id'],))
-        g.person = cursor.fetchone()
+        g.person = get_person_from_id(session['person_id'])
     return g.person
 
 
@@ -216,9 +220,39 @@ def tour_create():
 
 
 # Persons
-@app.route('/person')
-def person():
-    return render_template('profile.jinja2.html')
+@app.route('/person', methods=('GET', 'POST'))
+@app.route('/person/<int:person_id>', methods=('GET', 'POST'))
+@authenticated
+def person(person_id=None):
+    person = g.person if person_id is None else get_person_from_id(person_id)
+
+    if request.method == 'POST':
+        password_match = (
+            request.form.get('password') ==
+            request.form.get('confirm_password'))
+        if not password_match:
+            flash('Les deux mots de passe doivent être les mêmes.')
+            return redirect(url_for('person', person_id=person_id))
+
+        connection = get_connection()
+        cursor = connection.cursor()
+        parameters = dict(request.form)
+        parameters['id'] = person['id']
+        cursor.execute('''
+            UPDATE person
+            SET mail = :mail, firstname = :firstname, lastname = :lastname,
+                phone = :phone
+            WHERE id = :id
+        ''', parameters)
+        if (password := request.form.get('password')):
+            cursor.execute(
+                'UPDATE person SET password = ? WHERE id = ?',
+                (generate_password_hash(password), person['id']))
+        connection.commit()
+        flash('Les informations ont été sauvegardées')
+        return redirect(url_for('person', person_id=person_id))
+
+    return render_template('person.jinja2.html', person=person)
 
 
 @app.route('/persons')

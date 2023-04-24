@@ -5,7 +5,7 @@ CREATE TABLE person (
   mail TEXT UNIQUE NOT NULL,
   firstname TEXT NOT NULL,
   lastname TEXT NOT NULL,
-  phone TEXT,
+  phone TEXT NOT NULL,
   password TEXT,
   reset_password TEXT
 );
