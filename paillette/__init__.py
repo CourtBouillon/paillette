@@ -239,17 +239,22 @@ def person(person_id=None):
         parameters = dict(request.form)
         parameters['id'] = person['id']
         cursor.execute('''
-            UPDATE person
-            SET mail = :mail, firstname = :firstname, lastname = :lastname,
-                phone = :phone
-            WHERE id = :id
+            UPDATE
+              person
+            SET
+              mail = :mail,
+              firstname = :firstname,
+              lastname = :lastname,
+              phone = :phone
+            WHERE
+              id = :id
         ''', parameters)
         if (password := request.form.get('password')):
             cursor.execute(
                 'UPDATE person SET password = ? WHERE id = ?',
                 (generate_password_hash(password), person['id']))
         connection.commit()
-        flash('Les informations ont été sauvegardées')
+        flash('Les informations ont été sauvegardées.')
         return redirect(url_for('person', person_id=person_id))
 
     return render_template('person.jinja2.html', person=person)
