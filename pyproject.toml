@@ -1,6 +1,10 @@
 [project]
 name = 'paillette'
 dependencies = ['flask']
+version = '0'
+
+[tool.setuptools]
+packages = []
 
 [tool.isort]
 default_section = 'FIRSTPARTY'
