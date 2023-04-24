@@ -1,10 +1,40 @@
-from flask import Flask, redirect, render_template, url_for
+import sqlite3
+
+from flask import Flask, g, redirect, render_template, session, url_for
 
 app = Flask(__name__)
 app.config.update(
     SECRET_KEY=b'change_me_in_configuration_file',
     DB='paillette.db')
 app.config.from_envvar('PAILLETTE_CONFIG', silent=True)
+
+
+def get_connection():
+    if not hasattr(g, 'connection'):
+        g.connection = sqlite3.connect(app.config['DB'])
+        g.connection.row_factory = sqlite3.Row
+        cursor = g.connection.cursor()
+        cursor.execute('PRAGMA foreign_keys=ON')
+        cursor.close()
+    return g.connection
+
+
+def close_connection():
+    if hasattr(g, 'connection'):
+        g.connection.close()
+
+
+def get_user():
+    if 'person_id' not in session:
+        return None
+    if not hasattr(g, 'person'):
+        cursor = get_connection().cursor()
+        cursor.execute(
+            'SELECT *, person.firstname || " " || person.lastname AS name '
+            'FROM person WHERE id = (?)',
+            (session['person_id'],))
+        g.person = cursor.fetchone()
+    return g.person
 
 
 # Common
