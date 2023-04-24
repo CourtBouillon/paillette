@@ -23,6 +23,18 @@
           </ul>
         </nav>
       {% endif %}
+
+      {% set messages = get_flashed_messages() %}
+      {% if messages %}
+        <aside id="messages">
+          {% for message in messages %}
+            <section>
+              <input type="checkbox" title="Fermer" onClick="return this.parentNode.remove() /* Just for Firefox that’s missing ':has, ;) */" />
+              {{ message }}
+            </section>
+          {% endfor %}
+        </aside>
+      {% endif %}
     </header>
 
     <main>
