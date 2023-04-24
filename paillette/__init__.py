@@ -68,8 +68,8 @@ def login():
     if request.method == 'POST':
         cursor = get_connection().cursor()
         cursor.execute(
-            'SELECT id, password FROM person WHERE mail = ?',
-            (request.form['login'],))
+            'SELECT id, password FROM person WHERE mail = :login',
+            request.form)
         person = cursor.fetchone()
         if person and (app.config['DEBUG'] or person['password']):
             passwords = person['password'], request.form['password']
