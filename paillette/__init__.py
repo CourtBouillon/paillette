@@ -1,11 +1,13 @@
 import sqlite3
 from email.message import EmailMessage
+from functools import wraps
 from smtplib import SMTP_SSL
 from uuid import uuid4
 
 from flask import (
-    Flask, flash, g, redirect, render_template, request, session, url_for)
-from werkzeug.security import check_password_hash
+    Flask, Markup, abort, flash, g, redirect, render_template, request,
+    session, url_for)
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 app.config.update(
@@ -40,6 +42,15 @@ def get_person():
             (session['person_id'],))
         g.person = cursor.fetchone()
     return g.person
+
+
+def authenticated(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        if get_person():
+            return function(*args, **kwargs)
+        return abort(403)
+    return wrapper
 
 
 # Common
