@@ -288,17 +288,56 @@ def costume_create():
 
 # Make-ups
 @app.route('/makeups')
+@authenticated
 def makeups():
-    return render_template('makeups.jinja2.html')
+    cursor = get_connection().cursor()
+    cursor.execute('SELECT * FROM makeup')
+    makeups = cursor.fetchall()
+    return render_template('makeups.jinja2.html', makeups=makeups)
 
 
-@app.route('/makeup')
-def makeup():
-    return render_template('makeup.jinja2.html')
+@app.route('/makeup/<int:makeup_id>/update', methods=('GET', 'POST'))
+@authenticated
+def makeup_update(makeup_id):
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        parameters = dict(request.form)
+        parameters['id'] = makeup_id
+        cursor.execute('''
+            UPDATE
+              makeup
+            SET
+              name = :name,
+              color = :color
+            WHERE
+              id = :id
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        return redirect(url_for('makeups'))
+
+    cursor.execute('SELECT * FROM makeup WHERE id = ?', (makeup_id,))
+    makeup = cursor.fetchone()
+    return render_template('makeup_update.jinja2.html', makeup=makeup)
 
 
-@app.route('/makeup/create')
+@app.route('/makeup/create', methods=('GET', 'POST'))
+@authenticated
 def makeup_create():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        parameters = dict(request.form)
+        cursor.execute('''
+            INSERT INTO
+              makeup (name, color)
+            VALUES
+              (:name, :color)
+        ''', parameters)
+        cursor.connection.commit()
+        flash('La boîte à maquillage a été créée.')
+        return redirect(url_for('makeups'))
+
     return render_template('makeup_create.jinja2.html')
 
 

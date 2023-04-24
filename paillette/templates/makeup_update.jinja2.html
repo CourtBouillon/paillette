@@ -1,0 +1,19 @@
+{% set title = 'Boîte de maquillage — {}'.format(makeup.name) %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <form method="post">
+    <label for="name">Nom</label>
+    <input id="name" name="name" value="{{ makeup.name }}" required>
+
+    <label for"=color">Couleur</label>
+    <input id="color" name="color" type="color" value="{{ makeup.color }}">
+
+    {# TODO: define how makeups are hidden #}
+
+    <input type="submit" value="Mettre à jour">
+  </form>
+{% endblock %}
