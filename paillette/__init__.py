@@ -1,6 +1,11 @@
 import sqlite3
+from email.message import EmailMessage
+from smtplib import SMTP_SSL
+from uuid import uuid4
 
-from flask import Flask, g, redirect, render_template, session, url_for
+from flask import (
+    Flask, flash, g, redirect, render_template, request, session, url_for)
+from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
 app.config.update(
@@ -40,53 +45,103 @@ def get_user():
 # Common
 @app.route('/')
 def index():
+    if get_user():
+        return redirect(url_for(''))
     return redirect(url_for('login'))
 
 
-@app.route('/login')
+@app.route('/login', methods=('GET', 'POST'))
 def login():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        cursor.execute(
+            'SELECT id, password FROM person WHERE mail = ?',
+            (request.form['login'],))
+        person = cursor.fetchone()
+        if person and (app.config['DEBUG'] or person['password']):
+            passwords = person['password'], request.form['password']
+            if app.config['DEBUG'] or check_password_hash(*passwords):
+                session['person_id'] = person['id']
+                return redirect(url_for('index'))
+        flash('L’identifiant ou le mot de passe est incorrect')
+        return redirect(url_for('login'))
     return render_template('login.jinja2.html')
 
 
 @app.route('/logout')
 def logout():
+    session.pop('person_id', None)
     return redirect(url_for('login'))
 
 
-@app.route('/lost_password')
+@app.route('/lost_password', methods=('GET', 'POST'))
 def lost_password():
+    if request.method == 'POST':
+        connection = get_connection()
+        cursor = connection.cursor()
+        uuid = str(uuid4())
+        cursor.execute('''
+            UPDATE person
+            SET reset_password = ?
+            WHERE mail = ?
+            RETURNING id, firstname, lastname
+        ''', (uuid, request.form['mail'],))
+        person = cursor.fetchone()
+        connection.commit()
+        if person:
+            smtp = SMTP_SSL(app.config['SMTP_HOSTNAME'])
+            smtp.set_debuglevel(1)
+            smtp.login(app.config['SMTP_LOGIN'], app.config['SMTP_PASSWORD'])
+            message = EmailMessage()
+            message['From'] = app.config['SMTP_FROM']
+            message['To'] = request.form['mail']
+            message['Subject'] = 'Réinitialisation de mot de passe'
+            message.set_content(
+                f'Bonjour {person["firstname"]} {person["lastname"]},\n\n'
+                'Vous avez demandé une réinitialisation de mot de passe '
+                'concernant votre compte Paillette. Merci de vous rendre '
+                'sur l’adresse suivante pour changer votre mot de passe :\n\n'
+                f'{url_for("reset_password", uuid=uuid, _external=True)}\n\n'
+                'Si vous n’êtes pas à l’origine de cette demande, vous pouvez '
+                'ignorer ce message.'
+            )
+            smtp.send_message(message)
+            smtp.quit()
+        flash('Un message vous a été envoyé si votre email est correct')
+        return redirect(url_for('login'))
     return render_template('lost_password.jinja2.html')
 
 
-# Shows
-@app.route('/shows')
-def shows():
-    return render_template('shows.jinja2.html')
+# Spectacles
+@app.route('/spectacles')
+def spectacles():
+    return render_template('spectacles.jinja2.html')
 
 
-@app.route('/show_add')
-def show_add():
-    return render_template('show_add.jinja2.html')
+@app.route('/spectacle/create')
+def spectacle_create():
+    return render_template('spectacle_create.jinja2.html')
 
 
-@app.route('/show')
-def show():
-    return render_template('show.jinja2.html')
+@app.route('/spectacle')
+def spectacle():
+    return render_template('spectacle.jinja2.html')
 
 
-@app.route('/update_show')
-def update_show():
-    return render_template('update_show.jinja2.html')
+@app.route('/spectacle/update')
+def spectacle_update():
+    return render_template('spectacle_update.jinja2.html')
 
 
+# Roadmaps
 @app.route('/roadmap')
 def roadmap():
     return render_template('roadmap.jinja2.html')
 
 
-@app.route('/roadmap_receivers')
-def roadmap_receivers():
-    return render_template('roadmap_receivers.jinja2.html')
+@app.route('/roadmap/send')
+def roadmap_send():
+    return render_template('roadmap_send.jinja2.html')
 
 
 # Follow-ups
@@ -95,14 +150,9 @@ def followups():
     return render_template('followups.jinja2.html')
 
 
-@app.route('/update_availabilities')
-def update_availabilities():
-    return render_template('update_availabilities.jinja2.html')
-
-
-@app.route('/filter_availabilities')
-def filter_availabilities():
-    return render_template('filter_availabilities.jinja2.html')
+@app.route('/availabilities/update')
+def availabilities_update():
+    return render_template('availabilities_update.jinja2.html')
 
 
 # Tours
@@ -116,30 +166,30 @@ def tour():
     return render_template('tour.jinja2.html')
 
 
-@app.route('/update_tour')
-def update_tour():
-    return render_template('update_tour.jinja2.html')
+@app.route('/tour/update')
+def tour_update():
+    return render_template('tour_update.jinja2.html')
 
 
-@app.route('/tour_add')
-def tour_add():
-    return render_template('tour_add.jinja2.html')
+@app.route('/tour/create')
+def tour_create():
+    return render_template('tour_create.jinja2.html')
 
 
-# Users
-@app.route('/profile')
-def profile():
+# Persons
+@app.route('/person')
+def person():
     return render_template('profile.jinja2.html')
 
 
-@app.route('/users')
-def users():
-    return render_template('users.jinja2.html')
+@app.route('/persons')
+def persons():
+    return render_template('persons.jinja2.html')
 
 
-@app.route('/user_add')
-def user_add():
-    return render_template('user_add.jinja2.html')
+@app.route('/person/create')
+def person_create():
+    return render_template('person_create.jinja2.html')
 
 
 # Costumes
@@ -153,9 +203,9 @@ def costume():
     return render_template('costume.jinja2.html')
 
 
-@app.route('/costume_add')
-def costume_add():
-    return render_template('costume_add.jinja2.html')
+@app.route('/costume/create')
+def costume_create():
+    return render_template('costume_create.jinja2.html')
 
 
 # Make-ups
@@ -169,9 +219,9 @@ def makeup():
     return render_template('makeup.jinja2.html')
 
 
-@app.route('/makeup_add')
-def makeup_add():
-    return render_template('makeup_add.jinja2.html')
+@app.route('/makeup/create')
+def makeup_create():
+    return render_template('makeup_create.jinja2.html')
 
 
 # Sounds
@@ -185,9 +235,9 @@ def sound():
     return render_template('sound.jinja2.html')
 
 
-@app.route('/sound_add')
-def sound_add():
-    return render_template('sound_add.jinja2.html')
+@app.route('/sound/create')
+def sound_create():
+    return render_template('sound_create.jinja2.html')
 
 
 # Artists
@@ -201,22 +251,22 @@ def artist():
     return render_template('artist.jinja2.html')
 
 
-@app.route('/artist_add')
-def artist_add():
-    return render_template('artist_add.jinja2.html')
+@app.route('/artist/create')
+def artist_create():
+    return render_template('artist_create.jinja2.html')
 
 
-# Vehicules
-@app.route('/vehicules')
-def vehicules():
-    return render_template('vehicules.jinja2.html')
+# Vehicles
+@app.route('/vehicles')
+def vehicles():
+    return render_template('vehicles.jinja2.html')
 
 
-@app.route('/vehicule')
-def vehicule():
-    return render_template('vehicule.jinja2.html')
+@app.route('/vehicle')
+def vehicle():
+    return render_template('vehicle.jinja2.html')
 
 
-@app.route('/vehicule_add')
-def vehicule_add():
-    return render_template('vehicule_add.jinja2.html')
+@app.route('/vehicle/create')
+def vehicle_create():
+    return render_template('vehicle_create.jinja2.html')

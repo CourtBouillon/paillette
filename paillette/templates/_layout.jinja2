@@ -12,13 +12,13 @@
         <nav>
           <a href="{{ url_for('index') }}"><img src=""></a>
           <ul>
-            <li><a href="{{ url_for('profile') }}">Mon profil</a></li>
-            <li><a href="{{ url_for('users') }}">Utilisateurs</a></li>
+            <li><a href="{{ url_for('person') }}">Mon profil</a></li>
+            <li><a href="{{ url_for('persons') }}">Utilisateurs</a></li>
             <li><a href="{{ url_for('artists') }}">Artistes</a></li>
             <li><a href="{{ url_for('costumes') }}">Costumes</a></li>
             <li><a href="{{ url_for('makeups') }}">Maquillage</a></li>
             <li><a href="{{ url_for('sounds') }}">Son</a></li>
-            <li><a href="{{ url_for('vehicules') }}">Véhicules</a></li>
+            <li><a href="{{ url_for('vehicles') }}">Véhicules</a></li>
             <li><a href="{{ url_for('logout') }}">Déconnexion</a></li>
           </ul>
         </nav>
@@ -32,7 +32,7 @@
     <footer>
       {% if g.person %}
         <ul>
-          <li><a href="{{ url_for('shows') }}">Spectacles</a></li>
+          <li><a href="{{ url_for('spectacles') }}">Spectacles</a></li>
           <li><a href="{{ url_for('followups') }}">Suivis</a></li>
           <li><a href="{{ url_for('tours') }}">Tournées</a></li>
         </ul>
