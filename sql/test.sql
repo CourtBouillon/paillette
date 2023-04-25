@@ -12,3 +12,8 @@ INSERT INTO costume (name, color) VALUES
 ('Clown', '#0000FF'),
 ('Bulle', '#008800'),
 ('Paillettes', NULL);
+
+INSERT INTO sound (name, color) VALUES
+('Enceintes', '#0000FF'),
+('Gros sound system', '#008800'),
+('Kit de son', NULL);

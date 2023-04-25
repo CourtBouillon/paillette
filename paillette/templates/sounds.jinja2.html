@@ -3,31 +3,17 @@
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>Mtaériels de son</h2>
+  <h2>{{ title }}</h2>
 
   <ul class="actions">
     <li><a href="{{ url_for('sound_create') }}">Ajouter un matériel de son</a></li>
   </ul>
 
   <dl>
-    <dt>Nom du matériel</dt>
-    <dd><a href="{{ url_for('sound') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom du matériel</dt>
-    <dd><a href="{{ url_for('sound') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom du matériel</dt>
-    <dd><a href="{{ url_for('sound') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom du matériel</dt>
-    <dd><a href="{{ url_for('sound') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom du matériel</dt>
-    <dd><a href="{{ url_for('sound') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
+    {% for sound in sounds %}
+      <dt{% if sound.color %} data-color="{{ sound.color }}"{% endif %}>{{ sound.name }}</dt>
+      <dd><a href="{{ url_for('sound_update', sound_id=sound.id) }}">Éditer</a></dd>
+      <dd>Supprimer</dd>
+    {% endfor %}
   </dl>
 {% endblock %}

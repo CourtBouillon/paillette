@@ -382,17 +382,56 @@ def makeup_create():
 
 # Sounds
 @app.route('/sounds')
+@authenticated
 def sounds():
-    return render_template('sounds.jinja2.html')
+    cursor = get_connection().cursor()
+    cursor.execute('SELECT * FROM sound')
+    sounds = cursor.fetchall()
+    return render_template('sounds.jinja2.html', sounds=sounds)
 
 
-@app.route('/sound')
-def sound():
-    return render_template('sound.jinja2.html')
+@app.route('/sound/<int:sound_id>/update', methods=('GET', 'POST'))
+@authenticated
+def sound_update(sound_id):
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        parameters = dict(request.form)
+        parameters['id'] = sound_id
+        cursor.execute('''
+            UPDATE
+              sound
+            SET
+              name = :name,
+              color = :color
+            WHERE
+              id = :id
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        return redirect(url_for('sounds'))
+
+    cursor.execute('SELECT * FROM sound WHERE id = ?', (sound_id,))
+    sound = cursor.fetchone()
+    return render_template('sound_update.jinja2.html', sound=sound)
 
 
-@app.route('/sound/create')
+@app.route('/sound/create', methods=('GET', 'POST'))
+@authenticated
 def sound_create():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        parameters = dict(request.form)
+        cursor.execute('''
+            INSERT INTO
+              sound (name, color)
+            VALUES
+              (:name, :color)
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Le matériel de son a été créée.')
+        return redirect(url_for('sounds'))
+
     return render_template('sound_create.jinja2.html')
 
 
