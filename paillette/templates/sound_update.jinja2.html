@@ -10,7 +10,7 @@
     <input id="name" name="name" value="{{ sound.name }}" required>
 
     <label for"=color">Couleur</label>
-    <input id="color" name="color" type="color" value="{{ sound.color }}">
+    <input id="color" name="color" type="color" value="{{ sound.color or '' }}">
 
     {# TODO: define how sounds are hidden #}
 
