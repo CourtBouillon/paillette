@@ -507,15 +507,84 @@ def vehicle_create():
 
 # Artists
 @app.route('/artists')
+@authenticated
 def artists():
-    return render_template('artists.jinja2.html')
+    cursor = get_connection().cursor()
+    cursor.execute('''
+        SELECT
+          artist.*,
+          person.mail,
+          person.firstname,
+          person.lastname,
+          person.phone,
+          person.firstname || " " || person.lastname AS name
+        FROM
+          artist
+        JOIN
+          person
+        ON
+          artist.person_id = person.id
+    ''')
+    artists = cursor.fetchall()
+    return render_template('artists.jinja2.html', artists=artists)
 
 
-@app.route('/artist')
-def artist():
-    return render_template('artist.jinja2.html')
+@app.route('/artist/<int:artist_id>/update', methods=('GET', 'POST'))
+@authenticated
+def artist_update(artist_id):
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        parameters = dict(request.form)
+        parameters['id'] = artist_id
+        cursor.execute('''
+            UPDATE
+              artist
+            SET
+              color = :color
+            WHERE
+              id = :id
+            RETURNING
+              person_id
+        ''', parameters)
+        parameters['person_id'] = cursor.fetchone()['person_id']
+        cursor.execute('''
+            UPDATE
+              person
+            SET
+              mail = :mail,
+              firstname = :firstname,
+              lastname = :lastname,
+              phone = :phone
+            WHERE
+              id = :person_id
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        return redirect(url_for('artists'))
+
+    cursor.execute('''
+        SELECT
+          artist.*,
+          person.mail,
+          person.firstname,
+          person.lastname,
+          person.phone,
+          person.firstname || " " || person.lastname AS name
+        FROM
+          artist
+        JOIN
+          person
+        ON
+          artist.person_id = person.id
+        WHERE
+          artist.id = ?
+    ''', (artist_id,))
+    artist = cursor.fetchone()
+    return render_template('artist_update.jinja2.html', artist=artist)
 
 
 @app.route('/artist/create')
+@authenticated
 def artist_create():
     return render_template('artist_create.jinja2.html')

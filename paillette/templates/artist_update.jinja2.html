@@ -1,0 +1,26 @@
+{% set title = 'Artiste − {}'.format(artist.name) %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <form method="post">
+    <label for="firstname">Prénom</label>
+    <input id="firstname" name="firstname" value="{{ artist.firstname }}" required>
+
+    <label for="lastname">Nom</label>
+    <input id="lastname" name="lastname" value="{{ artist.lastname }}" required>
+
+    <label for"=color">Couleur</label>
+    <input id="color" name="color" type="color" value="{{ artist.color or '' }}">
+
+    <label for="mail">Email</label>
+    <input id="mail" name="mail" value="{{ artist.mail }}" required>
+
+    <label for="phone">Téléphone</label>
+    <input id="phone" name="phone" value="{{ artist.phone }}" required>
+
+    <input type="submit" value="Mettre à jour">
+  </form>
+{% endblock %}

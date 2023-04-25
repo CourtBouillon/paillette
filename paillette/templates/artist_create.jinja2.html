@@ -7,18 +7,20 @@
 
   <form>
     <label for="firstname">Prénom</label>
-    <input id="firstname" name="firstname" placeholder="Prénom">
+    <input id="firstname" name="firstname" required>
 
     <label for="lastname">Nom</label>
-    <input id="lastname" name="lastname" placeholder="Nom">
+    <input id="lastname" name="lastname" required>
+
+    <label for"=color">Couleur</label>
+    <input id="color" name="color" type="color">
 
     <label for="mail">Email</label>
-    <input id="mail" name="mail" placeholder="Email">
+    <input id="mail" name="mail" required>
 
     <label for="phone">Téléphone</label>
-    <input id="phone" name="phone" placeholder="Téléphone">
+    <input id="phone" name="phone" required>
 
-    <a href="">Annuler</a>
     <input type="submit" value="Ajouter">
   </form>
 {% endblock %}
