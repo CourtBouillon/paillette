@@ -1,33 +1,19 @@
-{% set title = 'Véhicules' %}
+{% set title = 'Vehicules' %}
 
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>Véhicules</h2>
+  <h2>{{ title }}</h2>
 
   <ul class="actions">
-    <li><a href="{{ url_for('vehicle_create') }}">Ajouter un véhicule</a></li>
+    <li><a href="{{ url_for('vehicle_create') }}">Ajouter un vehicule</a></li>
   </ul>
 
   <dl>
-    <dt>Nom du véhicule</dt>
-    <dd><a href="{{ url_for('vehicle') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom du véhicule</dt>
-    <dd><a href="{{ url_for('vehicle') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom du véhicule</dt>
-    <dd><a href="{{ url_for('vehicle') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom du véhicule</dt>
-    <dd><a href="{{ url_for('vehicle') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom du véhicule</dt>
-    <dd><a href="{{ url_for('vehicle') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
+    {% for vehicle in vehicles %}
+      <dt{% if vehicle.color %} data-color="{{ vehicle.color }}"{% endif %}>{{ vehicle.name }}</dt>
+      <dd><a href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">Éditer</a></dd>
+      <dd>Supprimer</dd>
+    {% endfor %}
   </dl>
 {% endblock %}

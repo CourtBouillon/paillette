@@ -1,0 +1,49 @@
+{% set title = 'Véhicule − {}'.format(vehicle.name) %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <form method="post">
+    <label for="name">Nom</label>
+    <input id="name" name="name" value="{{ vehicle.name }}" required>
+
+    <label for"=color">Couleur</label>
+    <input id="color" name="color" type="color" value="{{ vehicle.color or '' }}">
+
+    <label for="type">Type</label>
+    <input id="type" name="type" value="{{ vehicle.type or '' }}">
+
+    <label for="license_plate">Immatriculation</label>
+    <input id="license_plate" name="license_plate" value="{{ vehicle.license_plate or '' }}">
+
+    <fieldset>
+      <input type="radio" id="rental" name="rental_status" value="rental"{% if vehicle.rented %} checked{% endif %}>
+      <label for="rental">Location</label>
+
+      <input type="radio" id="company" name="rental_status" value="company"{% if not vehicle.rented %} checked{% endif %}>
+      <label for="company">Mademoiselle Paillette</label>
+    </fieldset>
+
+    <label for="rental_company_name">Agence de location</label>
+    <input id="rental_company_name" name="rental_company_name" value="{{ vehicle.rental_company_name or '' }}">
+
+    <label for="rental_company_hours">Horaires de l’agence de location</label>
+    <textarea id="rental_company_hours" name="rental_company_hours">{{ vehicle.rental_company_hours or '' }}</textarea>
+
+    <label for="rental_company_address">Adresse de l’agence de location</label>
+    <textarea id="rental_company_address" name="rental_company_address">{{ vehicle.rental_company_address or '' }}</textarea>
+
+    <label for="rented_from">Début de la location</label>
+    <input id="rented_from" name="rented_from" type="date" value="{{ vehicle.rented_from or '' }}">
+
+    <label for="rented_to">Fin de la location</label>
+    <input id="rented_to" name="rented_to" type="date" value="{{ vehicle.rented_to or '' }}">
+
+    {# TODO: define how vehicles are hidden #}
+    {# TODO: JS to hide rental company #}
+
+    <input type="submit" value="Mettre à jour">
+  </form>
+{% endblock %}

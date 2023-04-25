@@ -92,7 +92,15 @@ CREATE TABLE sound_spectacle (
 CREATE TABLE vehicle (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
-  color TEXT
+  color TEXT,
+  type TEXT,
+  license_plate TEXT,
+  rented BOOLEAN NOT NULL,
+  rental_company_name TEXT,
+  rental_company_hours TEXT,
+  rental_company_address TEXT,
+  rented_from DATE,
+  rented_to DATE
 );
 
 CREATE TABLE vehicle_spectacle (

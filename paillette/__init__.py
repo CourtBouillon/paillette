@@ -435,6 +435,76 @@ def sound_create():
     return render_template('sound_create.jinja2.html')
 
 
+# Vehicles
+@app.route('/vehicles')
+@authenticated
+def vehicles():
+    cursor = get_connection().cursor()
+    cursor.execute('SELECT * FROM vehicle')
+    vehicles = cursor.fetchall()
+    return render_template('vehicles.jinja2.html', vehicles=vehicles)
+
+
+@app.route('/vehicle/<int:vehicle_id>/update', methods=('GET', 'POST'))
+@authenticated
+def vehicle_update(vehicle_id):
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        parameters = dict(request.form)
+        parameters['id'] = vehicle_id
+        parameters['rented'] = parameters['rental_status'] == 'rental'
+        cursor.execute('''
+            UPDATE
+              vehicle
+            SET
+              name = :name,
+              color = :color,
+              type = :type,
+              license_plate = :license_plate,
+              rented = :rented,
+              rental_company_name = :rental_company_name,
+              rental_company_hours = :rental_company_hours,
+              rental_company_address = :rental_company_address,
+              rented_from = :rented_from,
+              rented_to = :rented_to
+            WHERE
+              id = :id
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        return redirect(url_for('vehicles'))
+
+    cursor.execute('SELECT * FROM vehicle WHERE id = ?', (vehicle_id,))
+    vehicle = cursor.fetchone()
+    return render_template('vehicle_update.jinja2.html', vehicle=vehicle)
+
+
+@app.route('/vehicle/create', methods=('GET', 'POST'))
+@authenticated
+def vehicle_create():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        parameters = dict(request.form)
+        parameters['rented'] = parameters['rental_status'] == 'rental'
+        cursor.execute('''
+            INSERT INTO
+              vehicle (
+                name, color, type, license_plate, rented, rental_company_name,
+                rental_company_hours, rental_company_address, rented_from,
+                rented_to)
+            VALUES
+              (:name, :color, :type, :license_plate, :rented,
+               :rental_company_name, :rental_company_hours,
+               :rental_company_address, :rented_from, :rented_to)
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Le véhicule a été créée.')
+        return redirect(url_for('vehicles'))
+
+    return render_template('vehicle_create.jinja2.html')
+
+
 # Artists
 @app.route('/artists')
 def artists():
@@ -449,19 +519,3 @@ def artist():
 @app.route('/artist/create')
 def artist_create():
     return render_template('artist_create.jinja2.html')
-
-
-# Vehicles
-@app.route('/vehicles')
-def vehicles():
-    return render_template('vehicles.jinja2.html')
-
-
-@app.route('/vehicle')
-def vehicle():
-    return render_template('vehicle.jinja2.html')
-
-
-@app.route('/vehicle/create')
-def vehicle_create():
-    return render_template('vehicle_create.jinja2.html')
