@@ -88,8 +88,7 @@ def logout():
 @app.route('/password/lost', methods=('GET', 'POST'))
 def password_lost():
     if request.method == 'POST':
-        connection = get_connection()
-        cursor = connection.cursor()
+        cursor = get_connection().cursor()
         uuid = str(uuid4())
         mail = request.form['mail']
         cursor.execute('''
@@ -99,7 +98,7 @@ def password_lost():
             RETURNING id, firstname, lastname
         ''', (uuid, mail))
         person = cursor.fetchone()
-        connection.commit()
+        cursor.connection.commit()
         if person:
             url = url_for("password_reset", uuid=uuid, _external=True)
             if app.config['DEBUG']:
@@ -132,8 +131,7 @@ def password_lost():
 
 @app.route('/password/reset/<uuid>', methods=('GET', 'POST'))
 def password_reset(uuid):
-    connection = get_connection()
-    cursor = connection.cursor()
+    cursor = get_connection().cursor()
     if request.method == 'POST':
         password_match = (
             request.form.get('password') ==
@@ -146,7 +144,7 @@ def password_reset(uuid):
             SET password = ?, reset_password = NULL
             WHERE reset_password = ?
         ''', (generate_password_hash(request.form['password']), uuid))
-        connection.commit()
+        cursor.connection.commit()
         flash('Le mot de passe a été modifié, merci de vous connecter.')
         return redirect(url_for('login'))
     return render_template('password_reset.jinja2.html')
@@ -232,8 +230,7 @@ def person_update(person_id=None):
             flash('Les deux mots de passe doivent être les mêmes.')
             return redirect(url_for('person_update', person_id=person_id))
 
-        connection = get_connection()
-        cursor = connection.cursor()
+        cursor = get_connection().cursor()
         parameters = dict(request.form)
         parameters['id'] = person['id']
         cursor.execute('''
@@ -251,7 +248,7 @@ def person_update(person_id=None):
             cursor.execute(
                 'UPDATE person SET password = ? WHERE id = ?',
                 (generate_password_hash(password), person['id']))
-        connection.commit()
+        cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
         return redirect(url_for('person_update', person_id=person_id))
 
