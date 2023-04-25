@@ -3,31 +3,17 @@
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>Utilisateurs</h2>
+  <h2>{{ title }}</h2>
 
   <ul class="actions">
     <li><a href="{{ url_for('person_create') }}">Ajouter un utilisateur</a></li>
   </ul>
 
   <dl>
-    <dt>Nom de l’utilisateur</dt>
-    <dd><a href="{{ url_for('profile') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom de l’utilisateur</dt>
-    <dd><a href="{{ url_for('profile') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom de l’utilisateur</dt>
-    <dd><a href="{{ url_for('profile') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom de l’utilisateur</dt>
-    <dd><a href="{{ url_for('profile') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
-    
-    <dt>Nom de l’utilisateur</dt>
-    <dd><a href="{{ url_for('profile') }}">Éditer</a></dd>
-    <dd>Supprimer</dd>
+    {% for person in persons %}
+      <dt>{{ person.name }}</dt>
+      <dd><a href="{{ url_for('person_update', person_id=person.id) }}">Éditer</a></dd>
+      <dd>Supprimer</dd>
+    {% endfor %}
   </dl>
 {% endblock %}

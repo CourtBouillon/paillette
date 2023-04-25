@@ -3,17 +3,20 @@
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>Ajouter un utilisateur</h2>
+  <h2>{{ title }}</h2>
 
-  <form>
+  <form method="post">
     <label for="firstname">Prénom</label>
-    <input id="firstname" name="firstname" placeholder="Prénom">
+    <input id="firstname" name="firstname" required>
 
     <label for="lastname">Nom</label>
-    <input id="lastname" name="lastname" placeholder="Nom">
+    <input id="lastname" name="lastname" required>
 
     <label for="mail">Email</label>
-    <input id="mail" name="mail" placeholder="Email">
+    <input id="mail" name="mail" type="email">
+
+    <label for="phone">Numéro de téléphone</label>
+    <input id="phone" name="phone" required>
 
     <a href="">Annuler</a>
     <input type="submit" value="Ajouter">

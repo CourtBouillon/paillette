@@ -220,10 +220,10 @@ def tour_create():
 
 
 # Persons
-@app.route('/person', methods=('GET', 'POST'))
-@app.route('/person/<int:person_id>', methods=('GET', 'POST'))
+@app.route('/person/update', methods=('GET', 'POST'))
+@app.route('/person/<int:person_id>/update', methods=('GET', 'POST'))
 @authenticated
-def person(person_id=None):
+def person_update(person_id=None):
     person = g.person if person_id is None else get_person_from_id(person_id)
 
     if request.method == 'POST':
@@ -232,7 +232,7 @@ def person(person_id=None):
             request.form.get('confirm_password'))
         if not password_match:
             flash('Les deux mots de passe doivent être les mêmes.')
-            return redirect(url_for('person', person_id=person_id))
+            return redirect(url_for('person_update', person_id=person_id))
 
         connection = get_connection()
         cursor = connection.cursor()
@@ -255,18 +255,47 @@ def person(person_id=None):
                 (generate_password_hash(password), person['id']))
         connection.commit()
         flash('Les informations ont été sauvegardées.')
-        return redirect(url_for('person', person_id=person_id))
+        return redirect(url_for('person_update', person_id=person_id))
 
-    return render_template('person.jinja2.html', person=person)
+    return render_template('person_update.jinja2.html', person=person)
 
 
 @app.route('/persons')
+@authenticated
 def persons():
-    return render_template('persons.jinja2.html')
+    cursor = get_connection().cursor()
+    cursor.execute('''
+      SELECT
+        person.*,
+        person.firstname || " " || person.lastname AS name
+      FROM
+        person
+      LEFT JOIN
+        artist
+      ON
+        person.id = artist.person_id
+      WHERE
+        artist.id IS NULL
+    ''')
+    persons = cursor.fetchall()
+    return render_template('persons.jinja2.html', persons=persons)
 
 
-@app.route('/person/create')
+@app.route('/person/create', methods=('GET', 'POST'))
+@authenticated
 def person_create():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        parameters = dict(request.form)
+        cursor.execute('''
+            INSERT INTO
+              person (firstname, lastname, mail, phone)
+            VALUES
+              (:firstname, :lastname, :mail, :phone)
+        ''', parameters)
+        cursor.connection.commit()
+        flash('La personne a été ajoutée.')
+        return redirect(url_for('persons'))
     return render_template('person_create.jinja2.html')
 
 
