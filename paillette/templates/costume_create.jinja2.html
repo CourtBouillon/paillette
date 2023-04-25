@@ -3,19 +3,15 @@
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>Ajouter un costume</h2>
+  <h2>{{ title }}</h2>
 
-  <form>
+  <form method="post">
     <label for="name">Nom</label>
-    <input id="name" name="name" placeholder="Nom">
+    <input id="name" name="name" required>
 
-    <label for="description">Description</label>
-    <textarea id="description" name="description"></textarea>
+    <label for"=color">Couleur</label>
+    <input id="color" name="color" type="color">
 
-    <label for"=main_color">Couleur</label>
-    <input id="main_color" name="main_color" value="#ffffff" type="color">
-
-    <a href="">Annuler</a>
     <input type="submit" value="Ajouter">
   </form>
 {% endblock %}

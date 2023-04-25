@@ -272,17 +272,56 @@ def person_create():
 
 # Costumes
 @app.route('/costumes')
+@authenticated
 def costumes():
-    return render_template('costumes.jinja2.html')
+    cursor = get_connection().cursor()
+    cursor.execute('SELECT * FROM costume')
+    costumes = cursor.fetchall()
+    return render_template('costumes.jinja2.html', costumes=costumes)
 
 
-@app.route('/costume')
-def costume():
-    return render_template('costume.jinja2.html')
+@app.route('/costume/<int:costume_id>/update', methods=('GET', 'POST'))
+@authenticated
+def costume_update(costume_id):
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        parameters = dict(request.form)
+        parameters['id'] = costume_id
+        cursor.execute('''
+            UPDATE
+              costume
+            SET
+              name = :name,
+              color = :color
+            WHERE
+              id = :id
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        return redirect(url_for('costumes'))
+
+    cursor.execute('SELECT * FROM costume WHERE id = ?', (costume_id,))
+    costume = cursor.fetchone()
+    return render_template('costume_update.jinja2.html', costume=costume)
 
 
-@app.route('/costume/create')
+@app.route('/costume/create', methods=('GET', 'POST'))
+@authenticated
 def costume_create():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        parameters = dict(request.form)
+        cursor.execute('''
+            INSERT INTO
+              costume (name, color)
+            VALUES
+              (:name, :color)
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Le costume a été créée.')
+        return redirect(url_for('costumes'))
+
     return render_template('costume_create.jinja2.html')
 
 

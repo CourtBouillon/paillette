@@ -1,0 +1,19 @@
+{% set title = 'Costume − {}'.format(costume.name) %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <form method="post">
+    <label for="name">Nom</label>
+    <input id="name" name="name" value="{{ costume.name }}" required>
+
+    <label for"=color">Couleur</label>
+    <input id="color" name="color" type="color" value="{{ costume.color }}">
+
+    {# TODO: define how costumes are hidden #}
+
+    <input type="submit" value="Mettre à jour">
+  </form>
+{% endblock %}
