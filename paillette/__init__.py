@@ -19,10 +19,8 @@ app.config.from_envvar('PAILLETTE_CONFIG', silent=True)
 def get_connection():
     if not hasattr(g, 'connection'):
         g.connection = sqlite3.connect(app.config['DB'])
+        g.connection.execute('PRAGMA foreign_keys')
         g.connection.row_factory = sqlite3.Row
-        cursor = g.connection.cursor()
-        cursor.execute('PRAGMA foreign_keys=ON')
-        cursor.close()
     return g.connection
 
 
