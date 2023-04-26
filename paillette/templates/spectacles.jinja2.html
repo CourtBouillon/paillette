@@ -3,62 +3,32 @@
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>Spectacles</h2>
+  <h2>{{ title }}</h2>
 
   <ul>
-    <li><a href="">Mois précédent</a></li>
-    <li>Mois en cours</li>
-    <li><a href="">Mois suivant</a></li>
+    <li><a href="{{ url_for('spectacles', year=previous.year, month=previous.month) }}">Mois précédent</a></li>
+    <li>{{ start.strftime('%B %Y') | capitalize }}</li>
+    <li><a href="{{ url_for('spectacles', year=next.year, month=next.month) }}">Mois suivant</a></li>
   </ul>
 
   <ul class="actions">
     <li><a href="{{ url_for('spectacle_create') }}">Ajouter un spectacle</a></li>
   </ul>
 
-  <section>
-    <ul>
-      <li>Date</li>
-      <li>Lieu</li>
-      <li>Temps de transport</li>
-    </ul>
-
-    <dl>
-      <dt>Évènement</dt>
-      <dd>Nom de l’évènement</dd>
-      <dt>Spectacle</dt>
-      <dd>Nom du spectacle</dd>
-      <dd>Nom du spectacle</dd>
-    </dl>
-  </section>
-
-  <section>
-    <ul>
-      <li>Date</li>
-      <li>Lieu</li>
-      <li>Temps de transport</li>
-    </ul>
-
-    <dl>
-      <dt>Évènement</dt>
-      <dd>Nom de l’évènement</dd>
-      <dt>Spectacle</dt>
-      <dd>Nom du spectacle</dd>
-      <dd>Nom du spectacle</dd>
-    </dl>
-  </section>
-
-  <section>
-    <ul>
-      <li>Date</li>
-      <li>Lieu</li>
-      <li>Temps de transport</li>
-    </ul>
-
-    <dl>
-      <dt>Évènement</dt>
-      <dd>Nom de l’évènement</dd>
-      <dt>Spectacle</dt>
-      <dd>Nom du spectacle</dd>
-    </dl>
-  </section>
+  {% for spectacle in spectacles %}
+    <a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">
+      <section>
+        <dl>
+          <dt>Date</dt>
+          <dd>Du {{ spectacle.date_from.strftime('%d/%m') }} au {{ spectacle.date_to.strftime('%d/%m') }}</dd>
+          <dt>Lieu</dt>
+          <dd>{{ spectacle.place }}</dd>
+          <dt>Évènement</dt>
+          <dd>{{ spectacle.event }}</dd>
+          <dt>Temps de transport</dt>
+          <dd>{{ spectacle.travel_time }}</dd>
+        </dl>
+      </section>
+    </a>
+  {% endfor %}
 {% endblock %}

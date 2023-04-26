@@ -1,6 +1,9 @@
+import calendar
 import sqlite3
+from datetime import date, timedelta
 from email.message import EmailMessage
 from functools import wraps
+from locale import LC_ALL, setlocale
 from smtplib import SMTP_SSL
 from uuid import uuid4
 
@@ -8,6 +11,8 @@ from flask import (
     Flask, Markup, abort, flash, g, redirect, render_template, request,
     session, url_for)
 from werkzeug.security import check_password_hash, generate_password_hash
+
+setlocale(LC_ALL, 'fr_FR')
 
 app = Flask(__name__)
 app.config.update(
@@ -18,7 +23,8 @@ app.config.from_envvar('PAILLETTE_CONFIG', silent=True)
 
 def get_connection():
     if not hasattr(g, 'connection'):
-        g.connection = sqlite3.connect(app.config['DB'])
+        g.connection = sqlite3.connect(
+            app.config['DB'], detect_types=sqlite3.PARSE_DECLTYPES)
         g.connection.execute('PRAGMA foreign_keys')
         g.connection.row_factory = sqlite3.Row
     return g.connection
@@ -152,29 +158,135 @@ def password_reset(uuid):
 
 # Spectacles
 @app.route('/spectacles')
+@app.route('/spectacles/<int:year>/<int:month>')
 @authenticated
-def spectacles():
-    return render_template('spectacles.jinja2.html')
+def spectacles(year=None, month=None):
+    if None in (year, month):
+        today = date.today()
+        year, month = today.year, today.month
+    start = date(year, month, 1)
+    stop = date(year, month, calendar.monthrange(year, month)[1])
+    previous = start - timedelta(days=1)
+    next = stop + timedelta(days=1)
+    cursor = get_connection().cursor()
+    cursor.execute('''
+      SELECT
+        *
+      FROM
+        spectacle
+      WHERE
+        date_from BETWEEN ? AND ?
+      OR
+        date_to BETWEEN ? AND ?
+    ''', (start, stop) * 2)  # Assume that spectacles last less than one month
+    spectacles = cursor.fetchall()
+    return render_template(
+        'spectacles.jinja2.html', spectacles=spectacles, start=start,
+        stop=stop, previous=previous, next=next)
 
 
-@app.route('/spectacle/create')
+@app.route('/spectacle/create', methods=('GET', 'POST'))
+@authenticated
 def spectacle_create():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        parameters = dict(request.form)
+        parameters['trigram'] = parameters['place'][:3].upper()
+        cursor.execute('''
+            INSERT INTO
+              spectacle (
+                event, place, travel_time, trigram, date_from, date_to)
+            VALUES
+              (:event, :place, :travel_time, :trigram, :date_from, :date_to)
+            RETURNING
+              id
+        ''', parameters)
+        spectacle_id = cursor.fetchone()['id']
+        cursor.connection.commit()
+        flash('Le spectacle a été ajouté.')
+        return redirect(url_for('spectacle', spectacle_id=spectacle_id))
     return render_template('spectacle_create.jinja2.html')
 
 
-@app.route('/spectacle')
-def spectacle():
-    return render_template('spectacle.jinja2.html')
+@app.route('/spectacle/<int:spectacle_id>')
+@authenticated
+def spectacle(spectacle_id):
+    cursor = get_connection().cursor()
+    cursor.execute('''
+        SELECT
+          spectacle.*,
+          representation.name AS representation_name,
+          representation_date.date AS representation_date
+        FROM
+          spectacle
+        LEFT JOIN
+          representation
+        ON
+          spectacle.id = representation.spectacle_id
+        LEFT JOIN
+          representation_date
+        ON
+          representation.id = representation_date.id
+        WHERE
+          spectacle.id = ?
+    ''', (spectacle_id,))
+    representation_dates = cursor.fetchall()
+    return render_template(
+        'spectacle.jinja2.html', representation_dates=representation_dates)
 
 
-@app.route('/spectacle/update')
-def spectacle_update():
-    return render_template('spectacle_update.jinja2.html')
+@app.route('/spectacle/<int:spectacle_id>/update', methods=('GET', 'POST'))
+@authenticated
+def spectacle_update(spectacle_id):
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        parameters = dict(request.form)
+        parameters['id'] = spectacle_id
+        cursor.execute('''
+            UPDATE
+              spectacle
+            SET
+              date_from = :date_from,
+              date_to = :date_to,
+              event = :event,
+              travel_time = :travel_time,
+              trigram = :trigram
+            WHERE
+              id = :id
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        return redirect(url_for('spectacle', spectacle_id=spectacle_id))
+
+    cursor.execute('''
+        SELECT
+          spectacle.*,
+          representation.name AS representation_name,
+          representation_date.date AS representation_date
+        FROM
+          spectacle
+        LEFT JOIN
+          representation
+        ON
+          spectacle.id = representation.spectacle_id
+        LEFT JOIN
+          representation_date
+        ON
+          representation.id = representation_date.id
+        WHERE
+          spectacle.id = ?
+    ''', (spectacle_id,))
+    representation_dates = cursor.fetchall()
+    return render_template(
+        'spectacle_update.jinja2.html',
+        representation_dates=representation_dates)
 
 
 # Roadmaps
-@app.route('/roadmap')
-def roadmap():
+@app.route('/roadmap/<int:spectacle_id>')
+@authenticated
+def roadmap(spectacle_id):
     return render_template('roadmap.jinja2.html')
 
 

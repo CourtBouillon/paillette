@@ -21,7 +21,10 @@ CREATE TABLE spectacle (
   tour_id INTEGER REFERENCES tour(id),
   event TEXT NOT NULL,
   place TEXT NOT NULL,
-  trigram TEXT NOT NULL
+  travel_time TEXT NOT NULL,
+  trigram TEXT NOT NULL,
+  date_from DATE NOT NULL,
+  date_to DATE NOT NULL
 );
 
 CREATE TABLE roadmap (
@@ -44,6 +47,12 @@ CREATE TABLE availability (
 CREATE TABLE representation (
   id INTEGER PRIMARY KEY,
   spectacle_id INTEGER NOT NULL REFERENCES spectacle(id),
+  name TEXT NOT NULL
+);
+
+CREATE TABLE representation_date (
+  id INTEGER PRIMARY KEY,
+  representation_id INTEGER NOT NULL REFERENCES representation(id),
   date DATE NOT NULL
 );
 

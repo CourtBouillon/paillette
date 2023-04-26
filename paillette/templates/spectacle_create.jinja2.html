@@ -1,0 +1,26 @@
+{% set title = 'Nouveau spectacle' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <form method="post">
+    <label for="date_from">Date de départ</label>
+    <input id="date_from" name="date_from" type="date" required>
+
+    <label for="date_to">Date de retour</label>
+    <input id="date_to" name="date_to" type="date" required>
+
+    <label for="place">Ville</label>
+    <input id="place" name="place" required>
+
+    <label for="event">Évènement</label>
+    <input id="event" name="event" required>
+
+    <label for="travel_time">Temps de transport</label>
+    <input id="travel_time" name="travel_time" required>
+
+    <input type="submit" value="Ajouter">
+  </form>
+{% endblock %}

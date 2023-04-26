@@ -1,6 +1,36 @@
 INSERT INTO person (mail, firstname, lastname, phone) VALUES
-('elodie@example.com', 'Élodie', 'Admin', '01 23 45 67 89'),
-('amandine@example.com', 'Amandine', 'Échasses', '01 23 45 67 80');
+('elodie@example.com', 'Élodie', 'Dulac', '01 23 45 67 89'),
+('isabelle@example.com', 'Isabelle', 'Leclerc', '01 23 45 67 10'),
+('amandine@example.com', 'Amandine', 'Camala', '01 23 45 67 80'),
+('lucile@example.com', 'Lucile', 'Gérin', '01 23 45 67 81'),
+('fabrice@example.com', 'Fabrice', 'Duplan', '01 23 45 67 82'),
+('samantha@example.com', 'Samantha', 'Labale', '01 23 45 67 83'),
+('claire@example.com', 'Claire', 'Touillat', '01 23 45 67 84'),
+('charly@example.com', 'Charly', 'Perdon', '01 23 45 67 85'),
+('bertrand@example.com', 'Bertrand', 'Klamir', '01 23 45 67 86');
+
+INSERT INTO spectacle (event, place, travel_time, trigram, date_from, date_to) VALUES
+('Vive le printemps', 'Chamonix', '2h', 'CHA', '2023-01-23', '2023-01-25'),
+('Fête de la ville', 'Besançon', '2h30', 'BES', '2023-02-01', '2023-02-07'),
+('Carnaval', 'Grenoble', '1h30', 'GRE', '2023-03-01', '2023-03-03');
+
+INSERT INTO representation (name, spectacle_id) VALUES
+('Les sorcières', 1),
+('Échasses de rue', 2),
+('La grande bulle', 2),
+('Déambulations', 3);
+
+INSERT INTO representation_date (representation_id, date) VALUES
+(1, '2023-01-24'),
+(2, '2023-02-02'),
+(2, '2023-02-04'),
+(3, '2023-02-03'),
+(3, '2023-02-04'),
+(3, '2023-02-05'),
+(3, '2023-02-06'),
+(4, '2023-03-01'),
+(4, '2023-03-02'),
+(4, '2023-03-03');
 
 INSERT INTO makeup (name, color) VALUES
 ('Poissons', '#0000ff'),
@@ -24,4 +54,10 @@ INSERT INTO vehicle (name, color, type, license_plate, rented, rental_company_na
 ('Voiture de Paillette', '#008800', 'Voiture', 'YY-888-YY', FALSE, NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO artist (person_id, color) VALUES
-(2, '#880000');
+(3, '#800080'),
+(4, '#008800'),
+(5, '#880000'),
+(6, '#080080'),
+(7, '#880000'),
+(8, '#800080'),
+(9, '#800008');
