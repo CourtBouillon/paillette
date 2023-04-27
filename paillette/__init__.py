@@ -306,27 +306,6 @@ def availabilities_update():
     return render_template('availabilities_update.jinja2.html')
 
 
-# Tours
-@app.route('/tours')
-def tours():
-    return render_template('tours.jinja2.html')
-
-
-@app.route('/tour')
-def tour():
-    return render_template('tour.jinja2.html')
-
-
-@app.route('/tour/update')
-def tour_update():
-    return render_template('tour_update.jinja2.html')
-
-
-@app.route('/tour/create')
-def tour_create():
-    return render_template('tour_create.jinja2.html')
-
-
 # Persons
 @app.route('/person/update', methods=('GET', 'POST'))
 @app.route('/person/<int:person_id>/update', methods=('GET', 'POST'))

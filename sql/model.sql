@@ -10,15 +10,8 @@ CREATE TABLE person (
   reset_password TEXT
 );
 
-CREATE TABLE tour (
-  id INTEGER PRIMARY KEY,
-  name TEXT NOT NULL,
-  color TEXT
-);
-
 CREATE TABLE spectacle (
   id INTEGER PRIMARY KEY,
-  tour_id INTEGER REFERENCES tour(id),
   event TEXT NOT NULL,
   place TEXT NOT NULL,
   travel_time TEXT NOT NULL,
