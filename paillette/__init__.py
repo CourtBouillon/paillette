@@ -361,6 +361,7 @@ def costumes_followup(year=None, month=None):
     cursor.execute('''
         SELECT
           costume.id AS costume_id,
+          costume.name || '-' || costume.id AS grouper,
           costume.name,
           spectacle.trigram,
           spectacle.date_from,
@@ -376,7 +377,6 @@ def costumes_followup(year=None, month=None):
           OR date_to BETWEEN ? AND ?
         ) AS spectacle
         ON costume_spectacle.spectacle_id = spectacle.id
-        ORDER BY name
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     costumes_spectacles = cursor.fetchall()
     return render_template(
@@ -394,6 +394,7 @@ def makeups_followup(year=None, month=None):
     cursor.execute('''
         SELECT
           makeup.id AS makeup_id,
+          makeup.name || '-' || makeup.id AS grouper,
           makeup.name,
           spectacle.trigram,
           spectacle.date_from,
@@ -409,7 +410,6 @@ def makeups_followup(year=None, month=None):
           OR date_to BETWEEN ? AND ?
         ) AS spectacle
         ON makeup_spectacle.spectacle_id = spectacle.id
-        ORDER BY name
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     makeups_spectacles = cursor.fetchall()
     return render_template(
@@ -427,6 +427,7 @@ def sounds_followup(year=None, month=None):
     cursor.execute('''
         SELECT
           sound.id AS sound_id,
+          sound.name || '-' || sound.id AS grouper,
           sound.name,
           spectacle.trigram,
           spectacle.date_from,
@@ -442,7 +443,6 @@ def sounds_followup(year=None, month=None):
           OR date_to BETWEEN ? AND ?
         ) AS spectacle
         ON sound_spectacle.spectacle_id = spectacle.id
-        ORDER BY name
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     sounds_spectacles = cursor.fetchall()
     return render_template(
@@ -460,6 +460,7 @@ def vehicles_followup(year=None, month=None):
     cursor.execute('''
         SELECT
           vehicle.id AS vehicle_id,
+          vehicle.name || '-' || vehicle.id AS grouper,
           vehicle.name,
           spectacle.trigram,
           spectacle.date_from,
@@ -475,7 +476,6 @@ def vehicles_followup(year=None, month=None):
           OR date_to BETWEEN ? AND ?
         ) AS spectacle
         ON vehicle_spectacle.spectacle_id = spectacle.id
-        ORDER BY name
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     vehicles_spectacles = cursor.fetchall()
     return render_template(

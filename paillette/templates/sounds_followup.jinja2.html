@@ -29,7 +29,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for (sound_id, spectacles) in sounds_spectacles | groupby('sound_id') %}
+      {% for (grouper, spectacles) in sounds_spectacles | groupby('grouper') %}
         {% set sound = spectacles[0] %}
         <tr>
           <th>{{ sound.name }}</th>

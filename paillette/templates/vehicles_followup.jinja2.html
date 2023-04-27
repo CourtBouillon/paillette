@@ -29,7 +29,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for (vehicle_id, spectacles) in vehicles_spectacles | groupby('vehicle_id') %}
+      {% for (grouper, spectacles) in vehicles_spectacles | groupby('grouper') %}
         {% set vehicle = spectacles[0] %}
         <tr>
           <th>{{ vehicle.name }}</th>
