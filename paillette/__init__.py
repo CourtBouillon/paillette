@@ -699,7 +699,29 @@ def artist_update(artist_id):
     return render_template('artist_update.jinja2.html', artist=artist)
 
 
-@app.route('/artist/create')
+@app.route('/artist/create', methods=('GET', 'POST'))
 @authenticated
 def artist_create():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        parameters = dict(request.form)
+        cursor.execute('''
+            INSERT INTO
+              person (mail, firstname, lastname, phone)
+            VALUES
+              (:mail, :firstname, :lastname, :phone)
+            RETURNING
+              id
+        ''', parameters)
+        parameters['person_id'] = cursor.fetchone()['id']
+        cursor.execute('''
+            INSERT INTO
+              artist (person_id, color)
+            VALUES
+              (:person_id, :color)
+        ''', parameters)
+        cursor.connection.commit()
+        flash('L’artiste a été ajouté.')
+        return redirect(url_for('artists'))
+
     return render_template('artist_create.jinja2.html')

@@ -3,9 +3,9 @@
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>Ajouter un artiste</h2>
+  <h2>{{ title }}</h2>
 
-  <form>
+  <form method="post">
     <label for="firstname">Prénom</label>
     <input id="firstname" name="firstname" required>
 
