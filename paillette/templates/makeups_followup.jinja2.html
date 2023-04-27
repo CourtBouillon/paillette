@@ -1,0 +1,50 @@
+{% set title = 'Suivi du maquillage' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <ul>
+    <li><a href="{{ url_for('artists_followup', year=start.year, month=start.month) }}">Artistes</a></li>
+    <li><a href="{{ url_for('costumes_followup', year=start.year, month=start.month) }}">Costumes</a></li>
+    <li><a href="{{ url_for('makeups_followup', year=start.year, month=start.month) }}">Maquillage</a></li>
+    <li><a href="{{ url_for('sounds_followup', year=start.year, month=start.month) }}">Son</a></li>
+    <li><a href="{{ url_for('vehicles_followup', year=start.year, month=start.month) }}">Véhicules</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="{{ url_for('makeups_followup', year=previous.year, month=previous.month) }}">Mois précédent</a></li>
+    <li>{{ start.strftime('%B %Y') | capitalize }}</li>
+    <li><a href="{{ url_for('makeups_followup', year=next.year, month=next.month) }}">Mois suivant</a></li>
+  </ul>
+
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        {% for i in range(1, stop.day + 1) %}
+          <th>{{ start.replace(day=i).strftime('%d/%m') }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for (makeup_id, spectacles) in makeups_spectacles | groupby('makeup_id') %}
+        {% set makeup = spectacles[0] %}
+        <tr>
+          <th>{{ makeup.name }}</th>
+          {% for i in range(1, stop.day + 1) %}
+            {% set day = start.replace(day=i) %}
+            <td>
+              {% for spectacle in spectacles %}
+                {% if spectacle.date_from and spectacle.date_from <= day <= spectacle.date_to %}
+                  {{ spectacle.trigram }}
+                {% endif %}
+              {% endfor %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -12,13 +12,15 @@ INSERT INTO person (mail, firstname, lastname, phone) VALUES
 INSERT INTO spectacle (event, place, travel_time, trigram, date_from, date_to) VALUES
 ('Vive le printemps', 'Chamonix', '2h', 'CHA', '2023-01-23', '2023-01-25'),
 ('Fête de la ville', 'Besançon', '2h30', 'BES', '2023-02-01', '2023-02-07'),
+('Défilé de la Tour Eiffel', 'Paris', '4h30', 'PAR', '2023-02-10', '2023-02-12'),
 ('Carnaval', 'Grenoble', '1h30', 'GRE', '2023-03-01', '2023-03-03');
 
 INSERT INTO representation (name, spectacle_id) VALUES
 ('Les sorcières', 1),
 ('Échasses de rue', 2),
 ('La grande bulle', 2),
-('Déambulations', 3);
+('Défilé', 3),
+('Déambulations', 4);
 
 INSERT INTO representation_date (representation_id, date) VALUES
 (1, '2023-01-24'),
@@ -28,30 +30,63 @@ INSERT INTO representation_date (representation_id, date) VALUES
 (3, '2023-02-04'),
 (3, '2023-02-05'),
 (3, '2023-02-06'),
-(4, '2023-03-01'),
-(4, '2023-03-02'),
-(4, '2023-03-03');
+(4, '2023-02-11'),
+(5, '2023-03-01'),
+(5, '2023-03-02'),
+(5, '2023-03-03');
 
 INSERT INTO makeup (name, color) VALUES
 ('Poissons', '#0000ff'),
 ('Végétaux', '#008800'),
 ('Corail', '#888800'),
 ('Nuit', '#000088'),
-('Inconnue', NULL);
+('Petite boîte', NULL);
+
+INSERT INTO makeup_spectacle (makeup_id, spectacle_id) VALUES
+(1, 1),
+(1, 2),
+(2, 2),
+(2, 3),
+(3, 3),
+(1, 4),
+(5, 4);
 
 INSERT INTO costume (name, color) VALUES
 ('Clown', '#0000FF'),
 ('Bulle', '#008800'),
 ('Paillettes', NULL);
 
+INSERT INTO costume_spectacle (costume_id, spectacle_id) VALUES
+(1, 1),
+(1, 2),
+(2, 2),
+(2, 3),
+(3, 3),
+(1, 4);
+
 INSERT INTO sound (name, color) VALUES
 ('Enceintes', '#0000FF'),
 ('Gros sound system', '#008800'),
 ('Kit de son', NULL);
 
+INSERT INTO sound_spectacle (sound_id, spectacle_id) VALUES
+(1, 1),
+(1, 2),
+(2, 2),
+(2, 3),
+(3, 3),
+(1, 4);
+
 INSERT INTO vehicle (name, color, type, license_plate, rented, rental_company_name, rental_company_hours, rental_company_address, rented_from, rented_to) VALUES
 ('Gros camion', '#0000FF', 'Camion', 'XX-777-XX', TRUE, 'Loca-Voiture', 'Du lundi au vendredi de 6h à 22h\nDu samedi au dimanche de 7h à 20h', '6 rue de la barre\n69001 Lyon', '2023-02-02', '2023-04-01'),
 ('Voiture de Paillette', '#008800', 'Voiture', 'YY-888-YY', FALSE, NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO vehicle_spectacle (vehicle_id, spectacle_id) VALUES
+(1, 1),
+(1, 2),
+(2, 2),
+(2, 3),
+(2, 4);
 
 INSERT INTO artist (person_id, color) VALUES
 (3, '#800080'),

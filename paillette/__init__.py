@@ -52,6 +52,17 @@ def get_person():
     return g.person
 
 
+def get_date_data(year, month):
+    if None in (year, month):
+        today = date.today()
+        year, month = today.year, today.month
+    start = date(year, month, 1)
+    stop = date(year, month, calendar.monthrange(year, month)[1])
+    previous = start - timedelta(days=1)
+    next = stop + timedelta(days=1)
+    return year, month, start, stop, previous, next
+
+
 def authenticated(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
@@ -161,13 +172,7 @@ def password_reset(uuid):
 @app.route('/spectacles/<int:year>/<int:month>')
 @authenticated
 def spectacles(year=None, month=None):
-    if None in (year, month):
-        today = date.today()
-        year, month = today.year, today.month
-    start = date(year, month, 1)
-    stop = date(year, month, calendar.monthrange(year, month)[1])
-    previous = start - timedelta(days=1)
-    next = stop + timedelta(days=1)
+    year, month, start, stop, previous, next = get_date_data(year, month)
     cursor = get_connection().cursor()
     cursor.execute('''
       SELECT
@@ -178,7 +183,7 @@ def spectacles(year=None, month=None):
         date_from BETWEEN ? AND ?
       OR
         date_to BETWEEN ? AND ?
-    ''', (start, stop) * 2)  # Assume that spectacles last less than one month
+    ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     spectacles = cursor.fetchall()
     return render_template(
         'spectacles.jinja2.html', spectacles=spectacles, start=start,
@@ -296,9 +301,180 @@ def roadmap_send():
 
 
 # Follow-ups
-@app.route('/followups')
-def followups():
-    return render_template('followups.jinja2.html')
+@app.route('/artists/followup')
+@app.route('/artists/followup/<int:year>/<int:month>')
+@authenticated
+def artists_followup(year=None, month=None):
+    year, month, start, stop, previous, next = get_date_data(year, month)
+    artists_spectacles = []
+    return render_template(
+        'artists_followup.jinja2.html',
+        artists_spectacles=artists_spectacles, start=start, stop=stop,
+        previous=previous, next=next)
+
+
+@app.route('/costumes/followup')
+@app.route('/costumes/followup/<int:year>/<int:month>')
+@authenticated
+def costumes_followup(year=None, month=None):
+    year, month, start, stop, previous, next = get_date_data(year, month)
+    cursor = get_connection().cursor()
+    cursor.execute('''
+        SELECT
+          costume.id AS costume_id,
+          costume.name,
+          spectacle.trigram,
+          spectacle.date_from,
+          spectacle.date_to
+        FROM
+          costume
+        LEFT JOIN
+          costume_spectacle
+        ON
+          costume.id = costume_spectacle.costume_id
+        LEFT JOIN (
+          SELECT
+            *
+          FROM
+            spectacle
+          WHERE
+            (date_from IS NULL AND date_to IS NULL)
+          OR
+            date_from BETWEEN ? AND ?
+          OR
+            date_to BETWEEN ? AND ?
+        ) AS spectacle
+        ON
+          costume_spectacle.spectacle_id = spectacle.id
+      ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
+    costumes_spectacles = cursor.fetchall()
+    return render_template(
+        'costumes_followup.jinja2.html',
+        costumes_spectacles=costumes_spectacles, start=start, stop=stop,
+        previous=previous, next=next)
+
+
+@app.route('/makeups/followup')
+@app.route('/makeups/followup/<int:year>/<int:month>')
+@authenticated
+def makeups_followup(year=None, month=None):
+    year, month, start, stop, previous, next = get_date_data(year, month)
+    cursor = get_connection().cursor()
+    cursor.execute('''
+        SELECT
+          makeup.id AS makeup_id,
+          makeup.name,
+          spectacle.trigram,
+          spectacle.date_from,
+          spectacle.date_to
+        FROM
+          makeup
+        LEFT JOIN
+          makeup_spectacle
+        ON
+          makeup.id = makeup_spectacle.makeup_id
+        LEFT JOIN (
+          SELECT
+            *
+          FROM
+            spectacle
+          WHERE
+            (date_from IS NULL AND date_to IS NULL)
+          OR
+            date_from BETWEEN ? AND ?
+          OR
+            date_to BETWEEN ? AND ?
+        ) AS spectacle
+        ON
+          makeup_spectacle.spectacle_id = spectacle.id
+      ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
+    makeups_spectacles = cursor.fetchall()
+    return render_template(
+        'makeups_followup.jinja2.html',
+        makeups_spectacles=makeups_spectacles, start=start, stop=stop,
+        previous=previous, next=next)
+
+
+@app.route('/sounds/followup')
+@app.route('/sounds/followup/<int:year>/<int:month>')
+@authenticated
+def sounds_followup(year=None, month=None):
+    year, month, start, stop, previous, next = get_date_data(year, month)
+    cursor = get_connection().cursor()
+    cursor.execute('''
+        SELECT
+          sound.id AS sound_id,
+          sound.name,
+          spectacle.trigram,
+          spectacle.date_from,
+          spectacle.date_to
+        FROM
+          sound
+        LEFT JOIN
+          sound_spectacle
+        ON
+          sound.id = sound_spectacle.sound_id
+        LEFT JOIN (
+          SELECT
+            *
+          FROM
+            spectacle
+          WHERE
+            (date_from IS NULL AND date_to IS NULL)
+          OR
+            date_from BETWEEN ? AND ?
+          OR
+            date_to BETWEEN ? AND ?
+        ) AS spectacle
+        ON
+          sound_spectacle.spectacle_id = spectacle.id
+      ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
+    sounds_spectacles = cursor.fetchall()
+    return render_template(
+        'sounds_followup.jinja2.html',
+        sounds_spectacles=sounds_spectacles, start=start, stop=stop,
+        previous=previous, next=next)
+
+
+@app.route('/vehicles/followup')
+@app.route('/vehicles/followup/<int:year>/<int:month>')
+@authenticated
+def vehicles_followup(year=None, month=None):
+    year, month, start, stop, previous, next = get_date_data(year, month)
+    cursor = get_connection().cursor()
+    cursor.execute('''
+        SELECT
+          vehicle.id AS vehicle_id,
+          vehicle.name,
+          spectacle.trigram,
+          spectacle.date_from,
+          spectacle.date_to
+        FROM
+          vehicle
+        LEFT JOIN
+          vehicle_spectacle
+        ON
+          vehicle.id = vehicle_spectacle.vehicle_id
+        LEFT JOIN (
+          SELECT
+            *
+          FROM
+            spectacle
+          WHERE
+            (date_from IS NULL AND date_to IS NULL)
+          OR
+            date_from BETWEEN ? AND ?
+          OR
+            date_to BETWEEN ? AND ?
+        ) AS spectacle
+        ON
+          vehicle_spectacle.spectacle_id = spectacle.id
+      ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
+    vehicles_spectacles = cursor.fetchall()
+    return render_template(
+        'vehicles_followup.jinja2.html',
+        vehicles_spectacles=vehicles_spectacles, start=start, stop=stop,
+        previous=previous, next=next)
 
 
 @app.route('/availabilities/update')
