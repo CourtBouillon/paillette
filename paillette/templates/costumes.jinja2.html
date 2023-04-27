@@ -9,11 +9,24 @@
     <li><a href="{{ url_for('costume_create') }}">Ajouter un costume</a></li>
   </ul>
 
-  <dl>
-    {% for costume in costumes %}
-      <dt{% if costume.color %} data-color="{{ costume.color }}"{% endif %}>{{ costume.name }}</dt>
-      <dd><a href="{{ url_for('costume_update', costume_id=costume.id) }}">Éditer</a></dd>
-      <dd>Supprimer</dd>
-    {% endfor %}
-  </dl>
+  {% for hidden, costumes in costumes | groupby('hidden') | sort %}
+    {% if hidden %}
+      <details>
+        <summary>Costumes cachés</summary>
+    {% endif %}
+    <dl>
+      {% for costume in costumes %}
+        <dt{% if costume.color %} data-color="{{ costume.color }}"{% endif %}>{{ costume.name }}</dt>
+        <dd><a href="{{ url_for('costume_update', costume_id=costume.id) }}">Éditer</a></dd>
+        {% if hidden %}
+          <dd><a href="{{ url_for('show', type='costume', id=costume.id) }}">Montrer</a></dd>
+        {% else %}
+          <dd><a href="{{ url_for('hide', type='costume', id=costume.id) }}">Cacher</a></dd>
+        {% endif %}
+      {% endfor %}
+    </dl>
+    {% if hidden %}
+      </details>
+    {% endif %}
+  {% endfor %}
 {% endblock %}

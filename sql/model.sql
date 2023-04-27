@@ -28,7 +28,8 @@ CREATE TABLE roadmap (
 CREATE TABLE artist (
   id INTEGER PRIMARY KEY,
   person_id INTEGER NOT NULL REFERENCES person(id),
-  color TEXT
+  color TEXT,
+  hidden BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE availability (
@@ -58,7 +59,8 @@ CREATE TABLE artist_representation (
 CREATE TABLE costume (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
-  color TEXT
+  color TEXT,
+  hidden BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE costume_spectacle (
@@ -70,7 +72,8 @@ CREATE TABLE costume_spectacle (
 CREATE TABLE makeup (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
-  color TEXT
+  color TEXT,
+  hidden BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE makeup_spectacle (
@@ -82,7 +85,8 @@ CREATE TABLE makeup_spectacle (
 CREATE TABLE sound (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
-  color TEXT
+  color TEXT,
+  hidden BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE sound_spectacle (
@@ -102,7 +106,8 @@ CREATE TABLE vehicle (
   rental_company_hours TEXT,
   rental_company_address TEXT,
   rented_from DATE,
-  rented_to DATE
+  rented_to DATE,
+  hidden BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE vehicle_spectacle (

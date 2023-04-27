@@ -9,11 +9,24 @@
     <li><a href="{{ url_for('vehicle_create') }}">Ajouter un vehicule</a></li>
   </ul>
 
-  <dl>
-    {% for vehicle in vehicles %}
-      <dt{% if vehicle.color %} data-color="{{ vehicle.color }}"{% endif %}>{{ vehicle.name }}</dt>
-      <dd><a href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">Éditer</a></dd>
-      <dd>Supprimer</dd>
-    {% endfor %}
-  </dl>
+  {% for hidden, vehicles in vehicles | groupby('hidden') | sort %}
+    {% if hidden %}
+      <details>
+        <summary>Véhicules cachés</summary>
+    {% endif %}
+    <dl>
+      {% for vehicle in vehicles %}
+        <dt{% if vehicle.color %} data-color="{{ vehicle.color }}"{% endif %}>{{ vehicle.name }}</dt>
+        <dd><a href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">Éditer</a></dd>
+        {% if hidden %}
+          <dd><a href="{{ url_for('show', type='vehicle', id=vehicle.id) }}">Montrer</a></dd>
+        {% else %}
+          <dd><a href="{{ url_for('hide', type='vehicle', id=vehicle.id) }}">Cacher</a></dd>
+        {% endif %}
+      {% endfor %}
+    </dl>
+    {% if hidden %}
+      </details>
+    {% endif %}
+  {% endfor %}
 {% endblock %}

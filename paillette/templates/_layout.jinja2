@@ -21,6 +21,11 @@
             <li><a href="{{ url_for('vehicles') }}">Véhicules</a></li>
             <li><a href="{{ url_for('logout') }}">Déconnexion</a></li>
           </ul>
+          {% if request.endpoint.endswith(('_create', '_update', 'hide')) %}
+            <ul>
+              <li><a href="{{ request.referrer }}">Annuler</a></li>
+            </ul>
+          {% endif %}
         </nav>
       {% endif %}
 

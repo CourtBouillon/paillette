@@ -1,0 +1,13 @@
+{% set title = 'Montrer {}'.format(element.name) %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <p>Souhaitez vous réellement montrer {{ element.name }} ?</p>
+
+  <form method="post">
+    <input type="submit" value="Confirmer">
+  </form>
+{% endblock %}

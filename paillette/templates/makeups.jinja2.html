@@ -1,4 +1,4 @@
-{% set title = 'Boîtes de Maquillage' %}
+{% set title = 'Boîtes de maquillage' %}
 
 {% extends '_layout.jinja2' %}
 
@@ -9,11 +9,24 @@
     <li><a href="{{ url_for('makeup_create') }}">Ajouter une boîte de maquillage</a></li>
   </ul>
 
-  <dl>
-    {% for makeup in makeups %}
-      <dt{% if makeup.color %} data-color="{{ makeup.color }}"{% endif %}>{{ makeup.name }}</dt>
-      <dd><a href="{{ url_for('makeup_update', makeup_id=makeup.id) }}">Éditer</a></dd>
-      <dd>Supprimer</dd>
-    {% endfor %}
-  </dl>
+  {% for hidden, makeups in makeups | groupby('hidden') | sort %}
+    {% if hidden %}
+      <details>
+        <summary>Boîtes de maquillage cachés</summary>
+    {% endif %}
+    <dl>
+      {% for makeup in makeups %}
+        <dt{% if makeup.color %} data-color="{{ makeup.color }}"{% endif %}>{{ makeup.name }}</dt>
+        <dd><a href="{{ url_for('makeup_update', makeup_id=makeup.id) }}">Éditer</a></dd>
+        {% if hidden %}
+          <dd><a href="{{ url_for('show', type='makeups', id=makeup.id) }}">Montrer</a></dd>
+        {% else %}
+          <dd><a href="{{ url_for('hide', type='makeups', id=makeup.id) }}">Cacher</a></dd>
+        {% endif %}
+      {% endfor %}
+    </dl>
+    {% if hidden %}
+      </details>
+    {% endif %}
+  {% endfor %}
 {% endblock %}

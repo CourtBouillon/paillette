@@ -13,7 +13,6 @@
     {% for person in persons %}
       <dt>{{ person.name }}</dt>
       <dd><a href="{{ url_for('person_update', person_id=person.id) }}">Éditer</a></dd>
-      <dd>Supprimer</dd>
     {% endfor %}
   </dl>
 {% endblock %}

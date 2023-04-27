@@ -167,6 +167,60 @@ def password_reset(uuid):
     return render_template('password_reset.jinja2.html')
 
 
+@app.route('/<type>/<int:id>/hide', methods=('GET', 'POST'))
+@authenticated
+def hide(type, id):
+    if type not in ('vehicle', 'makeup', 'sound', 'artist', 'costume'):
+        return abort(404)
+
+    cursor = get_connection().cursor()
+    if request.method == 'POST':
+        cursor.execute(f'UPDATE {type} SET hidden = TRUE WHERE id = ?', (id,))
+        cursor.connection.commit()
+        flash('L’élément a été caché.')
+        return redirect(url_for(f'{type}s'))
+
+    if type == 'artist':
+        cursor.execute('''
+            SELECT person.firstname || " " || person.lastname AS name
+            FROM person
+            JOIN artist
+            ON person.id = artist.person_id
+            WHERE artist.id = ?
+        ''', (id,))
+    else:
+        cursor.execute(f'SELECT * FROM {type} WHERE id = ?', (id,))
+    element = cursor.fetchone()
+    return render_template('hide.jinja2.html', element=element)
+
+
+@app.route('/<type>/<int:id>/show', methods=('GET', 'POST'))
+@authenticated
+def show(type, id):
+    if type not in ('vehicle', 'makeup', 'sound', 'artist', 'costume'):
+        return abort(404)
+
+    cursor = get_connection().cursor()
+    if request.method == 'POST':
+        cursor.execute(f'UPDATE {type} SET hidden = FALSE WHERE id = ?', (id,))
+        cursor.connection.commit()
+        flash('L’élément a été caché.')
+        return redirect(url_for(f'{type}s'))
+
+    if type == 'artist':
+        cursor.execute('''
+            SELECT person.firstname || " " || person.lastname AS name
+            FROM person
+            JOIN artist
+            ON person.id = artist.person_id
+            WHERE artist.id = ?
+        ''', (id,))
+    else:
+        cursor.execute(f'SELECT * FROM {type} WHERE id = ?', (id,))
+    element = cursor.fetchone()
+    return render_template('show.jinja2.html', element=element)
+
+
 # Spectacles
 @app.route('/spectacles')
 @app.route('/spectacles/<int:year>/<int:month>')
@@ -175,14 +229,11 @@ def spectacles(year=None, month=None):
     year, month, start, stop, previous, next = get_date_data(year, month)
     cursor = get_connection().cursor()
     cursor.execute('''
-      SELECT
-        *
-      FROM
-        spectacle
-      WHERE
-        date_from BETWEEN ? AND ?
-      OR
-        date_to BETWEEN ? AND ?
+        SELECT *
+        FROM spectacle
+        WHERE date_from BETWEEN ? AND ?
+        OR date_to BETWEEN ? AND ?
+        ORDER BY date_from
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     spectacles = cursor.fetchall()
     return render_template(
@@ -222,18 +273,13 @@ def spectacle(spectacle_id):
           spectacle.*,
           representation.name AS representation_name,
           representation_date.date AS representation_date
-        FROM
-          spectacle
-        LEFT JOIN
-          representation
-        ON
-          spectacle.id = representation.spectacle_id
-        LEFT JOIN
-          representation_date
-        ON
-          representation.id = representation_date.id
-        WHERE
-          spectacle.id = ?
+        FROM spectacle
+        LEFT JOIN representation
+        ON spectacle.id = representation.spectacle_id
+        LEFT JOIN representation_date
+        ON representation.id = representation_date.id
+        WHERE spectacle.id = ?
+        ORDER BY representation_name, representation_date
     ''', (spectacle_id,))
     representation_dates = cursor.fetchall()
     return render_template(
@@ -249,16 +295,14 @@ def spectacle_update(spectacle_id):
         parameters = dict(request.form)
         parameters['id'] = spectacle_id
         cursor.execute('''
-            UPDATE
-              spectacle
+            UPDATE spectacle
             SET
               date_from = :date_from,
               date_to = :date_to,
               event = :event,
               travel_time = :travel_time,
               trigram = :trigram
-            WHERE
-              id = :id
+            WHERE id = :id
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
@@ -269,18 +313,13 @@ def spectacle_update(spectacle_id):
           spectacle.*,
           representation.name AS representation_name,
           representation_date.date AS representation_date
-        FROM
-          spectacle
-        LEFT JOIN
-          representation
-        ON
-          spectacle.id = representation.spectacle_id
-        LEFT JOIN
-          representation_date
-        ON
-          representation.id = representation_date.id
-        WHERE
-          spectacle.id = ?
+        FROM spectacle
+        LEFT JOIN representation
+        ON spectacle.id = representation.spectacle_id
+        LEFT JOIN representation_date
+        ON representation.id = representation_date.id
+        WHERE spectacle.id = ?
+        ORDER BY representation_name, representation_date
     ''', (spectacle_id,))
     representation_dates = cursor.fetchall()
     return render_template(
@@ -326,26 +365,18 @@ def costumes_followup(year=None, month=None):
           spectacle.trigram,
           spectacle.date_from,
           spectacle.date_to
-        FROM
-          costume
-        LEFT JOIN
-          costume_spectacle
-        ON
-          costume.id = costume_spectacle.costume_id
+        FROM costume
+        LEFT JOIN costume_spectacle
+        ON costume.id = costume_spectacle.costume_id
         LEFT JOIN (
-          SELECT
-            *
-          FROM
-            spectacle
-          WHERE
-            (date_from IS NULL AND date_to IS NULL)
-          OR
-            date_from BETWEEN ? AND ?
-          OR
-            date_to BETWEEN ? AND ?
+          SELECT *
+          FROM spectacle
+          WHERE (date_from IS NULL AND date_to IS NULL)
+          OR date_from BETWEEN ? AND ?
+          OR date_to BETWEEN ? AND ?
         ) AS spectacle
-        ON
-          costume_spectacle.spectacle_id = spectacle.id
+        ON costume_spectacle.spectacle_id = spectacle.id
+        ORDER BY name
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     costumes_spectacles = cursor.fetchall()
     return render_template(
@@ -367,26 +398,18 @@ def makeups_followup(year=None, month=None):
           spectacle.trigram,
           spectacle.date_from,
           spectacle.date_to
-        FROM
-          makeup
-        LEFT JOIN
-          makeup_spectacle
-        ON
-          makeup.id = makeup_spectacle.makeup_id
+        FROM makeup
+        LEFT JOIN makeup_spectacle
+        ON makeup.id = makeup_spectacle.makeup_id
         LEFT JOIN (
-          SELECT
-            *
-          FROM
-            spectacle
-          WHERE
-            (date_from IS NULL AND date_to IS NULL)
-          OR
-            date_from BETWEEN ? AND ?
-          OR
-            date_to BETWEEN ? AND ?
+          SELECT *
+          FROM spectacle
+          WHERE (date_from IS NULL AND date_to IS NULL)
+          OR date_from BETWEEN ? AND ?
+          OR date_to BETWEEN ? AND ?
         ) AS spectacle
-        ON
-          makeup_spectacle.spectacle_id = spectacle.id
+        ON makeup_spectacle.spectacle_id = spectacle.id
+        ORDER BY name
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     makeups_spectacles = cursor.fetchall()
     return render_template(
@@ -408,26 +431,18 @@ def sounds_followup(year=None, month=None):
           spectacle.trigram,
           spectacle.date_from,
           spectacle.date_to
-        FROM
-          sound
-        LEFT JOIN
-          sound_spectacle
-        ON
-          sound.id = sound_spectacle.sound_id
+        FROM sound
+        LEFT JOIN sound_spectacle
+        ON sound.id = sound_spectacle.sound_id
         LEFT JOIN (
-          SELECT
-            *
-          FROM
-            spectacle
-          WHERE
-            (date_from IS NULL AND date_to IS NULL)
-          OR
-            date_from BETWEEN ? AND ?
-          OR
-            date_to BETWEEN ? AND ?
+          SELECT *
+          FROM spectacle
+          WHERE (date_from IS NULL AND date_to IS NULL)
+          OR date_from BETWEEN ? AND ?
+          OR date_to BETWEEN ? AND ?
         ) AS spectacle
-        ON
-          sound_spectacle.spectacle_id = spectacle.id
+        ON sound_spectacle.spectacle_id = spectacle.id
+        ORDER BY name
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     sounds_spectacles = cursor.fetchall()
     return render_template(
@@ -449,26 +464,18 @@ def vehicles_followup(year=None, month=None):
           spectacle.trigram,
           spectacle.date_from,
           spectacle.date_to
-        FROM
-          vehicle
-        LEFT JOIN
-          vehicle_spectacle
-        ON
-          vehicle.id = vehicle_spectacle.vehicle_id
+        FROM vehicle
+        LEFT JOIN vehicle_spectacle
+        ON vehicle.id = vehicle_spectacle.vehicle_id
         LEFT JOIN (
-          SELECT
-            *
-          FROM
-            spectacle
-          WHERE
-            (date_from IS NULL AND date_to IS NULL)
-          OR
-            date_from BETWEEN ? AND ?
-          OR
-            date_to BETWEEN ? AND ?
+          SELECT *
+          FROM spectacle
+          WHERE (date_from IS NULL AND date_to IS NULL)
+          OR date_from BETWEEN ? AND ?
+          OR date_to BETWEEN ? AND ?
         ) AS spectacle
-        ON
-          vehicle_spectacle.spectacle_id = spectacle.id
+        ON vehicle_spectacle.spectacle_id = spectacle.id
+        ORDER BY name
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     vehicles_spectacles = cursor.fetchall()
     return render_template(
@@ -501,15 +508,13 @@ def person_update(person_id=None):
         parameters = dict(request.form)
         parameters['id'] = person['id']
         cursor.execute('''
-            UPDATE
-              person
+            UPDATE person
             SET
               mail = :mail,
               firstname = :firstname,
               lastname = :lastname,
               phone = :phone
-            WHERE
-              id = :id
+            WHERE id = :id
         ''', parameters)
         if (password := request.form.get('password')):
             cursor.execute(
@@ -530,14 +535,11 @@ def persons():
       SELECT
         person.*,
         person.firstname || " " || person.lastname AS name
-      FROM
-        person
-      LEFT JOIN
-        artist
-      ON
-        person.id = artist.person_id
-      WHERE
-        artist.id IS NULL
+      FROM person
+      LEFT JOIN artist
+      ON person.id = artist.person_id
+      WHERE artist.id IS NULL
+      ORDER BY name
     ''')
     persons = cursor.fetchall()
     return render_template('persons.jinja2.html', persons=persons)
@@ -550,10 +552,8 @@ def person_create():
         cursor = get_connection().cursor()
         parameters = dict(request.form)
         cursor.execute('''
-            INSERT INTO
-              person (firstname, lastname, mail, phone)
-            VALUES
-              (:firstname, :lastname, :mail, :phone)
+            INSERT INTO person (firstname, lastname, mail, phone)
+            VALUES (:firstname, :lastname, :mail, :phone)
         ''', parameters)
         cursor.connection.commit()
         flash('La personne a été ajoutée.')
@@ -566,7 +566,7 @@ def person_create():
 @authenticated
 def costumes():
     cursor = get_connection().cursor()
-    cursor.execute('SELECT * FROM costume')
+    cursor.execute('SELECT * FROM costume ORDER BY name')
     costumes = cursor.fetchall()
     return render_template('costumes.jinja2.html', costumes=costumes)
 
@@ -580,13 +580,11 @@ def costume_update(costume_id):
         parameters = dict(request.form)
         parameters['id'] = costume_id
         cursor.execute('''
-            UPDATE
-              costume
+            UPDATE costume
             SET
               name = :name,
               color = :color
-            WHERE
-              id = :id
+            WHERE id = :id
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
@@ -604,10 +602,8 @@ def costume_create():
         cursor = get_connection().cursor()
         parameters = dict(request.form)
         cursor.execute('''
-            INSERT INTO
-              costume (name, color)
-            VALUES
-              (:name, :color)
+            INSERT INTO costume (name, color)
+            VALUES (:name, :color)
         ''', parameters)
         cursor.connection.commit()
         flash('Le costume a été créée.')
@@ -621,7 +617,7 @@ def costume_create():
 @authenticated
 def makeups():
     cursor = get_connection().cursor()
-    cursor.execute('SELECT * FROM makeup')
+    cursor.execute('SELECT * FROM makeup ORDER BY name')
     makeups = cursor.fetchall()
     return render_template('makeups.jinja2.html', makeups=makeups)
 
@@ -635,13 +631,11 @@ def makeup_update(makeup_id):
         parameters = dict(request.form)
         parameters['id'] = makeup_id
         cursor.execute('''
-            UPDATE
-              makeup
+            UPDATE makeup
             SET
               name = :name,
               color = :color
-            WHERE
-              id = :id
+            WHERE id = :id
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
@@ -659,10 +653,8 @@ def makeup_create():
         cursor = get_connection().cursor()
         parameters = dict(request.form)
         cursor.execute('''
-            INSERT INTO
-              makeup (name, color)
-            VALUES
-              (:name, :color)
+            INSERT INTO makeup (name, color)
+            VALUES (:name, :color)
         ''', parameters)
         cursor.connection.commit()
         flash('La boîte à maquillage a été créée.')
@@ -676,7 +668,7 @@ def makeup_create():
 @authenticated
 def sounds():
     cursor = get_connection().cursor()
-    cursor.execute('SELECT * FROM sound')
+    cursor.execute('SELECT * FROM sound ORDER BY name')
     sounds = cursor.fetchall()
     return render_template('sounds.jinja2.html', sounds=sounds)
 
@@ -690,13 +682,11 @@ def sound_update(sound_id):
         parameters = dict(request.form)
         parameters['id'] = sound_id
         cursor.execute('''
-            UPDATE
-              sound
+            UPDATE sound
             SET
               name = :name,
               color = :color
-            WHERE
-              id = :id
+            WHERE id = :id
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
@@ -714,10 +704,8 @@ def sound_create():
         cursor = get_connection().cursor()
         parameters = dict(request.form)
         cursor.execute('''
-            INSERT INTO
-              sound (name, color)
-            VALUES
-              (:name, :color)
+            INSERT INTO sound (name, color)
+            VALUES (:name, :color)
         ''', parameters)
         cursor.connection.commit()
         flash('Le matériel de son a été créée.')
@@ -731,7 +719,7 @@ def sound_create():
 @authenticated
 def vehicles():
     cursor = get_connection().cursor()
-    cursor.execute('SELECT * FROM vehicle')
+    cursor.execute('SELECT * FROM vehicle ORDER BY name')
     vehicles = cursor.fetchall()
     return render_template('vehicles.jinja2.html', vehicles=vehicles)
 
@@ -746,8 +734,7 @@ def vehicle_update(vehicle_id):
         parameters['id'] = vehicle_id
         parameters['rented'] = parameters['rental_status'] == 'rental'
         cursor.execute('''
-            UPDATE
-              vehicle
+            UPDATE vehicle
             SET
               name = :name,
               color = :color,
@@ -759,8 +746,7 @@ def vehicle_update(vehicle_id):
               rental_company_address = :rental_company_address,
               rented_from = :rented_from,
               rented_to = :rented_to
-            WHERE
-              id = :id
+            WHERE id = :id
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
@@ -809,12 +795,10 @@ def artists():
           person.lastname,
           person.phone,
           person.firstname || " " || person.lastname AS name
-        FROM
-          artist
-        JOIN
-          person
-        ON
-          artist.person_id = person.id
+        FROM artist
+        JOIN person
+        ON artist.person_id = person.id
+        ORDER BY name
     ''')
     artists = cursor.fetchall()
     return render_template('artists.jinja2.html', artists=artists)
@@ -829,26 +813,20 @@ def artist_update(artist_id):
         parameters = dict(request.form)
         parameters['id'] = artist_id
         cursor.execute('''
-            UPDATE
-              artist
-            SET
-              color = :color
-            WHERE
-              id = :id
-            RETURNING
-              person_id
+            UPDATE artist
+            SET color = :color
+            WHERE id = :id
+            RETURNING person_id
         ''', parameters)
         parameters['person_id'] = cursor.fetchone()['person_id']
         cursor.execute('''
-            UPDATE
-              person
+            UPDATE person
             SET
               mail = :mail,
               firstname = :firstname,
               lastname = :lastname,
               phone = :phone
-            WHERE
-              id = :person_id
+            WHERE id = :person_id
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
@@ -862,14 +840,10 @@ def artist_update(artist_id):
           person.lastname,
           person.phone,
           person.firstname || " " || person.lastname AS name
-        FROM
-          artist
-        JOIN
-          person
-        ON
-          artist.person_id = person.id
-        WHERE
-          artist.id = ?
+        FROM artist
+        JOIN person
+        ON artist.person_id = person.id
+        WHERE artist.id = ?
     ''', (artist_id,))
     artist = cursor.fetchone()
     return render_template('artist_update.jinja2.html', artist=artist)
@@ -882,19 +856,14 @@ def artist_create():
         cursor = get_connection().cursor()
         parameters = dict(request.form)
         cursor.execute('''
-            INSERT INTO
-              person (mail, firstname, lastname, phone)
-            VALUES
-              (:mail, :firstname, :lastname, :phone)
-            RETURNING
-              id
+            INSERT INTO person (mail, firstname, lastname, phone)
+            VALUES (:mail, :firstname, :lastname, :phone)
+            RETURNING id
         ''', parameters)
         parameters['person_id'] = cursor.fetchone()['id']
         cursor.execute('''
-            INSERT INTO
-              artist (person_id, color)
-            VALUES
-              (:person_id, :color)
+            INSERT INTO artist (person_id, color)
+            VALUES (:person_id, :color)
         ''', parameters)
         cursor.connection.commit()
         flash('L’artiste a été ajouté.')

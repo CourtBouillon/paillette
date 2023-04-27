@@ -1,4 +1,4 @@
-{% set title = 'Matériels de Son' %}
+{% set title = 'Matériels de son' %}
 
 {% extends '_layout.jinja2' %}
 
@@ -9,11 +9,25 @@
     <li><a href="{{ url_for('sound_create') }}">Ajouter un matériel de son</a></li>
   </ul>
 
-  <dl>
-    {% for sound in sounds %}
-      <dt{% if sound.color %} data-color="{{ sound.color }}"{% endif %}>{{ sound.name }}</dt>
-      <dd><a href="{{ url_for('sound_update', sound_id=sound.id) }}">Éditer</a></dd>
-      <dd>Supprimer</dd>
-    {% endfor %}
-  </dl>
+  {% for hidden, sounds in sounds | groupby('hidden') | sort %}
+    {% if hidden %}
+      <details>
+        <summary>Matériels de son cachés</summary>
+    {% endif %}
+    <dl>
+      <dl>
+        {% for sound in sounds %}
+          <dt{% if sound.color %} data-color="{{ sound.color }}"{% endif %}>{{ sound.name }}</dt>
+          <dd><a href="{{ url_for('sound_update', sound_id=sound.id) }}">Éditer</a></dd>
+          {% if hidden %}
+            <dd><a href="{{ url_for('show', type='sound', id=sound.id) }}">Montrer</a></dd>
+          {% else %}
+            <dd><a href="{{ url_for('hide', type='sound', id=sound.id) }}">Cacher</a></dd>
+          {% endif %}
+        {% endfor %}
+      </dl>
+    {% if hidden %}
+      </details>
+    {% endif %}
+  {% endfor %}
 {% endblock %}
