@@ -16,19 +16,18 @@
   </ul>
 
   {% for spectacle in spectacles %}
-    <a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">
-      <section>
-        <dl>
-          <dt>Date</dt>
-          <dd>Du {{ spectacle.date_from.strftime('%d/%m') }} au {{ spectacle.date_to.strftime('%d/%m') }}</dd>
-          <dt>Lieu</dt>
-          <dd>{{ spectacle.place }}</dd>
-          <dt>Évènement</dt>
-          <dd>{{ spectacle.event }}</dd>
-          <dt>Temps de transport</dt>
-          <dd>{{ spectacle.travel_time }}</dd>
-        </dl>
-      </section>
-    </a>
+    <section>
+      <h3><a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">{{ '{}, du {} au {}'.format(spectacle.place, spectacle.date_from.strftime('%d/%m'), spectacle.date_to.strftime('%d/%m')) }}</a></h3>
+      <dl>
+        <dt>Date</dt>
+        <dd>Du {{ spectacle.date_from.strftime('%d/%m') }} au {{ spectacle.date_to.strftime('%d/%m') }}</dd>
+        <dt>Lieu</dt>
+        <dd>{{ spectacle.place }}</dd>
+        <dt>Évènement</dt>
+        <dd>{{ spectacle.event }}</dd>
+        <dt>Temps de transport</dt>
+        <dd>{{ spectacle.travel_time }}</dd>
+      </dl>
+    </section>
   {% endfor %}
 {% endblock %}
