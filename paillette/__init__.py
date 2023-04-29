@@ -37,10 +37,7 @@ def close_connection():
 
 def get_person_from_id(person_id):
     cursor = get_connection().cursor()
-    cursor.execute(
-        'SELECT *, person.firstname || " " || person.lastname AS name '
-        'FROM person WHERE id = (?)',
-        (person_id,))
+    cursor.execute('SELECT * FROM person WHERE id = (?)', (person_id,))
     return cursor.fetchone()
 
 
@@ -182,7 +179,7 @@ def hide(type, id):
 
     if type == 'artist':
         cursor.execute('''
-            SELECT person.firstname || " " || person.lastname AS name
+            SELECT name
             FROM person
             JOIN artist
             ON person.id = artist.person_id
@@ -209,7 +206,7 @@ def show(type, id):
 
     if type == 'artist':
         cursor.execute('''
-            SELECT person.firstname || " " || person.lastname AS name
+            SELECT name
             FROM person
             JOIN artist
             ON person.id = artist.person_id
@@ -532,9 +529,7 @@ def person_update(person_id=None):
 def persons():
     cursor = get_connection().cursor()
     cursor.execute('''
-      SELECT
-        person.*,
-        person.firstname || " " || person.lastname AS name
+      SELECT person.*
       FROM person
       LEFT JOIN artist
       ON person.id = artist.person_id
@@ -793,8 +788,8 @@ def artists():
           person.mail,
           person.firstname,
           person.lastname,
-          person.phone,
-          person.firstname || " " || person.lastname AS name
+          person.name,
+          person.phone
         FROM artist
         JOIN person
         ON artist.person_id = person.id
@@ -838,8 +833,8 @@ def artist_update(artist_id):
           person.mail,
           person.firstname,
           person.lastname,
-          person.phone,
-          person.firstname || " " || person.lastname AS name
+          person.name,
+          person.phone
         FROM artist
         JOIN person
         ON artist.person_id = person.id
