@@ -12,7 +12,7 @@ from flask import (
     session, url_for)
 from werkzeug.security import check_password_hash, generate_password_hash
 
-setlocale(LC_ALL, 'fr_FR')
+setlocale(LC_ALL, 'fr_FR.utf8')
 
 app = Flask(__name__)
 app.config.update(
