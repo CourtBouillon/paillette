@@ -6,25 +6,158 @@
 {% block content %}
   <h2>{{ title }}</h2>
 
+  <h3>Résumé</h3>
   <form method="post">
+    <!--
+         Pareil que pour le formulaire de création pour les dates de spectacle et les dates de transport.
+    -->
     <label for="date_from">Date de départ</label>
     <input id="date_from" name="date_from" type="date" value="{{ spectacle.date_from }}" required>
 
     <label for="date_to">Date de retour</label>
     <input id="date_to" name="date_to" type="date" value="{{ spectacle.date_to }}" required>
 
-    <label for="place">Ville</label>
+    <label for="place">Lieu</label>
     <input id="place" name="place" value ="{{ spectacle.place }}" required>
 
-    <label for="event">Évènement</label>
-    <input id="event" name="event" value="{{ spectacle.event }}" required>
-
     <label for="travel_time">Temps de transport</label>
-    <input id="travel_time" name="travel_time" value="{{ spectacle.travel_time }}" required>
+    <input id="travel_time" name="travel_time" value="{{ spectacle.travel_time }}">
 
     <label for="trigram">Trigramme</label>
     <input id="trigram" name="trigram" value="{{ spectacle.trigram }}" required>
 
+    <label for="event">Évènement</label>
+    <input id="event" name="event" value="{{ spectacle.event }}" required>
+
+    <label for="link">Lien</label>
+    <input id="link" name="link">
+
+    <label for="configuration">Configuration</label>
+
+    <input id="configuration" name="configuration">
+    <label for="organizer">Organisateur</label>
+    <input id="organizer" name="organizer">
+
+    <label for="date_departure">Date de départ</label>
+    <input id="date_departure" name="date_departure" type="date">
+
+    <label for="date_return">Date de retour</label>
+    <input id="date_return" name="date_return" type="date">
+
+    <label for="spectacle">Spectacles</label>
+    <dl id="spectacles">
+      <dt><input id="spectacle_X" name="spectacle" value="Nom du spectacle"></dt>
+      <dd><a href="">Supprimer</a></dd>
+    </dl>
+    <input id="new_spectacle" name="new_spectacle"><p id="add_spectacle">Ajouter un spectacle</p>
+
     <input type="submit" value="Mettre à jour">
   </form>
+
+  <h3>Matériel Son</h3>
+  <dl>
+    <dt>Nom du matériel de son</dt>
+    <dd><a href="">Supprimer</a><dd>
+    <dt>Nom du matériel de son</dt>
+    <dd><a href="">Supprimer</a><dd>
+  </dl>
+  <form method="post">
+    <label for="sound">Matériel de son</label>
+    <select name="sound" id="sound">
+      <option>La liste du matériel de son disponible</option>
+    </select>
+
+    <input type="submit" value="Ajouter ce matériel">
+  </form>
+
+  <h3>Boîtes de Maquillage</h3>
+  <dl>
+    <dt>Nom de la boite</dt>
+    <dd><a href="">Supprimer</a><dd>
+    <dt>Nom de la boite</dt>
+    <dd><a href="">Supprimer</a><dd>
+  </dl>
+  <form method="post">
+    <label for="makeup">Boîte de maquillage</label>
+    <select name="makeup" id="makeup">
+      <option>La liste des boites disponibles</option>
+    </select>
+
+    <input type="submit" value="Ajouter cette boite">
+  </form>
+
+  <h3>Véhicules</h3>
+  <dl>
+    <dt>Nom du véhicule</dt>
+    <dd><a href="">Supprimer</a><dd>
+    <dt>Nom du véhicule</dt>
+    <dd><a href="">Supprimer</a><dd>
+  </dl>
+  <form method="post">
+    <label for="vehicule">Véhicule</label>
+    <select name="vehicule" id="vehicule">
+      <option>La liste des véhicules disponibles</option>
+    </select>
+
+    <input type="submit" value="Ajouter ce véhicule">
+  </form>
+
+  <h3>Participants</h3>
+  <h4>Tout le spectacle</h4>
+  <dl>
+    <dt>Nom artiste</dt>
+    <dd><a href="">Supprimer</a></dd>
+  </dl>
+  <h4>Le XX</h4>
+  <dl>
+    <dt>Nom artiste</dt>
+    <dd><a href="">Supprimer</a></dd>
+  </dl>
+  <form method="post">
+    <label for="artist">Artiste</label>
+    <select name="artist" id="artist">
+      <option>La liste des artistes disponibles</option>
+    </select>
+    <fieldset>
+      <legend>Disponibilité</legend>
+
+      <label for="full">Tout le spectacle</label>
+      <input type="radio" id="full" name="availability" value="full" checked>
+      <label for="XX">Le XX</label>
+      <input type="radio" id="XX" name="availability" value="XX">
+      <label for="YY">YY</label>
+      <input type="radio" id="YY" name="availability" value="YY" YY>
+    </fieldset>
+
+    <input type="submit" value="Ajouter cet artiste">
+  </form>
+
+  <script>
+   function add_spectacle_input() {
+       let parent = document.getElementById("spectacles");
+       let dts = parent.getElementsByTagName("dt");
+       let last_dd = dts[dts.length - 1].nextElementSibling;
+
+       let new_spectacle = document.getElementById("new_spectacle");
+
+       let id_input = Number(dts.length) + 1;
+       let new_input = document.createElement("input");
+       new_input.setAttribute("id", `spectacle_${id_input}`);
+       new_input.setAttribute("name", "spectacle");
+       new_input.setAttribute("value", new_spectacle.value);
+
+       let new_dt = document.createElement("dt");
+       new_dt.appendChild(new_input)
+
+       let new_dd = document.createElement("dd");
+       new_dd.innerHTML += '<a href="">Supprimer</a>';
+
+       parent.insertBefore(new_dt, last_dd.nextSibling);
+       parent.insertBefore(new_dd, new_dt.nextSibling);
+
+       new_spectacle.value = "";
+   }
+
+   document.getElementById("add_spectacle").addEventListener("click", (event) => add_spectacle_input());
+  </script>
 {% endblock %}
