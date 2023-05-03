@@ -136,7 +136,7 @@
    function add_spectacle_input() {
        let parent = document.getElementById("spectacles");
        let dts = parent.getElementsByTagName("dt");
-       let last_dd = dts[dts.length - 1].nextElementSibling;
+       let last_dd = parent.lastElementChild;
 
        let new_spectacle = document.getElementById("new_spectacle");
 
