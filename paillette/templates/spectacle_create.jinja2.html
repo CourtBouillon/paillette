@@ -6,21 +6,61 @@
   <h2>{{ title }}</h2>
 
   <form method="post">
+    <!--
+         Sur les spectacles, y a les dates du spectacle,
+         mais y a aussi les dates d’aller et retour niveau transport.
+         Peut-être reprendre le du/au pour les dates de spectacle.
+    -->
     <label for="date_from">Date de départ</label>
     <input id="date_from" name="date_from" type="date" required>
 
     <label for="date_to">Date de retour</label>
     <input id="date_to" name="date_to" type="date" required>
 
-    <label for="place">Ville</label>
+    <label for="place">Lieu</label>
     <input id="place" name="place" required>
+
+    <!-- le temps de transport n’y est pas forcément -->
+    <label for="travel_time">Temps de transport</label>
+    <input id="travel_time" name="travel_time">
 
     <label for="event">Évènement</label>
     <input id="event" name="event" required>
 
-    <label for="travel_time">Temps de transport</label>
-    <input id="travel_time" name="travel_time" required>
+    <label for="link">Lien</label>
+    <input id="link" name="link">
+
+    <label for="configuration">Configuration</label>
+    <input id="configuration" name="configuration">
+
+    <label for="organizer">Organisateur</label>
+    <input id="organizer" name="organizer">
+
+    <label for="date_departure">Date de départ</label>
+    <input id="date_departure" name="date_departure" type="date">
+
+    <label for="date_return">Date de retour</label>
+    <input id="date_return" name="date_return" type="date">
+
+    <label for="spectacle">Spectacle</label>
+    <input id="spectacle_1" name="spectacle">
+    <p id="add_spectacle">Ajouter un spectacle</p>
 
     <input type="submit" value="Ajouter">
   </form>
+
+  <script>
+   function add_spectacle_input() {
+       let p = document.getElementById("add_spectacle");
+       let parent = p.parentNode;
+       let id_input = Number(p.previousElementSibling.id.split("_")[1]) + 1;
+       let new_input = document.createElement("input");
+       new_input.setAttribute("id", `spectacle_${id_input}`);
+       new_input.setAttribute("name", "spectacle");
+
+       parent.insertBefore(new_input, p);
+   }
+
+   document.getElementById("add_spectacle").addEventListener("click", (event) => add_spectacle_input());
+  </script>
 {% endblock %}
