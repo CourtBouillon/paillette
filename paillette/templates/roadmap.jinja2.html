@@ -15,99 +15,120 @@
   <section>
     <h3>Résumé</h3>
 
-    <input id="place" name="place" value="le lieu, ONLA">
-    <input id="date_from" name="date_from" value="date de début du spectacle, ONLA">
-    <input id="date_to" name="date_to" value="date de fin du spectacle, ONLA">
-
-    <label for="event">Évènement</label>
-    <input id="event" name="event" value="nom de l’event, ONLA">
-
-    <label for="link">Lien</label>
-    <input id=link name="link" value="lien de l’event, ONLA">
-
-    <!-- date de départ, ONLA -->
-    <input id="date_departure" type="date">
-    <!-- date de retour, ONLA -->
-    <input id="date_return" type="date">
-
-    <dl id="spectacles">
-      <dt><input id="spectacle_1" value="nom du spectacle, ONLA"></dt>
-      <dd><a href="">Supprimer</a></dd>
-      <dt><input id="spectacle_2" value="nom du spectacle, ONLA"></dt>
-      <dd><a href="">Supprimer</a></dd>
-    </dl>
-    <input id="new_spectacle" name="new_spectacle"><p id="add_spectacle">Ajouter un spectacle</p>
-
-    <label for="sound">Sonorisation</label>
     <dl>
-      <dt>Nom du matériel de son</dt>
-      <dd><a href="">Supprimer</a></dd>
-      <dt>Nom du matériel de son</dt>
-      <dd><a href="">Supprimer</a><dd>
-    </dl>
-    <label for="sound_details">Autres informations pour la sonorisation</label>
-    <textarea id="sound_details" name="sound_details"></textarea>
+      <dt>Lieu</dt>
+      <dd>le lieu</dd>
 
-    <label for="makeup">Boîtes de maquillage</label>
-    <dl>
-      <dt>Nom de la boîte</dt>
-      <dd><a href="">Supprimer</a></dd>
-      <dt>Nom de la boîte</dt>
-      <dd><a href="">Supprimer</a><dd>
+      <dt>Du</dt>
+      <dd>date début spectacle</dd>
+
+      <dt>Au</dt>
+      <dd>date fin spectacle</dd>
+
+      <dt>Évènement</dt>
+      <dd>nom évènement</dd>
+
+      <dt>Lien</dt>
+      <dd>lien évènement</dd>
+
+      <dt>Départ le</dt>
+      <dd>date départ</dd>
+
+      <dt>Retour le</dt>
+      <dd>date retour</dd>
+
+      <dt>Spectacles</dt>
+      <dd>nom du spectacle</dd>
+      <dd>nom du spectacle</dd>
+
+      <dt>Sonorisation</dt>
+      <dd>matériel de son</dd>
+      <dd>matériel de son</dd>
+      <dd>
+        <label for="sound_details">Informations supplémentaire pour la sonorisation</label>
+        <textarea id="sound_details" name="sound_details"></textarea>
+      </dd>
+
+      <dt>Boîtes de maquillage</dt>
+      <dd>nom de la boîte</dd>
+      <dd>nom de la boîte</dd>
     </dl>
   </section>
 
   <section>
     <h3>Équipe</h3>
-    <dl id="team">
-      <dt>Nom de l’artiste</dt>
-      <dd><a href="">Supprimer</a></dd>
-      <dd><input type="checkbox" id="manager"><label>Régie</label></dd>
+
+    <dl>
+      <dt>Artistes</dt>
+      <dt>Tout les dates</dt>
+      <dd>nom prénom téléphone artiste</dd>
+      <dd>nom prénom téléphone artiste</dd>
+
+      <dt>Le XX</dt>
+      <dd>nom prénom téléphone artiste</dd>
+      <dd>nom prénom téléphone artiste</dd>
+
+      <dt>Régisseur</dt>
+      <dd>info régisseur</dd>
     </dl>
-    <label for="new_name">Nom</label>
-    <input id="new_name" name="new_name">
-    <label for="new_firstname">Prémom</label>
-    <input id="new_firstname" name="new_firstname">
-    <label for="new_manager">Régie</label>
-    <input type="checkbox" id="new_manager" name="new_manager">
-    <p id="add_person">Ajouter à l’équipe</p>
   </section>
 
   <section>
     <h3>Message Important</h3>
-    <textarea></textarea>
+    <label for="message">Message important</label>
+    <textarea id="message" name="message"></textarea>
   </section>
 
   <section>
     <h3>Moyens de paiement</h3>
+
     <label for="payment">Moyen de paiement</label>
-    <input id="new_payment" name="new_payment">
-    <p id="add_payment">Ajouter le moyen de paiement</p>
+    <textarea id="payment" name="payment"></textarea>
   </section>
 
   <section>
     <h3>Véhicules</h3>
 
+    <dl>
+      <!-- si pas location -->
+      <dt>nom du véhicule</dt>
+      <dd>commentaire du véhicule</dd>
+
+      <!-- si location -->
+      <dt>nom du véhicule</dt>
+      <dd>dates de location</dd>
+      <dd>commentaire du véhicule</dd>
+      <dt>nom de l’agence</dt>
+      <dd>adresse de l’agence</dd>
+      <dd>horaires de l’agence</dd>
   </section>
 
   <section>
     <h3>Contact sur place</h3>
-    <textarea></textarea>
+
+    <label for="onsite_contact">Contact sur place</label>
+    <textarea id="onsite_contact" name="onsite_contact"></textarea>
   </section>
 
   <section>
     <h3>Planning</h3>
 
+    <label for="planning">Planning</label>
+    <textarea id="planning" name="planning"></textarea>
   </section>
 
   <section>
     <h3>Hébergement</h3>
 
+    <label for="hosting">Hébergement</label>
+    <textarea id="hosting" name="hosting"></textarea>
   </section>
 
   <section>
     <h3>Repas</h3>
 
+    <label for="meal">Repas</label>
+    <textarea id="meal" name="meal"></textarea>
   </section>
 
   <section>
@@ -121,65 +142,6 @@
   </section>
 
   <script>
-   function add_spectacle_input() {
-       let parent = document.getElementById("spectacles");
-       let dts = parent.getElementsByTagName("dt");
-       let last_dd = parent.lastElementChild;
-
-       let new_spectacle = document.getElementById("new_spectacle");
-
-       let id_input = Number(dts.length) + 1;
-       let new_input = document.createElement("input");
-       new_input.setAttribute("id", `spectacle_${id_input}`);
-       new_input.setAttribute("name", "spectacle");
-       new_input.setAttribute("value", new_spectacle.value);
-
-       let new_dt = document.createElement("dt");
-       new_dt.appendChild(new_input)
-
-       let new_dd = document.createElement("dd");
-       new_dd.innerHTML += '<a href="">Supprimer</a>';
-
-       parent.insertBefore(new_dt, last_dd.nextSibling);
-       parent.insertBefore(new_dd, new_dt.nextSibling);
-
-       new_spectacle.value = "";
-   }
-
-   function add_person() {
-       let parent = document.getElementById("team");
-       let dts = parent.getElementsByTagName("dt");
-       let last_dd = parent.lastElementChild;
-
-       let name = document.getElementById("new_name");
-       let firstname = document.getElementById("new_firstname");
-       let is_manager = document.getElementById("new_manager");
-
-       let new_dt = document.createElement("dt");
-       new_dt.innerHTML += name.value + " " + firstname.value;
-
-       let new_dd = document.createElement("dd");
-       new_dd.innerHTML += '<a href="">Supprimer</a>';
-
-       let new_dd_checkbox = document.createElement("dd");
-
-       let new_checkbox = document.createElement("input");
-       new_checkbox.setAttribute("type", "checkbox");
-       new_checkbox.setAttribute("checked", is_manager.checked);
-
-       new_dd_checkbox.appendChild(new_checkbox);
-
-       new_dd_checkbox.innerHTML += '<label>Régie</label>';
-
-       parent.insertBefore(new_dt, last_dd.nextSibling);
-       parent.insertBefore(new_dd, new_dt.nextSibling);
-       parent.insertBefore(new_dd_checkbox, new_dd.nextSibling);
-
-       name.value = "";
-       firstname.value = "";
-       is_manager.checked = false;
-   }
-
    function add_file_input() {
        let p = document.getElementById("add_file");
        let parent = p.parentElement;
@@ -193,9 +155,6 @@
        parent.insertBefore(new_input, p);
    }
 
-   document.getElementById("add_spectacle").addEventListener("click", (event) => add_spectacle_input());
-   document.getElementById("add_person").addEventListener("click", (event) => add_person());
-   document.getElementById("add_payment").addEventListener("click", (event) => add_payment());
    document.getElementById("add_file").addEventListener("click", (event) => add_file_input());
   </script>
 {% endblock %}
