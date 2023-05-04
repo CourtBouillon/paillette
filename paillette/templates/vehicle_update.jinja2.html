@@ -44,8 +44,22 @@
     <label for="details">Informations concernant le véhicule</label>
     <textarea id="details" name="details"></textarea>
 
-    {# TODO: JS to hide rental company #}
-
     <input type="submit" value="Mettre à jour">
   </form>
+
+  <script>
+   function update_form() {
+       let rental = document.getElementById("rental").checked;
+
+       var rental_elements = document.querySelectorAll(
+           '[id^="rental_"], [id^="rented_"], [for^="rental_"], [for^="rented_"]');
+       for (element of rental_elements) {
+           element.hidden = !rental;
+       }
+   }
+
+   document.getElementById("rental").addEventListener("click", (event) => update_form());
+   document.getElementById("company").addEventListener("click", (event) => update_form());
+   window.onload = update_form;
+  </script>
 {% endblock %}
