@@ -7,154 +7,149 @@
 
   <ul class="actions">
     <li><a href="">Voir le spectacle</a></li>
-    <li><a href="">Sauvegarder</a></li>
     <li><a href="">Prévisuliser</a></li>
     <li><a href="{{ url_for('roadmap_send') }}">Envoyer</a></li>
   </ul>
 
-  <section>
-    <h3>Résumé</h3>
+  <form method="post">
+    <section>
+      <h3>Résumé</h3>
 
-    <dl>
-      <dt>Lieu</dt>
-      <dd>le lieu</dd>
+      <dl>
+        <dt>Lieu</dt>
+        <dd>le lieu</dd>
 
-      <dt>Du</dt>
-      <dd>date début spectacle</dd>
+        <dt>Du</dt>
+        <dd>date début spectacle</dd>
 
-      <dt>Au</dt>
-      <dd>date fin spectacle</dd>
+        <dt>Au</dt>
+        <dd>date fin spectacle</dd>
 
-      <dt>Évènement</dt>
-      <dd>nom évènement</dd>
+        <dt>Évènement</dt>
+        <dd>nom évènement</dd>
 
-      <dt>Lien</dt>
-      <dd>lien évènement</dd>
+        <dt>Lien</dt>
+        <dd>lien évènement</dd>
 
-      <dt>Départ le</dt>
-      <dd>date départ</dd>
+        <dt>Départ le</dt>
+        <dd>date départ</dd>
 
-      <dt>Retour le</dt>
-      <dd>date retour</dd>
+        <dt>Retour le</dt>
+        <dd>date retour</dd>
 
-      <dt>Spectacles</dt>
-      <dd>nom du spectacle</dd>
-      <dd>nom du spectacle</dd>
+        <dt>Spectacles</dt>
+        <dd>nom du spectacle</dd>
+        <dd>nom du spectacle</dd>
 
-      <dt>Sonorisation</dt>
-      <dd>matériel de son</dd>
-      <dd>matériel de son</dd>
-      <dd>
-        <label for="sound_details">Informations supplémentaire pour la sonorisation</label>
-        <textarea id="sound_details" name="sound_details"></textarea>
-      </dd>
+        <dt>Sonorisation</dt>
+        <dd>matériel de son</dd>
+        <dd>matériel de son</dd>
+        <dd>
+          <label for="sound_details">Informations supplémentaire pour la sonorisation</label>
+          <textarea id="sound_details" name="sound_details"></textarea>
+        </dd>
 
-      <dt>Boîtes de maquillage</dt>
-      <dd>nom de la boîte</dd>
-      <dd>nom de la boîte</dd>
-    </dl>
-  </section>
+        <dt>Boîtes de maquillage</dt>
+        <dd>nom de la boîte</dd>
+        <dd>nom de la boîte</dd>
+      </dl>
+    </section>
 
-  <section>
-    <h3>Équipe</h3>
+    <section>
+      <h3>Équipe</h3>
 
-    <dl>
-      <dt>Artistes</dt>
-      <dt>Tout les dates</dt>
-      <dd>nom prénom téléphone artiste</dd>
-      <dd>nom prénom téléphone artiste</dd>
+      <dl>
+        <dt>Artistes</dt>
+        <dt>Tout les dates</dt>
+        <dd>nom prénom téléphone artiste</dd>
+        <dd>nom prénom téléphone artiste</dd>
 
-      <dt>Le XX</dt>
-      <dd>nom prénom téléphone artiste</dd>
-      <dd>nom prénom téléphone artiste</dd>
+        <dt>Le XX</dt>
+        <dd>nom prénom téléphone artiste</dd>
+        <dd>nom prénom téléphone artiste</dd>
 
-      <dt>Régisseur</dt>
-      <dd>info régisseur</dd>
-    </dl>
-  </section>
+        <dt>Régisseur</dt>
+        <dd>info régisseur</dd>
+      </dl>
+    </section>
 
-  <section>
-    <h3>Message Important</h3>
-    <label for="message">Message important</label>
-    <textarea id="message" name="message"></textarea>
-  </section>
+    <section>
+      <h3>Message Important</h3>
+      <label for="message">Message important</label>
+      <textarea id="message" name="message"></textarea>
+    </section>
 
-  <section>
-    <h3>Moyens de paiement</h3>
+    <section>
+      <h3>Moyens de paiement</h3>
 
-    <label for="payment">Moyen de paiement</label>
-    <textarea id="payment" name="payment"></textarea>
-  </section>
+      <label for="payment">Moyen de paiement</label>
+      <textarea id="payment" name="payment"></textarea>
+    </section>
 
-  <section>
-    <h3>Véhicules</h3>
+    <section>
+      <h3>Véhicules</h3>
 
-    <dl>
-      <!-- si pas location -->
-      <dt>nom du véhicule</dt>
-      <dd>commentaire du véhicule</dd>
+      <dl>
+        <!-- si pas location -->
+        <dt>nom du véhicule</dt>
+        <dd>commentaire du véhicule</dd>
 
-      <!-- si location -->
-      <dt>nom du véhicule</dt>
-      <dd>dates de location</dd>
-      <dd>commentaire du véhicule</dd>
-      <dt>nom de l’agence</dt>
-      <dd>adresse de l’agence</dd>
-      <dd>horaires de l’agence</dd>
-  </section>
+        <!-- si location -->
+        <dt>nom du véhicule</dt>
+        <dd>dates de location</dd>
+        <dd>commentaire du véhicule</dd>
+        <dt>nom de l’agence</dt>
+        <dd>adresse de l’agence</dd>
+        <dd>horaires de l’agence</dd>
+    </section>
 
-  <section>
-    <h3>Contact sur place</h3>
+    <section>
+      <h3>Contact sur place</h3>
 
-    <label for="onsite_contact">Contact sur place</label>
-    <textarea id="onsite_contact" name="onsite_contact"></textarea>
-  </section>
+      <label for="onsite_contact">Contact sur place</label>
+      <textarea id="onsite_contact" name="onsite_contact"></textarea>
+    </section>
 
-  <section>
-    <h3>Planning</h3>
+    <section>
+      <h3>Planning</h3>
 
-    <label for="planning">Planning</label>
-    <textarea id="planning" name="planning"></textarea>
-  </section>
+      <label for="planning">Planning</label>
+      <textarea id="planning" name="planning"></textarea>
+    </section>
 
-  <section>
-    <h3>Hébergement</h3>
+    <section>
+      <h3>Hébergement</h3>
 
-    <label for="hosting">Hébergement</label>
-    <textarea id="hosting" name="hosting"></textarea>
-  </section>
+      <label for="hosting">Hébergement</label>
+      <textarea id="hosting" name="hosting"></textarea>
+    </section>
 
-  <section>
-    <h3>Repas</h3>
+    <section>
+      <h3>Repas</h3>
 
-    <label for="meal">Repas</label>
-    <textarea id="meal" name="meal"></textarea>
-  </section>
+      <label for="meal">Repas</label>
+      <textarea id="meal" name="meal"></textarea>
+    </section>
 
-  <section>
-    <h3>Pièces-jointes</h3>
+    <input type="submit" value="Sauvegarder la feuille">
+  </form>
 
-    <label for="attached_description">Description des pièces-jointes</label>
-    <textarea id="attached_description" name="attached_description"></textarea>
+  <form method="post">
+    <section>
+      <h3>Pièces-jointes</h3>
 
-    <input id="file_1" type="file">
-    <p id="add_file">Ajouter une pièce-jointe</p>    
-  </section>
+      <label for="attached_description">Description des pièces-jointes</label>
+      <textarea id="attached_description" name="attached_description"></textarea>
 
-  <script>
-   function add_file_input() {
-       let p = document.getElementById("add_file");
-       let parent = p.parentElement;
+      <dl>
+        <dt>Nom de la pièce jointe</dt>
+        <dd><a href="">Supprimer</a></dd>
+        <dd><img src=""></dd>
+      </dl>
 
-       let id_input = Number(p.previousElementSibling.id.split("_")[1]) + 1;
-
-       let new_input = document.createElement("input");
-       new_input.setAttribute("id", `file_${id_input}`);
-       new_input.setAttribute("type", "file");
-
-       parent.insertBefore(new_input, p);
-   }
-
-   document.getElementById("add_file").addEventListener("click", (event) => add_file_input());
-  </script>
+      <!-- TODO afficher des pièces-jointes déjà
+      <input id="file_" type="file">
+      <input type="submit" value="Ajouter la pièce-jointe">
+    </section>
+  </form>
 {% endblock %}
