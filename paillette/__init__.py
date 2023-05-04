@@ -517,6 +517,7 @@ def vehicles_followup(year=None, month=None):
 
 @app.route('/availabilities/<int:artist_id>/<date>/update',
            methods=('GET', 'POST'))
+@authenticated
 def availabilities_update(artist_id, date):
     cursor = get_connection().cursor()
 
