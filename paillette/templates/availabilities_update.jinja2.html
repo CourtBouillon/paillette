@@ -1,0 +1,38 @@
+{% set title = 'Disponibilités — {}'.format(artist.name) %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <form method="post">
+    <label for="date_from">Du</label>
+    <input id="date_from" name="date_from" value="{{ date }}" required>
+
+    <label for="date_to">Au</label>
+    <input id="date_to" name="date_to" value="{{ date }}" required>
+
+    <input id="unknown" name="availability" value="unknown" type="radio" {{ 'checked' if artist.available is none }}>
+    <label for="unknown">Inconnu</label>
+
+    <input id="unavailable" name="availability" value="unavailable" type="radio" {{ 'checked' if artist.available == 0 }}>
+    <label for="unavailable">Indisponible</label>
+
+    <input id="available" name="availability" value="available" type="radio" {{ 'checked' if artist.available == 1 }}>
+    <label for="available">Disponible</label>
+
+    <label for="spectacle_id">Spectacle</label>
+    <select id="spectacle_id" name="spectacle_id">
+      <option></option>
+      {% for spectacle in spectacles %}
+        <option value="{{ spectacle.id }}" {{ 'selected' if spectacle.id == artist.spectacle_id }}>
+          {{ spectacle.place }} — {{ spectacle.event }}
+        </option>
+      {% endfor %}
+    </select>
+
+    {# TODO: JS to hide spectacle when unavailable #}
+
+    <input type="submit" value="Mettre à jour">
+  </form>
+{% endblock %}

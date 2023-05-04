@@ -24,23 +24,33 @@
       <tr>
         <th></th>
         {% for i in range(1, stop.day + 1) %}
-          <th>{{ start.replace(day=i).strftime('%d/%m') }}</th>
+          <th>
+            {{ start.replace(day=i).strftime('%d/%m') }}
+            <span class="count">{{ artists_spectacles | selectattr('date.day', 'equalto', i) | list | count }}</span>
+          </th>
         {% endfor %}
       </tr>
     </thead>
     <tbody>
-      {% for (artist_id, spectacles) in artists_spectacles | groupby('artist_id') %}
+      {% for (grouper, spectacles) in artists_spectacles | groupby('grouper') %}
         {% set artist = spectacles[0] %}
         <tr>
-          <th>{{ artist.name }}</th>
+          <th>
+            {{ artist.name }}
+            <span class="count">{{ spectacles | selectattr('date') | list | length }}</span>
+          </th>
           {% for i in range(1, stop.day + 1) %}
             {% set day = start.replace(day=i) %}
             <td>
-              {% for spectacle in spectacles %}
-                {% if spectacle.date_from and spectacle.date_from <= day <= spectacle.date_to %}
+              <a href="{{ url_for('availabilities_update', artist_id=artist.artist_id, date=day) }}">
+                {% for spectacle in spectacles | selectattr('date', 'equalto', day) %}
                   {{ spectacle.trigram }}
-                {% endif %}
-              {% endfor %}
+                {% else %}
+                  {% for availability in availabilities | selectattr('date', 'equalto', day) | selectattr('id', 'equalto', artist.artist_id) %}
+                    {{ '1' if availability.available else '0' }}
+                  {% endfor %}
+                {% endfor %}
+              </a>
             </td>
           {% endfor %}
         </tr>

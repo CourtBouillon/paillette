@@ -342,11 +342,45 @@ def roadmap_send():
 @authenticated
 def artists_followup(year=None, month=None):
     year, month, start, stop, previous, next = get_date_data(year, month)
-    artists_spectacles = []
+    cursor = get_connection().cursor()
+    cursor.execute('''
+        SELECT
+          artist.id AS artist_id,
+          person.name || '-' || artist.id AS grouper,
+          person.name,
+          spectacle.trigram,
+          representation_date.date
+        FROM artist
+        JOIN person
+        ON artist.person_id = person.id
+        LEFT JOIN (
+          SELECT artist_id, representation_id, date
+          FROM representation_date
+          JOIN artist_representation_date
+          ON
+            artist_representation_date.representation_date_id =
+            representation_date.id
+          WHERE date BETWEEN ? AND ?
+        ) AS representation_date
+        ON artist.id = representation_date.artist_id
+        LEFT JOIN representation
+        ON representation_date.representation_id = representation.id
+        LEFT JOIN spectacle
+        ON representation.spectacle_id = spectacle.id
+      ''', (start, stop))
+    artists_spectacles = cursor.fetchall()
+    cursor.execute('''
+      SELECT artist.id, date, available
+      FROM artist
+      JOIN artist_availability
+      ON artist.id = artist_availability.artist_id
+      WHERE date BETWEEN ? AND ?
+    ''', (start, stop))
+    availabilities = cursor.fetchall()
     return render_template(
         'artists_followup.jinja2.html',
-        artists_spectacles=artists_spectacles, start=start, stop=stop,
-        previous=previous, next=next)
+        artists_spectacles=artists_spectacles, availabilities=availabilities,
+        start=start, stop=stop, previous=previous, next=next)
 
 
 @app.route('/costumes/followup')
@@ -481,9 +515,108 @@ def vehicles_followup(year=None, month=None):
         previous=previous, next=next)
 
 
-@app.route('/availabilities/update')
-def availabilities_update():
-    return render_template('availabilities_update.jinja2.html')
+@app.route('/availabilities/<int:artist_id>/<date>/update',
+           methods=('GET', 'POST'))
+def availabilities_update(artist_id, date):
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        parameters = dict(request.form)
+        parameters['artist_id'] = artist_id
+
+        cursor.execute('''
+          DELETE FROM artist_representation_date
+          WHERE id IN (
+            SELECT artist_representation_date.id
+            FROM artist_representation_date
+            JOIN representation_date
+            ON
+              artist_representation_date.representation_date_id =
+              representation_date.id
+            WHERE artist_id = :artist_id
+            AND date BETWEEN :date_from AND :date_to
+          )
+        ''', parameters)
+        add_availability = (
+            parameters['availability'] == 'available' and
+            'spectacle_id' in parameters)
+        if add_availability:
+            cursor.execute('''
+              INSERT INTO
+                artist_representation_date(artist_id, representation_date_id)
+              SELECT :artist_id, representation_date.id
+              FROM representation_date
+              JOIN representation
+              WHERE spectacle_id = :spectacle_id
+            AND date BETWEEN :date_from AND :date_to
+            ''', parameters)
+
+        cursor.execute('''
+          DELETE FROM artist_availability
+          WHERE artist_id = :artist_id
+          AND date BETWEEN :date_from AND :date_to
+        ''', parameters)
+        if parameters['availability'] in ('unavailable', 'available'):
+            parameters['available'] = parameters['availability'] == 'available'
+            cursor.execute('''
+              WITH RECURSIVE dates(date) AS (
+                SELECT date(:date_from)
+                UNION
+                SELECT date(date, '+1 day')
+                FROM dates
+                WHERE date < date(:date_to)
+              )
+              INSERT INTO artist_availability(artist_id, date, available)
+              SELECT :artist_id, date, :available
+              FROM dates
+            ''', parameters)
+
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        year, month = date[:7].split('-')
+        return redirect(url_for('artists_followup', year=year, month=month))
+
+    cursor.execute('''
+      SELECT
+        person.name,
+        artist_availability.available,
+        representation.spectacle_id
+      FROM artist
+      JOIN person
+      ON artist.person_id = person.id
+      LEFT JOIN (
+        SELECT artist_id, available
+        FROM artist_availability
+        WHERE date = ?
+      ) AS artist_availability
+      ON artist.id = artist_availability.artist_id
+      LEFT JOIN (
+        SELECT artist_id, spectacle_id
+        FROM artist_representation_date
+        JOIN (
+          SELECT id, representation_id
+          FROM representation_date
+          WHERE date = ?
+        ) AS representation_date
+        ON
+          artist_representation_date.representation_date_id =
+          representation_date.id
+        JOIN representation
+        ON representation_date.representation_id = representation.id
+      ) AS representation
+      ON artist.id = representation.artist_id
+      WHERE artist.id = ?
+    ''', (date, date, artist_id))
+    artist = cursor.fetchone()
+    cursor.execute('''
+      SELECT *
+      FROM spectacle
+      WHERE ? BETWEEN date_from AND date_to
+    ''', (date,))
+    spectacles = cursor.fetchall()
+    return render_template(
+        'availabilities_update.jinja2.html',
+        artist=artist, spectacles=spectacles, date=date)
 
 
 # Persons

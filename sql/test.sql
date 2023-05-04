@@ -96,3 +96,38 @@ INSERT INTO artist (person_id, color) VALUES
 (7, '#880000'),
 (8, '#800080'),
 (9, '#800008');
+
+INSERT INTO artist_representation_date (representation_date_id, artist_id) VALUES
+(1, 1),
+(1, 2),
+(2, 3),
+(2, 4),
+(3, 3),
+(3, 4),
+(4, 1),
+(4, 5),
+(4, 6),
+(5, 1),
+(5, 5),
+(5, 6),
+(6, 1),
+(6, 5),
+(7, 1),
+(7, 5),
+(8, 6),
+(9, 2),
+(9, 4),
+(10, 2),
+(10, 4),
+(11, 2),
+(11, 4);
+
+INSERT INTO artist_availability (artist_id, date, available) VALUES
+(1, '2023-03-27', false),
+(1, '2023-03-28', true),
+(1, '2023-03-29', true);
+INSERT INTO artist_availability (artist_id, date, available)
+SELECT artist_id, date, true
+FROM artist_representation_date
+JOIN representation_date
+ON artist_representation_date.representation_date_id = representation_date.id;

@@ -33,10 +33,11 @@ CREATE TABLE artist (
   hidden BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE availability (
+CREATE TABLE artist_availability (
   id INTEGER PRIMARY KEY,
   artist_id INTEGER NOT NULL REFERENCES artist(id),
-  date DATE NOT NULL
+  date DATE NOT NULL,
+  available BOOLEAN NOT NULL
 );
 
 CREATE TABLE representation (
@@ -51,10 +52,10 @@ CREATE TABLE representation_date (
   date DATE NOT NULL
 );
 
-CREATE TABLE artist_representation (
+CREATE TABLE artist_representation_date (
   id INTEGER PRIMARY KEY,
   artist_id INTEGER NOT NULL REFERENCES artist(id),
-  representation_id INTEGER NOT NULL REFERENCES representation(id)
+  representation_date_id INTEGER NOT NULL REFERENCES representation_date(id)
 );
 
 CREATE TABLE costume (
