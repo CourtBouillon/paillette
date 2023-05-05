@@ -78,7 +78,9 @@ INSERT INTO sound_spectacle (sound_id, spectacle_id) VALUES
 (1, 4);
 
 INSERT INTO vehicle (name, color, type, license_plate, rented, rental_company_name, rental_company_hours, rental_company_address, rented_from, rented_to) VALUES
-('Gros camion', '#0000FF', 'Camion', 'XX-777-XX', TRUE, 'Loca-Voiture', 'Du lundi au vendredi de 6h à 22h\nDu samedi au dimanche de 7h à 20h', '6 rue de la barre\n69001 Lyon', '2023-02-02', '2023-04-01'),
+('Gros camion', '#0000FF', 'Camion', 'XX-777-XX', TRUE, 'Loca-Voiture', 'Du lundi au vendredi de 6h à 22h
+Du samedi au dimanche de 7h à 20h', '6 rue de la barre
+69001 Lyon', '2023-02-02', '2023-04-01'),
 ('Voiture de Paillette', '#008800', 'Voiture', 'YY-888-YY', FALSE, NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO vehicle_spectacle (vehicle_id, spectacle_id) VALUES
