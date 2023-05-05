@@ -25,11 +25,6 @@ CREATE TABLE spectacle (
   date_to DATE NOT NULL
 );
 
-CREATE TABLE roadmap (
-  id INTEGER PRIMARY KEY,
-  spectacle_id INTEGER UNIQUE REFERENCES spectacle(id)
-);
-
 CREATE TABLE artist (
   id INTEGER PRIMARY KEY,
   person_id INTEGER NOT NULL REFERENCES person(id),

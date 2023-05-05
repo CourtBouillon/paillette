@@ -1,40 +1,13 @@
-{% set title = 'Feuille de route du spectacle ' %}
+{% set title = '{}, du {} au {} — Feuille de route'.format(spectacle.place, spectacle.date_from.strftime('%d/%m'), spectacle.date_to.strftime('%d/%m')) %}
 
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>Feuille de route du spectacle</h2>
+  <h2>{{ title }}</h2>
 
   <ul>
-    <li>Date</li>
-    <li>Lieu</li>
-    <li>Temps de transport</li>
-  </ul>
-
-  <dl>
-    <dt>Prénom Nom (Email)</dt>
-    <dd>Supprimer</dd>
-
-    <dt>Prénom Nom (Email)</dt>
-    <dd>Supprimer</dd>
-
-    <dt>Prénom Nom (Email)</dt>
-    <dd>Supprimer</dd>
-
-    <dt>Prénom Nom (Email)</dt>
-    <dd>Supprimer</dd>    
-  </dl>
-  
-  <form>
-    <select name="artist_id">
-      <option value="">Prénom Nom des artistes</option>
-    </select>
-
-    <input type="submit" value="Ajouter">
-  </form>
-
-  <ul>
-    <li><a href="">Annuler</a></li>
-    <li><a href="">Envoyer</a></li>
+    {% for recipient in recipients %}
+      <li>{{ recipient.mail }} ({{ recipient.name }})</li>
+    {% endfor %}
   </ul>
 {% endblock %}

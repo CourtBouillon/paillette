@@ -60,6 +60,75 @@ def get_date_data(year, month):
     return year, month, start, stop, previous, next
 
 
+def get_spectacle_data(spectacle_id):
+    cursor = get_connection().cursor()
+    cursor.execute('''
+      SELECT
+        spectacle.*,
+        representation.id AS representation_id,
+        representation.name AS representation_name,
+        representation_date.date AS representation_date,
+        representation_date.id AS representation_date_id,
+        artist_representation_date.id AS artist_representation_date_id,
+        person.name AS person_name
+      FROM spectacle
+      LEFT JOIN representation
+      ON spectacle.id = representation.spectacle_id
+      LEFT JOIN representation_date
+      ON representation.id = representation_date.id
+      LEFT JOIN artist_representation_date
+      ON
+        representation_date.id =
+        artist_representation_date.representation_date_id
+      LEFT JOIN artist
+      ON artist_representation_date.artist_id = artist.id
+      LEFT JOIN person
+      ON artist.person_id = person.id
+      WHERE spectacle.id = ?
+      ORDER BY representation_name, representation_date
+    ''', (spectacle_id,))
+    artist_representation_dates = cursor.fetchall()
+    cursor.execute('''
+      SELECT makeup.name
+      FROM makeup
+      JOIN makeup_spectacle
+      ON makeup.id = makeup_spectacle.makeup_id
+      WHERE makeup_spectacle.spectacle_id = ?
+    ''', (spectacle_id,))
+    makeups = cursor.fetchall()
+    cursor.execute('''
+      SELECT sound.name
+      FROM sound
+      JOIN sound_spectacle
+      ON sound.id = sound_spectacle.sound_id
+      WHERE sound_spectacle.spectacle_id = ?
+    ''', (spectacle_id,))
+    sounds = cursor.fetchall()
+    cursor.execute('''
+      SELECT vehicle.name
+      FROM vehicle
+      JOIN vehicle_spectacle
+      ON vehicle.id = vehicle_spectacle.vehicle_id
+      WHERE vehicle_spectacle.spectacle_id = ?
+    ''', (spectacle_id,))
+    vehicles = cursor.fetchall()
+    cursor.execute('''
+      SELECT costume.name
+      FROM costume
+      JOIN costume_spectacle
+      ON costume.id = costume_spectacle.costume_id
+      WHERE costume_spectacle.spectacle_id = ?
+    ''', (spectacle_id,))
+    costumes = cursor.fetchall()
+    return {
+        'artist_representation_dates': artist_representation_dates,
+        'makups': makeups,
+        'sounds': sounds,
+        'vehicles': vehicles,
+        'costumes': costumes,
+    }
+
+
 def authenticated(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
@@ -263,61 +332,8 @@ def spectacle_create():
 @app.route('/spectacle/<int:spectacle_id>')
 @authenticated
 def spectacle(spectacle_id):
-    cursor = get_connection().cursor()
-    cursor.execute('''
-      SELECT
-        spectacle.*,
-        representation.id AS representation_id,
-        representation.name AS representation_name,
-        representation_date.date AS representation_date,
-        representation_date.id AS representation_date_id,
-        artist_representation_date.id AS artist_representation_date_id,
-        person.name AS person_name
-      FROM spectacle
-      LEFT JOIN representation
-      ON spectacle.id = representation.spectacle_id
-      LEFT JOIN representation_date
-      ON representation.id = representation_date.id
-      LEFT JOIN artist_representation_date
-      ON
-        representation_date.id =
-        artist_representation_date.representation_date_id
-      LEFT JOIN artist
-      ON artist_representation_date.artist_id = artist.id
-      LEFT JOIN person
-      ON artist.person_id = person.id
-      WHERE spectacle.id = ?
-      ORDER BY representation_name, representation_date
-    ''', (spectacle_id,))
-    artist_representation_dates = cursor.fetchall()
-    cursor.execute('''
-      SELECT makeup.name
-      FROM makeup
-      JOIN makeup_spectacle
-      ON makeup.id = makeup_spectacle.makeup_id
-      WHERE makeup_spectacle.spectacle_id = ?
-    ''', (spectacle_id,))
-    makeups = cursor.fetchall()
-    cursor.execute('''
-      SELECT sound.name
-      FROM sound
-      JOIN sound_spectacle
-      ON sound.id = sound_spectacle.sound_id
-      WHERE sound_spectacle.spectacle_id = ?
-    ''', (spectacle_id,))
-    sounds = cursor.fetchall()
-    cursor.execute('''
-      SELECT vehicle.name
-      FROM vehicle
-      JOIN vehicle_spectacle
-      ON vehicle.id = vehicle_spectacle.vehicle_id
-      WHERE vehicle_spectacle.spectacle_id = ?
-    ''', (spectacle_id,))
-    vehicles = cursor.fetchall()
-    return render_template(
-        'spectacle.jinja2.html', makeups=makeups, sounds=sounds,
-        vehicles=vehicles,
-        artist_representation_dates=artist_representation_dates)
+    spectacle_data = get_spectacle_data(spectacle_id)
+    return render_template('spectacle.jinja2.html', **spectacle_data)
 
 
 @app.route('/spectacle/<int:spectacle_id>/update', methods=('GET', 'POST'))
@@ -365,12 +381,38 @@ def spectacle_update(spectacle_id):
 @app.route('/roadmap/<int:spectacle_id>')
 @authenticated
 def roadmap(spectacle_id):
-    return render_template('roadmap.jinja2.html')
+    spectacle_data = get_spectacle_data(spectacle_id)
+    return render_template('roadmap.jinja2.html', **spectacle_data)
 
 
-@app.route('/roadmap/send')
-def roadmap_send():
-    return render_template('roadmap_send.jinja2.html')
+@app.route('/roadmap/<int:spectacle_id>/send')
+@authenticated
+def roadmap_send(spectacle_id):
+    cursor = get_connection().cursor()
+    cursor.execute('SELECT * FROM spectacle WHERE id = ?', (spectacle_id,))
+    spectacle = cursor.fetchone()
+    cursor.execute('''
+      SELECT name, mail
+      FROM person
+      WHERE person.id = ?
+      UNION
+      SELECT DISTINCT person.name, person.mail
+      FROM person
+      JOIN artist
+      ON person.id = artist.person_id
+      JOIN artist_representation_date
+      ON artist.id = artist_representation_date.artist_id
+      JOIN representation_date
+      ON
+        artist_representation_date.representation_date_id =
+        representation_date.id
+      JOIN representation
+      ON representation_date.representation_id = representation.id
+      WHERE representation.spectacle_id = ?
+    ''', (spectacle_id, session['person_id']))
+    recipients = cursor.fetchall()
+    return render_template(
+        'roadmap_send.jinja2.html', spectacle=spectacle, recipients=recipients)
 
 
 # Follow-ups
