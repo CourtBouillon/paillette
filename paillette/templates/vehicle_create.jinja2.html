@@ -48,18 +48,15 @@
   </form>
 
   <script>
-   function update_form() {
-       let rental = document.getElementById("rental").checked;
+    function updateForm() {
+      let rental = document.getElementById('rental').checked;
+      document.querySelectorAll('[id^="rental_"], [id^="rented_"], [for^="rental_"], [for^="rented_"]').forEach(
+        obj => obj.hidden = !rental
+      )
+    }
 
-       var rental_elements = document.querySelectorAll(
-           '[id^="rental_"], [id^="rented_"], [for^="rental_"], [for^="rented_"]');
-       for (element of rental_elements) {
-           element.hidden = !rental;
-       }
-   }
-
-   document.getElementById("rental").addEventListener("click", (event) => update_form());
-   document.getElementById("company").addEventListener("click", (event) => update_form());
-   window.onload = update_form;
+    document.getElementById('rental').addEventListener('click', updateForm);
+    document.getElementById('company').addEventListener('click', updateForm);
+    updateForm();
   </script>
 {% endblock %}

@@ -35,16 +35,16 @@
   </form>
 
   <script>
-    function update_form() {
+    function updateForm() {
       let available = document.querySelector('[name="availability"]:checked').value == 'available';
       document.querySelectorAll('#spectacle_id, [for="spectacle_id"]').forEach(
-        obj => obj.hidden = !available
+        obj => obj.hidden = !available;
       );
     }
 
     document.querySelectorAll('[name="availability"]').forEach(
-      obj => obj.addEventListener('click', update_form)
+      obj => obj.addEventListener('click', updateForm);
     );
-    window.onload = update_form;
+    updateForm();
   </script>
 {% endblock %}
