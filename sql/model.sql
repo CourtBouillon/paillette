@@ -109,6 +109,7 @@ CREATE TABLE vehicle (
   rental_company_address TEXT,
   rented_from DATE,
   rented_to DATE,
+  details TEXT,
   hidden BOOLEAN NOT NULL DEFAULT FALSE
 );
 

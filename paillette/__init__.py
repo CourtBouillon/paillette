@@ -874,7 +874,8 @@ def vehicle_update(vehicle_id):
               rental_company_hours = :rental_company_hours,
               rental_company_address = :rental_company_address,
               rented_from = :rented_from,
-              rented_to = :rented_to
+              rented_to = :rented_to,
+              details = :details
             WHERE id = :id
         ''', parameters)
         cursor.connection.commit()
@@ -898,11 +899,11 @@ def vehicle_create():
               vehicle (
                 name, color, type, license_plate, rented, rental_company_name,
                 rental_company_hours, rental_company_address, rented_from,
-                rented_to)
+                rented_to, details)
             VALUES
               (:name, :color, :type, :license_plate, :rented,
                :rental_company_name, :rental_company_hours,
-               :rental_company_address, :rented_from, :rented_to)
+               :rental_company_address, :rented_from, :rented_to, :details)
         ''', parameters)
         cursor.connection.commit()
         flash('Le véhicule a été créée.')
