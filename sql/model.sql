@@ -14,8 +14,12 @@ CREATE TABLE person (
 CREATE TABLE spectacle (
   id INTEGER PRIMARY KEY,
   event TEXT NOT NULL,
+  event_link TEXT,
   place TEXT NOT NULL,
-  travel_time TEXT NOT NULL,
+  configuration TEXT NOT NULL,
+  travel_time TEXT,
+  manager TEXT,
+  organizer TEXT,
   trigram TEXT NOT NULL,
   date_from DATE NOT NULL,
   date_to DATE NOT NULL

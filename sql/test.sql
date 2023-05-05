@@ -9,11 +9,11 @@ INSERT INTO person (mail, firstname, lastname, phone) VALUES
 ('charly@example.com', 'Charly', 'Perdon', '01 23 45 67 85'),
 ('bertrand@example.com', 'Bertrand', 'Klamir', '01 23 45 67 86');
 
-INSERT INTO spectacle (event, place, travel_time, trigram, date_from, date_to) VALUES
-('Vive le printemps', 'Chamonix', '2h', 'CHA', '2023-01-23', '2023-01-25'),
-('Fête de la ville', 'Besançon', '2h30', 'BES', '2023-02-01', '2023-02-07'),
-('Défilé de la Tour Eiffel', 'Paris', '4h30', 'PAR', '2023-02-10', '2023-02-12'),
-('Carnaval', 'Grenoble', '1h30', 'GRE', '2023-03-01', '2023-03-03');
+INSERT INTO spectacle (event, place, configuration, travel_time, manager, organizer, trigram, date_from, date_to) VALUES
+('Vive le printemps', 'Chamonix', '2 artistes', '2h', NULL, NULL, 'CHA', '2023-01-23', '2023-01-25'),
+('Fête de la ville', 'Besançon', '2 artistes et 1 régisseur', '2h30', 'Christel Pic', NULL, 'BES', '2023-02-01', '2023-02-07'),
+('Défilé de la Tour Eiffel', 'Paris', '3 artistes', NULL, NULL, 'Maire de Paris', 'PAR', '2023-02-10', '2023-02-12'),
+('Carnaval', 'Grenoble', '3 artistes', '1h30', 'Fanny Lemoine', 'Ville de Grenoble', 'GRE', '2023-03-01', '2023-03-03');
 
 INSERT INTO representation (name, spectacle_id) VALUES
 ('Les sorcières', 1),

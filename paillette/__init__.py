@@ -267,19 +267,57 @@ def spectacle(spectacle_id):
     cursor.execute('''
       SELECT
         spectacle.*,
+        representation.id AS representation_id,
         representation.name AS representation_name,
-        representation_date.date AS representation_date
+        representation_date.date AS representation_date,
+        representation_date.id AS representation_date_id,
+        artist_representation_date.id AS artist_representation_date_id,
+        person.name AS person_name
       FROM spectacle
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id
       LEFT JOIN representation_date
       ON representation.id = representation_date.id
+      LEFT JOIN artist_representation_date
+      ON
+        representation_date.id =
+        artist_representation_date.representation_date_id
+      LEFT JOIN artist
+      ON artist_representation_date.artist_id = artist.id
+      LEFT JOIN person
+      ON artist.person_id = person.id
       WHERE spectacle.id = ?
       ORDER BY representation_name, representation_date
     ''', (spectacle_id,))
-    representation_dates = cursor.fetchall()
+    artist_representation_dates = cursor.fetchall()
+    cursor.execute('''
+      SELECT makeup.name
+      FROM makeup
+      JOIN makeup_spectacle
+      ON makeup.id = makeup_spectacle.makeup_id
+      WHERE makeup_spectacle.spectacle_id = ?
+    ''', (spectacle_id,))
+    makeups = cursor.fetchall()
+    cursor.execute('''
+      SELECT sound.name
+      FROM sound
+      JOIN sound_spectacle
+      ON sound.id = sound_spectacle.sound_id
+      WHERE sound_spectacle.spectacle_id = ?
+    ''', (spectacle_id,))
+    sounds = cursor.fetchall()
+    cursor.execute('''
+      SELECT vehicle.name
+      FROM vehicle
+      JOIN vehicle_spectacle
+      ON vehicle.id = vehicle_spectacle.vehicle_id
+      WHERE vehicle_spectacle.spectacle_id = ?
+    ''', (spectacle_id,))
+    vehicles = cursor.fetchall()
     return render_template(
-        'spectacle.jinja2.html', representation_dates=representation_dates)
+        'spectacle.jinja2.html', makeups=makeups, sounds=sounds,
+        vehicles=vehicles,
+        artist_representation_dates=artist_representation_dates)
 
 
 @app.route('/spectacle/<int:spectacle_id>/update', methods=('GET', 'POST'))
