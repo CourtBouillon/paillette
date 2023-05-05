@@ -55,4 +55,15 @@
       {% endif %}
     </footer>
   </body>
+
+  <script>
+    let submit = document.querySelector('[type="submit"]');
+    if (submit) {
+      let cancel = document.createElement('button');
+      cancel.setAttribute('type', 'button');
+      cancel.setAttribute('onclick', 'history.back()');
+      cancel.textContent = 'Annuler';
+      submit.before(cancel);
+    }
+  </script>
 </html>
