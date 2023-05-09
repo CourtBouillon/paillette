@@ -1,5 +1,7 @@
 {% set spectacle = artist_representation_dates[0] %}
-{% set title = '{}, du {} au {} — Feuille de route'.format(spectacle.place, spectacle.date_from.strftime('%d/%m'), spectacle.date_to.strftime('%d/%m')) %}
+{% set first_date = (artist_representation_dates | sort(attribute='date'))[0].representation_date %}
+{% set last_date = (artist_representation_dates | sort(attribute='date'))[-1].representation_date %}
+{% set title = '{}, du {} au {} — Feuille de route'.format(spectacle.place, first_date.strftime('%d/%m'), last_date.strftime('%d/%m')) %}
 
 {% extends '_layout.jinja2' %}
 
@@ -11,41 +13,76 @@
 
     <dl>
       <dt>Lieu</dt>
-      <dd>{{ spectacle =  }}</dd>
+      <dd>{{ spectacle.place }}</dd>
 
       <dt>Du</dt>
-      <dd>date début spectacle</dd>
+      <dd>{{ first_date.strftime('%d/%m') }}</dd>
 
       <dt>Au</dt>
-      <dd>date fin spectacle</dd>
+      <dd>{{ last_date.strftime('%d/%m') }}</dd>
 
       <dt>Évènement</dt>
-      <dd>nom évènement</dd>
+      <dd>{{ spectacle.event }}</dd>
 
       <dt>Lien</dt>
-      <dd>lien évènement</dd>
+      <dd>{{ spectacle.link }}</dd>
+
+      {% if spectacle.organizer %}
+        <dt>Organisateur</dt>
+        <dd>{{ spectacle.organizer }}</dd>
+      {% endif %}
 
       <dt>Départ le</dt>
-      <dd>date départ</dd>
+      <dd>{{ spectacle.date_from.strftime('%d/%m') }}</dd>
 
       <dt>Retour le</dt>
-      <dd>date retour</dd>
+      <dd>{{ spectacle.date_to.strftime('%d/%m') }}</dd>
 
       <dt>Spectacles</dt>
-      <dd>nom du spectacle</dd>
-      <dd>nom du spectacle</dd>
+      {% for representation_id, artist_representation_dates in artist_representation_dates | groupby('representation_id') %}
+        {% set representation = artist_representation_dates[0] %}
+        <dd>
+          <dl>
+            <dt>Spectacle</dt>
+            <dd>{{ representation.representation_name }}</dd>
+            <dt>Dates</dt>
+            {% for representation_date_id, artist_representation_dates in artist_representation_dates | groupby('representation_date_id') %}
+              {% set representation_date = artist_representation_dates[0] %}
+              <dd>
+                <dl>
+                  <dt>Date</dt>
+                  <dd>{{ representation_date.representation_date.strftime('%d/%m') }}</dd>
+                  <dt>Artistes</dt>
+                  {% for artist_representation_date in artist_representation_dates %}
+                    <dd>{{ artist_representation_date.person_name }}</dd>
+                  {% else %}
+                    <dd>Pas d’artiste</dd>
+                  {% endfor %}
+                </dl>
+              </dd>
+            {% else %}
+              <dd>Pas de dates</dd>
+            {% endfor %}
+          </dl>
+        </dd>
+      {% else %}
+        <dd>Pas de spectacle</dd>
+      {% endfor %}
 
-      <dt>Sonorisation</dt>
-      <dd>matériel de son</dd>
-      <dd>matériel de son</dd>
-      <dd>
-        <label for="sound_details">Informations supplémentaire pour la sonorisation</label>
-        <textarea id="sound_details" name="sound_details"></textarea>
-      </dd>
+      <dt>Matériel de son</dt>
+      {% for sound in sounds %}
+        <dd>{{ sound.name }}</dd>
+      {% else %}
+        <dd>Pas de matériel de son</dd>
+      {% endfor %}
 
       <dt>Boîtes de maquillage</dt>
-      <dd>nom de la boîte</dd>
-      <dd>nom de la boîte</dd>
+      {% for makeup in makeups %}
+        <dd>{{ makeup.name }}</dd>
+      {% else %}
+        <dd>Pas de boîte de maquillage</dd>
+      {% endfor %}
+
     </dl>
   </section>
 
@@ -55,73 +92,78 @@
     <dl>
       <dt>Artistes</dt>
       <dt>Tout les dates</dt>
-      <dd>nom prénom téléphone artiste</dd>
-      <dd>nom prénom téléphone artiste</dd>
+      {% for _, persons in artist_representation_dates | groupby('person_name') %}
+        {% set person = persons[0] %}
+        <dd>{{ person.person_name }} — {{ person.person_phone }}</dd>
+      {% endfor %}
 
-      <dt>Le XX</dt>
-      <dd>nom prénom téléphone artiste</dd>
-      <dd>nom prénom téléphone artiste</dd>
-
-      <dt>Régisseur</dt>
-      <dd>info régisseur</dd>
+      {% if spectacle.organizer %}
+        <dt>Régisseur</dt>
+        <dd>{{ spectacle.organizer }}</dd>
+      {% endif %}
     </dl>
   </section>
 
-  <section>
-    <h3>Message Important</h3>
-    <label for="message">Message important</label>
-    <textarea id="message" name="message"></textarea>
-  </section>
+  {% if spectacle.message %}
+    <section>
+      <h3>Message important</h3>
+      {{ spectacle.message }}
+    </section>
+  {% endif %}
 
-  <section>
-    <h3>Moyens de paiement</h3>
-
-    <label for="payment">Moyen de paiement</label>
-    <textarea id="payment" name="payment"></textarea>
-  </section>
+  {% if spectacle.payment %}
+    <section>
+      <h3>Moyens de paiement</h3>
+      {{ spectacle.payment }}
+    </section>
+  {% endif %}
 
   <section>
     <h3>Véhicules</h3>
 
     <dl>
-      <!-- si pas location -->
-      <dt>nom du véhicule</dt>
-      <dd>commentaire du véhicule</dd>
-
-      <!-- si location -->
-      <dt>nom du véhicule</dt>
-      <dd>dates de location</dd>
-      <dd>commentaire du véhicule</dd>
-      <dt>nom de l’agence</dt>
-      <dd>adresse de l’agence</dd>
-      <dd>horaires de l’agence</dd>
+      {% for vehicle in vehicles %}
+        <dt>{{ vehicle.name }}</dt>
+        {% if vehicle.rented %}
+          <dd>Loué à {{ vehicle.rental_company_name }}</dd>
+          <dd>Du {{ vehicle.rented_from.strftime('%d/%m') }} au {{ vehicle.rented_to.strftime('%d/%m') }}</dd>
+          <dd>Adresse : {{ vehicle.rental_company_address }}</dd>
+          <dd>Horaires : {{ vehicle.rental_company_hours }}</dd>
+        {% endif %}
+        {% if vehicle.details %}
+          <dd>{{ vehicle.details }}</dd>
+        {% endif %}
+      {% else %}
+        <dt>Pas de véhicule</dt>
+      {% endfor %}
+    </dl>
   </section>
 
-  <section>
-    <h3>Contact sur place</h3>
+  {% if spectacle.contact %}
+    <section>
+      <h3>Contact sur place</h3>
+      {{ spectacle.contact }}
+    </section>
+  {% endif %}
 
-    <label for="onsite_contact">Contact sur place</label>
-    <textarea id="onsite_contact" name="onsite_contact"></textarea>
-  </section>
+  {% if spectacle.planning %}
+    <section>
+      <h3>Planning</h3>
+      {{ spectacle.planning }}
+    </section>
+  {% endif %}
 
-  <section>
-    <h3>Planning</h3>
+  {% if spectacle.hosting %}
+    <section>
+      <h3>Hébergement</h3>
+      {{ spectacle.hosting }}
+    </section>
+  {% endif %}
 
-    <label for="planning">Planning</label>
-    <textarea id="planning" name="planning"></textarea>
-  </section>
-
-  <section>
-    <h3>Hébergement</h3>
-
-    <label for="hosting">Hébergement</label>
-    <textarea id="hosting" name="hosting"></textarea>
-  </section>
-
-  <section>
-    <h3>Repas</h3>
-
-    <label for="meal">Repas</label>
-    <textarea id="meal" name="meal"></textarea>
-  </section>
+  {% if spectacle.meal %}
+    <section>
+      <h3>Repas</h3>
+      {{ spectacle.meal }}
+    </section>
+  {% endif %}
 {% endblock %}

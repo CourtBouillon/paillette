@@ -22,7 +22,13 @@ CREATE TABLE spectacle (
   organizer TEXT,
   trigram TEXT NOT NULL,
   date_from DATE NOT NULL,
-  date_to DATE NOT NULL
+  date_to DATE NOT NULL,
+  message TEXT,
+  payment TEXT,
+  contact TEXT,
+  planning TEXT,
+  hosting TEXT,
+  meal TEXT
 );
 
 CREATE TABLE artist (

@@ -10,6 +10,7 @@ from uuid import uuid4
 from flask import (
     Flask, Markup, abort, flash, g, redirect, render_template, request,
     session, url_for)
+from flask_weasyprint import HTML, render_pdf
 from werkzeug.security import check_password_hash, generate_password_hash
 
 setlocale(LC_ALL, 'fr_FR.utf8')
@@ -70,7 +71,8 @@ def get_spectacle_data(spectacle_id):
         representation_date.date AS representation_date,
         representation_date.id AS representation_date_id,
         artist_representation_date.id AS artist_representation_date_id,
-        person.name AS person_name
+        person.name AS person_name,
+        person.phone AS person_phone
       FROM spectacle
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id
@@ -89,7 +91,7 @@ def get_spectacle_data(spectacle_id):
     ''', (spectacle_id,))
     artist_representation_dates = cursor.fetchall()
     cursor.execute('''
-      SELECT makeup.name
+      SELECT makeup.*
       FROM makeup
       JOIN makeup_spectacle
       ON makeup.id = makeup_spectacle.makeup_id
@@ -97,7 +99,7 @@ def get_spectacle_data(spectacle_id):
     ''', (spectacle_id,))
     makeups = cursor.fetchall()
     cursor.execute('''
-      SELECT sound.name
+      SELECT sound.*
       FROM sound
       JOIN sound_spectacle
       ON sound.id = sound_spectacle.sound_id
@@ -105,7 +107,7 @@ def get_spectacle_data(spectacle_id):
     ''', (spectacle_id,))
     sounds = cursor.fetchall()
     cursor.execute('''
-      SELECT vehicle.name
+      SELECT vehicle.*
       FROM vehicle
       JOIN vehicle_spectacle
       ON vehicle.id = vehicle_spectacle.vehicle_id
@@ -113,7 +115,7 @@ def get_spectacle_data(spectacle_id):
     ''', (spectacle_id,))
     vehicles = cursor.fetchall()
     cursor.execute('''
-      SELECT costume.name
+      SELECT costume.*
       FROM costume
       JOIN costume_spectacle
       ON costume.id = costume_spectacle.costume_id
@@ -382,15 +384,16 @@ def spectacle_update(spectacle_id):
 @authenticated
 def roadmap(spectacle_id):
     spectacle_data = get_spectacle_data(spectacle_id)
-    return render_template('roadmap.jinja2.html', **spectacle_data)
+    html = render_template('roadmap.jinja2.html', **spectacle_data)
+    place = spectacle_data['artist_representation_dates'][0]['place'].lower()
+    return render_pdf(HTML(string=html), download_filename=f'{place}.pdf')
 
 
 @app.route('/roadmap/<int:spectacle_id>/send')
 @authenticated
 def roadmap_send(spectacle_id):
+    spectacle_data = get_spectacle_data(spectacle_id)
     cursor = get_connection().cursor()
-    cursor.execute('SELECT * FROM spectacle WHERE id = ?', (spectacle_id,))
-    spectacle = cursor.fetchone()
     cursor.execute('''
       SELECT name, mail
       FROM person
@@ -412,7 +415,7 @@ def roadmap_send(spectacle_id):
     ''', (spectacle_id, session['person_id']))
     recipients = cursor.fetchall()
     return render_template(
-        'roadmap_send.jinja2.html', spectacle=spectacle, recipients=recipients)
+        'roadmap_send.jinja2.html', recipients=recipients, **spectacle_data)
 
 
 # Follow-ups
