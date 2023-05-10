@@ -88,7 +88,7 @@ def get_spectacle_data(spectacle_id):
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id
       LEFT JOIN representation_date
-      ON representation.id = representation_date.id
+      ON representation.id = representation_date.representation_id
       LEFT JOIN artist_representation_date
       ON
         representation_date.id =
@@ -410,7 +410,7 @@ def spectacle_update(spectacle_id):
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id
       LEFT JOIN representation_date
-      ON representation.id = representation_date.id
+      ON representation.id = representation_date.representation_id
       WHERE spectacle.id = ?
       ORDER BY representation_name, representation_date
     ''', (spectacle_id,))
