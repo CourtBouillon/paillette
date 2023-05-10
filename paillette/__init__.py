@@ -594,6 +594,7 @@ def artists_followup(year=None, month=None):
       ON representation_date.representation_id = representation.id
       LEFT JOIN spectacle
       ON representation.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT artist.hidden
       ''', (start, stop))
     artists_spectacles = cursor.fetchall()
     cursor.execute('''
@@ -635,6 +636,7 @@ def costumes_followup(year=None, month=None):
         OR date_to BETWEEN ? AND ?
       ) AS spectacle
       ON costume_spectacle.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT costume.hidden
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     costumes_spectacles = cursor.fetchall()
     return render_template(
@@ -668,6 +670,7 @@ def makeups_followup(year=None, month=None):
         OR date_to BETWEEN ? AND ?
       ) AS spectacle
       ON makeup_spectacle.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT makeup.hidden
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     makeups_spectacles = cursor.fetchall()
     return render_template(
@@ -701,6 +704,7 @@ def sounds_followup(year=None, month=None):
         OR date_to BETWEEN ? AND ?
       ) AS spectacle
       ON sound_spectacle.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT sound.hidden
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     sounds_spectacles = cursor.fetchall()
     return render_template(
@@ -734,6 +738,7 @@ def vehicles_followup(year=None, month=None):
         OR date_to BETWEEN ? AND ?
       ) AS spectacle
       ON vehicle_spectacle.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT vehicle.hidden
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     vehicles_spectacles = cursor.fetchall()
     return render_template(
