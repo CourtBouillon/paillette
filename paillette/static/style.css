@@ -1,5 +1,9 @@
 /* Fonts */
 
+@font-face {
+  font-family: ForkAwesome;
+  src: local("ForkAwesome"), url(/static/fonts/forkawesome-webfont.woff2);
+}
 
 /* Variables */
 :root {
@@ -9,6 +13,155 @@
   --pink: #e090d0;
   --pink-opacity: #e090d025;
   --purple: #9050a0;
+  --purple-opacity: #9050a080
 }
 
 /* Common */
+
+html {
+  background: var(--white);
+  color: var(--black);
+  font-family: sans-serif;
+  font-size: 14pt;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+main {
+  margin: auto;
+  max-width: 1400px;
+  padding: 0 1em;
+}
+
+a {
+  color: var(--purple);
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+form > * {
+  display: block;
+}
+
+input {
+  border: 1px solid var(--pink);
+  margin: 0.5em 0 1.5em 0;
+  padding: 1em;
+}
+
+label {
+  color: var(--grey);
+  margin-top: 1em;
+}
+
+.button {
+  background: var(--purple);
+  border: 1px solid var(--purple);
+  color: var(--white);
+  padding: 1em;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.button:hover {
+  background: var(--purple-opacity);
+  cursor: pointer;
+}
+
+/* Flash Messages */
+
+#messages {
+  bottom: 0;
+  position: fixed;
+  right: 0;
+  width: 20em;
+}
+
+#messages section {
+  backdrop-filter: blur(0.3em);
+  background: #fffc;
+  border: 1px solid;
+  border-radius: 0.1em;
+  box-shadow: 0.1em 0.1em 0.3em #0004;
+  font-size: 0.8em;
+  line-height: 1.2;
+  margin: 1em;
+  padding: 1em 2em 1em 1em;
+  position: relative;
+}
+
+#messages section input {
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: block;
+  line-height: 0.5;
+  font-size: 1.5em;
+  margin: 0;
+  padding: 0.2em;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: min-content;
+}
+
+#messages section input::after {
+  content: '×';
+}
+
+#messages section:has(input:checked) {
+  display: none;
+}
+
+/* Login */
+
+#page-login {
+  align-items: center;
+  background: var(--black);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+#page-login main {
+  align-items: center;
+  display: flex;
+}
+
+#page-login h1 {
+  display: none;
+}
+
+#page-login img {
+  display: block;
+  margin: 1em 2em;
+  width: 30em;
+}
+
+#page-login input {
+  /* - borders - paddings */
+  width: calc(100% - 2px - 2em);
+}
+
+#page-login section {
+  width: 50%;
+}
+
+#page-login .button {
+  float: right;
+  margin: 0 0 0 10%;
+  width: 35%;
+}
+
+#page-login .cancel {
+  display: none;
+}
