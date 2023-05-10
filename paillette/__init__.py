@@ -8,9 +8,10 @@ from smtplib import SMTP_SSL
 from uuid import uuid4
 
 from flask import (
-    Flask, Markup, abort, flash, g, redirect, render_template, request,
-    session, url_for)
+    Flask, abort, flash, g, redirect, render_template, request, session,
+    url_for)
 from flask_weasyprint import HTML, render_pdf
+from markupsafe import Markup
 from werkzeug.security import check_password_hash, generate_password_hash
 
 setlocale(LC_ALL, 'fr_FR.utf8')
