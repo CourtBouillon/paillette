@@ -57,10 +57,11 @@
   </body>
 
   <script>
-    let submit = document.querySelector('[type="submit"]');
+    let submit = document.querySelector('form:not([action]) [type="submit"]');
     if (submit) {
       let cancel = document.createElement('button');
       cancel.setAttribute('type', 'button');
+      cancel.setAttribute('class', 'cancel');
       cancel.setAttribute('onclick', 'history.back()');
       cancel.textContent = 'Annuler';
       submit.before(cancel);
