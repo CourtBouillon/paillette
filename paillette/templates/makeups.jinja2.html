@@ -19,9 +19,9 @@
         <dt{% if makeup.color %} data-color="{{ makeup.color }}"{% endif %}>{{ makeup.name }}</dt>
         <dd><a href="{{ url_for('makeup_update', makeup_id=makeup.id) }}">Éditer</a></dd>
         {% if hidden %}
-          <dd><a href="{{ url_for('show', type='makeups', id=makeup.id) }}">Montrer</a></dd>
+          <dd><a href="{{ url_for('show', type='makeup', id=makeup.id) }}">Montrer</a></dd>
         {% else %}
-          <dd><a href="{{ url_for('hide', type='makeups', id=makeup.id) }}">Cacher</a></dd>
+          <dd><a href="{{ url_for('hide', type='makeup', id=makeup.id) }}">Cacher</a></dd>
         {% endif %}
       {% endfor %}
     </dl>
