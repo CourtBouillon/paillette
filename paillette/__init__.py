@@ -313,7 +313,7 @@ def show(type, id):
     if request.method == 'POST':
         cursor.execute(f'UPDATE {type} SET hidden = FALSE WHERE id = ?', (id,))
         cursor.connection.commit()
-        flash('L’élément a été caché.')
+        flash('L’élément n’est plus caché.')
         return redirect(url_for(f'{type}s'))
 
     if type == 'artist':
