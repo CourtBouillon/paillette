@@ -79,6 +79,13 @@
       <dd>Pas de boîte de maquillage</dd>
     {% endfor %}
 
+    <dt>Costumes</dt>
+    {% for costume in costumes %}
+      <dd>{{ costume.name }}</dd>
+    {% else %}
+      <dd>Pas de costume</dd>
+    {% endfor %}
+
     {% if spectacle.organizer %}
       <dt>Régisseur</dt>
       <dd>{{ spectacle.organizer }}</dd>
