@@ -28,7 +28,14 @@ CREATE TABLE spectacle (
   contact TEXT,
   planning TEXT,
   hosting TEXT,
-  meal TEXT
+  meal TEXT,
+  images_comment TEXT
+);
+
+CREATE TABLE spectacle_image (
+  id INTEGER PRIMARY KEY,
+  spectacle_id INTEGER NOT NULL REFERENCES spectacle(id),
+  image BINARY NOT NULL
 );
 
 CREATE TABLE artist (

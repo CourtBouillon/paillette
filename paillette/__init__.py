@@ -1,15 +1,20 @@
 import calendar
 import sqlite3
 from datetime import date, timedelta
-from email.message import EmailMessage
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import formatdate
 from functools import wraps
+from io import BytesIO
 from locale import LC_ALL, setlocale
 from smtplib import SMTP_SSL
 from uuid import uuid4
 
 from flask import (
-    Flask, abort, flash, g, redirect, render_template, request, session,
-    url_for)
+    Flask, Response, abort, flash, g, redirect, render_template, request,
+    session, url_for)
 from flask_weasyprint import HTML, render_pdf
 from markupsafe import Markup
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -19,7 +24,12 @@ setlocale(LC_ALL, 'fr_FR.utf8')
 app = Flask(__name__)
 app.config.update(
     SECRET_KEY=b'change_me_in_configuration_file',
-    DB='paillette.db')
+    DB='paillette.db',
+    SMTP_HOSTNAME=None,
+    SMTP_LOGIN=None,
+    SMTP_PASSWORD=None,
+    SMTP_FROM='sender@example.com',
+)
 app.config.from_envvar('PAILLETTE_CONFIG', silent=True)
 
 
@@ -123,13 +133,54 @@ def get_spectacle_data(spectacle_id):
       WHERE costume_spectacle.spectacle_id = ?
     ''', (spectacle_id,))
     costumes = cursor.fetchall()
+    cursor.execute('''
+      SELECT id
+      FROM spectacle_image
+      WHERE spectacle_id = ?
+    ''', (spectacle_id,))
+    images = cursor.fetchall()
     return {
         'artist_representation_dates': artist_representation_dates,
         'makups': makeups,
         'sounds': sounds,
         'vehicles': vehicles,
         'costumes': costumes,
+        'images': images,
     }
+
+
+def send_mail(to, subject, content, pdfs=None):
+    message = MIMEMultipart()
+    message['From'] = app.config['SMTP_FROM']
+    for to in to:
+        message['To'] = to
+    message['Date'] = formatdate(localtime=True)
+    message['Subject'] = subject
+    message.attach(MIMEText(content))
+
+    for name, pdf in (pdfs or {}).items():
+        part = MIMEBase('application', 'pdf')
+        part.set_payload(pdf)
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f'attachment; filename={name}')
+        message.attach(part)
+
+    if app.config['DEBUG']:
+        headers = str(message).split('\n\n', 1)[0]
+        markup = (
+            '<p>Message envoyé</p>'
+            f'<pre>{headers}</pre>'
+            f'<pre>{content}</pre>'
+        )
+        if pdfs:
+            markup += f'<p>+ {len(pdfs)} PDF</p>'
+        flash(Markup(markup))
+        return
+
+    smtp = SMTP_SSL(app.config['SMTP_HOSTNAME'])
+    smtp.login(app.config['SMTP_LOGIN'], app.config['SMTP_PASSWORD'])
+    smtp.send_message(message)
+    smtp.quit()
 
 
 def authenticated(function):
@@ -186,17 +237,10 @@ def password_lost():
         person = cursor.fetchone()
         cursor.connection.commit()
         if person:
-            url = url_for("password_reset", uuid=uuid, _external=True)
-            if app.config['DEBUG']:
-                flash(Markup(f'<a href="{url}">Nouveau mot de passe</a>.'))
-                return redirect(url_for('login'))
-            smtp = SMTP_SSL(app.config['SMTP_HOSTNAME'])
-            smtp.login(app.config['SMTP_LOGIN'], app.config['SMTP_PASSWORD'])
-            message = EmailMessage()
-            message['From'] = app.config['SMTP_FROM']
-            message['To'] = request.form['mail']
-            message['Subject'] = 'Réinitialisation de mot de passe'
-            message.set_content(
+            to = (request.form['mail'],)
+            subject = 'Réinitialisation de mot de passe'
+            url = url_for('password_reset', uuid=uuid, _external=True)
+            content = (
                 f'Bonjour {person["firstname"]} {person["lastname"]},\n\n'
                 'Vous avez demandé une réinitialisation de mot de passe '
                 'concernant votre compte Paillette. Merci de vous rendre '
@@ -205,11 +249,7 @@ def password_lost():
                 'Si vous n’êtes pas à l’origine de cette demande, vous pouvez '
                 'ignorer ce message.'
             )
-            smtp.send_message(message)
-            smtp.quit()
-        elif app.config['DEBUG']:
-            flash(f'Aucun utilisateur avec l’adresse {mail}.')
-            return redirect(url_for('login'))
+            send_mail(to, subject, content)
         flash('Un message vous a été envoyé si votre email est correct.')
         return redirect(url_for('login'))
     return render_template('password_lost.jinja2.html')
@@ -390,10 +430,29 @@ def roadmap(spectacle_id):
     return render_pdf(HTML(string=html), download_filename=f'{place}.pdf')
 
 
-@app.route('/roadmap/<int:spectacle_id>/send')
+@app.route('/roadmap/<int:spectacle_id>/send', methods=('GET', 'POST'))
 @authenticated
 def roadmap_send(spectacle_id):
     spectacle_data = get_spectacle_data(spectacle_id)
+
+    if request.method == 'POST':
+        to = tuple(mail for mail in request.form.getlist('mail') if mail)
+        place = spectacle_data['artist_representation_dates'][0]['place']
+        subject = f'Feuille de route pour {place}'
+        content = (
+            'Bonjour,\n\n'
+            'Veuillez trouver en pièce jointe la feuille de route '
+            f'pour {place}.\n\n'
+            'Cordialement,\n'
+            'Mademoiselle Paillette'
+        )
+        html = render_template('roadmap.jinja2.html', **spectacle_data)
+        pdf = HTML(string=html).write_pdf()
+        attachments = {f'{place.lower()}.pdf': pdf}
+        send_mail(to, subject, content, attachments)
+        flash('La feuille de route a été envoyée.')
+        return redirect(url_for('spectacle', spectacle_id=spectacle_id))
+
     cursor = get_connection().cursor()
     cursor.execute('''
       SELECT name, mail
@@ -413,10 +472,72 @@ def roadmap_send(spectacle_id):
       JOIN representation
       ON representation_date.representation_id = representation.id
       WHERE representation.spectacle_id = ?
-    ''', (spectacle_id, session['person_id']))
+    ''', (session['person_id'], spectacle_id))
     recipients = cursor.fetchall()
+    cursor.execute('SELECT name, mail FROM person ORDER BY name')
+    persons = cursor.fetchall()
     return render_template(
-        'roadmap_send.jinja2.html', recipients=recipients, **spectacle_data)
+        'roadmap_send.jinja2.html', recipients=recipients, persons=persons,
+        **spectacle_data)
+
+
+@app.route('/roadmap/<int:spectacle_id>/comment', methods=('POST',))
+@authenticated
+def roadmap_comment(spectacle_id):
+    parameters = dict(request.form)
+    parameters['spectacle_id'] = spectacle_id
+    cursor = get_connection().cursor()
+    cursor.execute('''
+      UPDATE spectacle
+      SET images_comment = :images_comment
+      WHERE id = :spectacle_id
+    ''', parameters)
+    cursor.connection.commit()
+    flash('Le commentaire des images a été mis à jour.')
+    return redirect(url_for('roadmap', spectacle_id=spectacle_id))
+
+
+@app.route('/roadmap/<int:spectacle_id>/attach', methods=('POST',))
+@authenticated
+def roadmap_attach_image(spectacle_id):
+    images = request.files.getlist('images')
+    if images:
+        cursor = get_connection().cursor()
+        for image in images:
+            bytes = BytesIO()
+            image.save(bytes)
+            cursor.execute('''
+              INSERT INTO spectacle_image (spectacle_id, image)
+              VALUES (?, ?)
+            ''', (spectacle_id, bytes.getvalue()))
+        cursor.connection.commit()
+        flash('Les images ont été ajoutées.')
+    return redirect(url_for('roadmap', spectacle_id=spectacle_id))
+
+
+@app.route('/roadmap/image/<image_id>/detach', methods=('POST',))
+@authenticated
+def roadmap_detach_image(image_id):
+    cursor = get_connection().cursor()
+    cursor.execute(
+        'DELETE FROM spectacle_image WHERE id = ? RETURNING spectacle_id',
+        (image_id,))
+    image = cursor.fetchone()
+    cursor.connection.commit()
+    flash('L’image a été supprimée.')
+    spectacle_id = image['spectacle_id']
+    return redirect(url_for('roadmap', spectacle_id=spectacle_id))
+
+
+@app.route('/roadmap/image/<int:image_id>')
+@authenticated
+def roadmap_image(image_id):
+    cursor = get_connection().cursor()
+    cursor.execute('SELECT * FROM spectacle_image WHERE id = ?', (image_id,))
+    image = cursor.fetchone()
+    data = image['image']
+    format = 'png' if data[1:4] == b'PNG' else 'jpeg'
+    return Response(data, mimetype=f'image/{format}')
 
 
 # Follow-ups

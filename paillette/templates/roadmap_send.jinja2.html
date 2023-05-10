@@ -8,13 +8,115 @@
 {% block content %}
   <h2>{{ title }}</h2>
 
-  <ul>
-    {% for recipient in recipients %}
-      <li>{{ recipient.mail }} ({{ recipient.name }})</li>
-    {% endfor %}
-  </ul>
+  <h3>Images</h3>
+  <form method="post" action="{{ url_for('roadmap_comment', spectacle_id=spectacle.id) }}">
+    <label for="images_comment">Commentaire</label>
+    <textarea id="images_comment" name="images_comment">{{ spectacle.images_comment or '' }}</textarea>
+
+    <input type="submit" value="Enregistrer">
+  </form>
+
+  {% if images %}
+    <ul>
+      {% for image in images %}
+        <li>
+          <img src="{{ url_for('roadmap_image', image_id=image.id) }}">
+          <form method="post" action="{{ url_for('roadmap_detach_image', image_id=image.id) }}">
+            <input type="submit" value="Supprimer">
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Pas d’image</p>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" action="{{ url_for('roadmap_attach_image', spectacle_id=spectacle.id) }}">
+    <label for="images">Pièces jointes</label>
+    <input id="images" name="images" type="file" accept="image/png, image/jpeg" multiple>
+
+    <input type="submit" value="Ajouter">
+  </form>
+
+  <h3>Destinataires</h3>
+
+  <form method="post">
+    <ul id="recipients">
+      {% for recipient in recipients %}
+        <li class="readonly">
+          <input name="mail" value="{{ recipient.mail }}" readonly><button type="button" onClick="remove(this)">Supprimer</button> ({{ recipient.name }})
+        </li>
+      {% endfor %}
+    </ul>
+
+    <select id="person">
+      <option></option>
+      {% for person in persons %}
+        <option value="{{ person.mail }}">{{ person.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="button" onClick="addRecipient()">Ajouter</button>
+
+    <input type="submit" value="Envoyer">
+  </form>
 
   <ul class="actions">
     <li><a href="{{ url_for('roadmap', spectacle_id=spectacle.id) }}">Télécharger un aperçu</a></li>
   </ul>
+
+  <script>
+    function addInputIfNeeded() {
+      if (![...document.querySelectorAll('input[name="mail"]')].filter(node => !node.value.length).length) {
+        let li = document.createElement("li");
+
+        let input = document.createElement("input");
+        input.setAttribute("type", "mail");
+        input.setAttribute("name", "mail");
+        input.setAttribute("onInput", "addInputIfNeeded()");
+        li.appendChild(input);
+
+        let button = document.createElement("button");
+        button.setAttribute("type", "button");
+        button.setAttribute("onClick", "remove(this)");
+        button.textContent = "Supprimer";
+        li.appendChild(button);
+
+        document.getElementById("recipients").appendChild(li);
+      }
+    }
+
+    function addRecipient() {
+      let select = document.getElementById("person");
+      let option = select.options[select.selectedIndex];
+
+      let li = document.createElement("li");
+      li.setAttribute("class", "readonly");
+
+      let input = document.createElement("input");
+      input.setAttribute("value", option.value);
+      input.setAttribute("type", "mail");
+      input.setAttribute("name", "mail");
+      input.setAttribute("readonly", "mail");
+      li.appendChild(input);
+
+      let button = document.createElement("button");
+      button.setAttribute("type", "button");
+      button.setAttribute("onClick", "remove(this)");
+      button.textContent = "Supprimer";
+      li.appendChild(button);
+
+      li.appendChild(document.createTextNode(" (" + option.textContent + ")"));
+
+      document.querySelector('#recipients li:not(.readonly)').before(li);
+
+      select.value = null;
+    }
+
+    function remove(button) {
+      button.parentNode.parentNode.removeChild(button.parentNode);
+      addInputIfNeeded();
+    }
+
+    addInputIfNeeded();
+  </script>
 {% endblock %}
