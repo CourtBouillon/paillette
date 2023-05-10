@@ -1,5 +1,8 @@
 {% set spectacle = representation_dates[0] %}
-{% set title = '{}, du {} au {}'.format(spectacle.place, spectacle.date_from.strftime('%d/%m'), spectacle.date_to.strftime('%d/%m')) %}
+{% set first_date = (representation_dates | sort(attribute='representation_date'))[0].representation_date %}
+{% set last_date = (representation_dates | sort(attribute='representation_date'))[-1].representation_date %}
+{% set dates = (first_date, last_date) | date_range %}
+{% set title = '{}, {}'.format(spectacle.place, dates) %}
 
 {% extends '_layout.jinja2' %}
 

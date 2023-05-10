@@ -1,7 +1,8 @@
 {% set spectacle = artist_representation_dates[0] %}
-{% set first_date = (artist_representation_dates | sort(attribute='date'))[0].representation_date %}
-{% set last_date = (artist_representation_dates | sort(attribute='date'))[-1].representation_date %}
-{% set title = '{}, du {} au {} — Feuille de route'.format(spectacle.place, first_date.strftime('%d/%m'), last_date.strftime('%d/%m')) %}
+{% set first_date = (artist_representation_dates | sort(attribute='representation_date'))[0].representation_date %}
+{% set last_date = (artist_representation_dates | sort(attribute='representation_date'))[-1].representation_date %}
+{% set dates = (first_date, last_date) | date_range %}
+{% set title = '{}, {}'.format(spectacle.place, dates) %}
 
 {% extends '_layout.jinja2' %}
 
@@ -126,7 +127,7 @@
         <dt>{{ vehicle.name }}</dt>
         {% if vehicle.rented %}
           <dd>Loué à {{ vehicle.rental_company_name }}</dd>
-          <dd>Du {{ vehicle.rented_from.strftime('%d/%m') }} au {{ vehicle.rented_to.strftime('%d/%m') }}</dd>
+          <dd>{{ (vehicle.rented_from, vehicle.rented_to) | date_range | capitalize }}</dd>
           <dd>Adresse : {{ vehicle.rental_company_address }}</dd>
           <dd>Horaires : {{ vehicle.rental_company_hours }}</dd>
         {% endif %}

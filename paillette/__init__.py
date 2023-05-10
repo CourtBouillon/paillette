@@ -1,6 +1,6 @@
 import calendar
 import sqlite3
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -192,6 +192,24 @@ def authenticated(function):
     return wrapper
 
 
+@app.template_filter('date_range')
+def date_range(dates):
+    date_from, date_to = dates
+    if isinstance(date_from, str):
+        date_from = datetime.strptime(date_from, '%Y-%m-%d')
+    if isinstance(date_to, str):
+        date_to = datetime.strptime(date_to, '%Y-%m-%d')
+    if None in dates:
+        return 'dates indéterminées'
+    elif date_from == date_to:
+        return f'le {date_from.strftime("%d/%m")}'
+    else:
+        return (
+            f'du {date_from.strftime("%d/%m")} '
+            f'au {date_to.strftime("%d/%m")}'
+        )
+
+
 # Common
 @app.route('/')
 def index():
@@ -338,10 +356,15 @@ def spectacles(year=None, month=None):
     year, month, start, stop, previous, next = get_date_data(year, month)
     cursor = get_connection().cursor()
     cursor.execute('''
-      SELECT *
+      SELECT spectacle.*, MIN(date) AS first_date, MAX(date) AS last_date
       FROM spectacle
+      LEFT JOIN representation
+      ON spectacle.id = representation.spectacle_id
+      LEFT JOIN representation_date
+      ON representation.id = representation_date.representation_id
       WHERE date_from BETWEEN ? AND ?
       OR date_to BETWEEN ? AND ?
+      GROUP BY spectacle.id
       ORDER BY date_from
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     spectacles = cursor.fetchall()
