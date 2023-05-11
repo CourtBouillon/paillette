@@ -170,6 +170,7 @@
 
   {% if images %}
     <h3>Images</h3>
+    {{ spectacle.images_comment | safe }}
     <ul>
       {% for image in images %}
         <li><img src="{{ url_for('roadmap_image', image_id=image.id) }}"></li>

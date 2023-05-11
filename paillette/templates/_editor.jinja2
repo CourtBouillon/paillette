@@ -1,0 +1,25 @@
+<script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>
+<link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet" />
+<script>
+  document.querySelectorAll("textarea").forEach(
+    textarea => {
+      let div = document.createElement("div");
+      div.innerHTML = textarea.textContent;
+      textarea.after(div);
+      textarea.setAttribute("hidden", true);
+      let editor = new Quill(div, {
+        modules: { toolbar: [
+          ["bold", "italic", "underline", { "background": [] }],
+          [ { "list": "bullet" }, { "list": "ordered" }],
+          ["clean"]
+        ]},
+        theme: "snow",
+      });
+      editor.on("text-change", (delta, oldDelta, source) => {
+        if (source == "user") {
+          textarea.textContent = editor.root.innerHTML;
+        }
+      })
+    }
+  );
+</script>
