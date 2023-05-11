@@ -317,7 +317,7 @@ def hide(type, id):
         ''', (id,))
     else:
         cursor.execute(f'SELECT * FROM {type} WHERE id = ?', (id,))
-    element = cursor.fetchone()
+    element = cursor.fetchone() or abort(404)
     return render_template('hide.jinja2.html', element=element)
 
 
@@ -344,7 +344,7 @@ def show(type, id):
         ''', (id,))
     else:
         cursor.execute(f'SELECT * FROM {type} WHERE id = ?', (id,))
-    element = cursor.fetchone()
+    element = cursor.fetchone() or abort(404)
     return render_template('show.jinja2.html', element=element)
 
 
@@ -545,7 +545,7 @@ def roadmap_detach_image(image_id):
     cursor.execute(
         'DELETE FROM spectacle_image WHERE id = ? RETURNING spectacle_id',
         (image_id,))
-    image = cursor.fetchone()
+    image = cursor.fetchone() or abort(404)
     cursor.connection.commit()
     flash('L’image a été supprimée.')
     spectacle_id = image['spectacle_id']
@@ -557,7 +557,7 @@ def roadmap_detach_image(image_id):
 def roadmap_image(image_id):
     cursor = get_connection().cursor()
     cursor.execute('SELECT * FROM spectacle_image WHERE id = ?', (image_id,))
-    image = cursor.fetchone()
+    image = cursor.fetchone() or abort(404)
     data = image['image']
     format = 'png' if data[1:4] == b'PNG' else 'jpeg'
     return Response(data, mimetype=f'image/{format}')
@@ -840,7 +840,7 @@ def availabilities_update(artist_id, date):
       ON artist.id = representation.artist_id
       WHERE artist.id = ?
     ''', (date, date, artist_id))
-    artist = cursor.fetchone()
+    artist = cursor.fetchone() or abort(404)
     cursor.execute('''
       SELECT *
       FROM spectacle
@@ -950,7 +950,7 @@ def costume_update(costume_id):
         return redirect(url_for('costumes'))
 
     cursor.execute('SELECT * FROM costume WHERE id = ?', (costume_id,))
-    costume = cursor.fetchone()
+    costume = cursor.fetchone() or abort(404)
     return render_template('costume_update.jinja2.html', costume=costume)
 
 
@@ -999,7 +999,7 @@ def makeup_update(makeup_id):
         return redirect(url_for('makeups'))
 
     cursor.execute('SELECT * FROM makeup WHERE id = ?', (makeup_id,))
-    makeup = cursor.fetchone()
+    makeup = cursor.fetchone() or abort(404)
     return render_template('makeup_update.jinja2.html', makeup=makeup)
 
 
@@ -1048,7 +1048,7 @@ def sound_update(sound_id):
         return redirect(url_for('sounds'))
 
     cursor.execute('SELECT * FROM sound WHERE id = ?', (sound_id,))
-    sound = cursor.fetchone()
+    sound = cursor.fetchone() or abort(404)
     return render_template('sound_update.jinja2.html', sound=sound)
 
 
@@ -1109,7 +1109,7 @@ def vehicle_update(vehicle_id):
         return redirect(url_for('vehicles'))
 
     cursor.execute('SELECT * FROM vehicle WHERE id = ?', (vehicle_id,))
-    vehicle = cursor.fetchone()
+    vehicle = cursor.fetchone() or abort(404)
     return render_template('vehicle_update.jinja2.html', vehicle=vehicle)
 
 
@@ -1201,7 +1201,7 @@ def artist_update(artist_id):
       ON artist.person_id = person.id
       WHERE artist.id = ?
     ''', (artist_id,))
-    artist = cursor.fetchone()
+    artist = cursor.fetchone() or abort(404)
     return render_template('artist_update.jinja2.html', artist=artist)
 
 
