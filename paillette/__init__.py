@@ -196,18 +196,24 @@ def authenticated(function):
 def date_range(dates):
     date_from, date_to = dates
     if isinstance(date_from, str):
-        date_from = datetime.strptime(date_from, '%Y-%m-%d')
+        date_from = datetime.fromisoformat(date_from)
     if isinstance(date_to, str):
-        date_to = datetime.strptime(date_to, '%Y-%m-%d')
+        date_to = datetime.fromisoformat(date_to)
     if None in dates:
         return 'dates indéterminées'
     elif date_from == date_to:
-        return f'le {date_from.strftime("%d/%m")}'
+        return f'le {date_simple(date_from)}'
     else:
-        return (
-            f'du {date_from.strftime("%d/%m")} '
-            f'au {date_to.strftime("%d/%m")}'
-        )
+        return f'du {date_simple(date_from)} au {date_simple(date_to)}'
+
+
+@app.template_filter('date_simple')
+def date_simple(date_or_string):
+    if not date_or_string:
+        return 'date indéterminée'
+    if isinstance(date_or_string, str):
+        date_or_string = date.fromisoformat(date_or_string)
+    return date_or_string.strftime('%d/%m')
 
 
 # Common

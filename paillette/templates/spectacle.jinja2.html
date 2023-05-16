@@ -95,10 +95,10 @@
     {% endif %}
 
     <dt>Départ le</dt>
-    <dd>{{ spectacle.date_from.strftime('%d/%m') }}</dd>
+    <dd>{{ spectacle.date_from | date_simple }}</dd>
 
     <dt>Retour le</dt>
-    <dd>{{ spectacle.date_to.strftime('%d/%m') }}</dd>
+    <dd>{{ spectacle.date_to | date_simple }}</dd>
 
     <dt>Véhicules</dt>
     {% for vehicle in vehicles %}

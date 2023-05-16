@@ -17,10 +17,10 @@
       <dd>{{ spectacle.place }}</dd>
 
       <dt>Du</dt>
-      <dd>{{ first_date.strftime('%d/%m') }}</dd>
+      <dd>{{ first_date | date_simple }}</dd>
 
       <dt>Au</dt>
-      <dd>{{ last_date.strftime('%d/%m') }}</dd>
+      <dd>{{ last_date | date_simple }}</dd>
 
       <dt>Évènement</dt>
       <dd>{{ spectacle.event }}</dd>
@@ -34,11 +34,9 @@
       {% endif %}
 
       <dt>Départ le</dt>
-      <dd>{{ spectacle.date_from.strftime('%d/%m') }}</dd>
+      <dd>{{ spectacle.date_from | date_simple }}</dd>
 
       <dt>Retour le</dt>
-      <dd>{{ spectacle.date_to.strftime('%d/%m') }}</dd>
-
       <dt>Spectacles</dt>
       {% for representation_id, artist_representation_dates in artist_representation_dates | groupby('representation_id') %}
         {% set representation = artist_representation_dates[0] %}
@@ -66,6 +64,8 @@
             {% endfor %}
           </dl>
         </dd>
+      <dd>{{ spectacle.date_to | date_simple }}</dd>
+
       {% else %}
         <dd>Pas de spectacle</dd>
       {% endfor %}
