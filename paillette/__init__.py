@@ -373,6 +373,13 @@ def spectacles(year=None, month=None):
         stop=stop, previous=previous, next=next)
 
 
+@app.route('/spectacle/<int:spectacle_id>')
+@authenticated
+def spectacle(spectacle_id):
+    spectacle_data = get_spectacle_data(spectacle_id)
+    return render_template('spectacle.jinja2.html', **spectacle_data)
+
+
 @app.route('/spectacle/create', methods=('GET', 'POST'))
 @authenticated
 def spectacle_create():
@@ -458,16 +465,10 @@ def spectacle_create():
         'spectacle_create.jinja2.html', artists=artists, **data)
 
 
-@app.route('/spectacle/<int:spectacle_id>')
-@authenticated
-def spectacle(spectacle_id):
-    spectacle_data = get_spectacle_data(spectacle_id)
-    return render_template('spectacle.jinja2.html', **spectacle_data)
-
-
 @app.route('/spectacle/<int:spectacle_id>/update', methods=('GET', 'POST'))
 @authenticated
 def spectacle_update(spectacle_id):
+    tables = ('sound', 'makeup', 'costume', 'vehicle')
     cursor = get_connection().cursor()
 
     if request.method == 'POST':
@@ -476,13 +477,100 @@ def spectacle_update(spectacle_id):
         cursor.execute('''
           UPDATE spectacle
           SET
+            event = :event,
+            place = :place,
+            travel_time = :travel_time,
+            trigram = :trigram,
             date_from = :date_from,
             date_to = :date_to,
-            event = :event,
-            travel_time = :travel_time,
-            trigram = :trigram
+            link = :link,
+            configuration = :configuration,
+            organizer = :organizer
           WHERE id = :id
         ''', parameters)
+
+        for table in tables:
+            cursor.execute(
+                f'DELETE FROM {table}_spectacle WHERE spectacle_id = ?',
+                (spectacle_id,))
+            for table_id in request.form.getlist(f'{table}s'):
+                cursor.execute(f'''
+                  INSERT INTO {table}_spectacle ({table}_id, spectacle_id)
+                  VALUES (?, ?)
+                ''', (table_id, spectacle_id))
+
+        cursor.execute('''
+          SELECT
+            representation.id AS representation_id,
+            representation_date.id AS representation_date_id,
+            artist_representation_date.id AS artist_representation_date_id
+          FROM representation
+          LEFT OUTER JOIN representation_date
+          ON representation.id = representation_date.representation_id
+          LEFT OUTER JOIN artist_representation_date
+          ON
+            representation_date.id =
+            artist_representation_date.representation_date_id
+          WHERE
+            representation.spectacle_id = ?
+        ''', (spectacle_id,))
+        rows = cursor.fetchall()
+        artist_representation_date_ids = {
+            row['artist_representation_date_id'] for row in rows
+            if row['artist_representation_date_id']}
+        representation_date_ids = {
+            row['representation_date_id'] for row in rows
+            if row['representation_date_id']}
+        representation_ids = {
+            row['representation_id'] for row in rows
+            if row['representation_id']}
+        cursor.execute(
+            'DELETE FROM artist_representation_date WHERE id IN '
+            f'({",".join("?" * len(artist_representation_date_ids))})',
+            tuple(artist_representation_date_ids))
+        cursor.execute(
+            'DELETE FROM representation_date WHERE id IN '
+            f'({",".join("?" * len(representation_date_ids))})',
+            tuple(representation_date_ids))
+        cursor.execute(
+            'DELETE FROM representation WHERE id IN '
+            f'({",".join("?" * len(representation_ids))})',
+            tuple(representation_ids))
+
+        for key, name in request.form.items():
+            if not key.endswith('-name'):
+                continue
+            key = key.split('-', 1)[0]
+            dates = request.form.getlist(f'{key}-dates')
+            artists = set(request.form.getlist(f'{key}-artists'))
+            if not dates or not artists:
+                continue
+            cursor.execute('''
+              INSERT INTO representation (spectacle_id, name)
+              VALUES (?, ?)
+              RETURNING id
+            ''', (spectacle_id, name))
+            representation_id = cursor.fetchone()['id']
+            for representation_date in dates:
+                if not representation_date:
+                    continue
+                cursor.execute('''
+                  INSERT INTO representation_date (representation_id, date)
+                  VALUES (?, ?)
+                  RETURNING id
+                ''', (representation_id, representation_date))
+                representation_date_id = cursor.fetchone()['id']
+                for artist_id in artists:
+                    if not artist_id:
+                        continue
+                    cursor.execute('''
+                      INSERT INTO
+                        artist_representation_date
+                        (representation_date_id, artist_id)
+                      VALUES
+                        (?, ?)
+                    ''', (representation_date_id, artist_id))
+
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
         return redirect(url_for('spectacle', spectacle_id=spectacle_id))
@@ -490,20 +578,55 @@ def spectacle_update(spectacle_id):
     cursor.execute('''
       SELECT
         spectacle.*,
+        representation_id AS representation_id,
         representation.name AS representation_name,
-        representation_date.date AS representation_date
+        GROUP_CONCAT(DISTINCT sound_spectacle.sound_id) AS sound_ids,
+        GROUP_CONCAT(DISTINCT makeup_spectacle.makeup_id) AS makeup_ids,
+        GROUP_CONCAT(DISTINCT costume_spectacle.costume_id) AS costume_ids,
+        GROUP_CONCAT(DISTINCT vehicle_spectacle.vehicle_id) AS vehicle_ids,
+        GROUP_CONCAT(DISTINCT representation_date.date)
+          AS representation_dates,
+        GROUP_CONCAT(DISTINCT artist_representation_date.artist_id)
+          AS artist_ids
       FROM spectacle
+      LEFT JOIN sound_spectacle
+      ON spectacle.id = sound_spectacle.spectacle_id
+      LEFT JOIN makeup_spectacle
+      ON spectacle.id = makeup_spectacle.spectacle_id
+      LEFT JOIN costume_spectacle
+      ON spectacle.id = costume_spectacle.spectacle_id
+      LEFT JOIN vehicle_spectacle
+      ON spectacle.id = vehicle_spectacle.spectacle_id
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id
       LEFT JOIN representation_date
       ON representation.id = representation_date.representation_id
+      LEFT JOIN artist_representation_date
+      ON
+        representation_date.id =
+        artist_representation_date.representation_date_id
       WHERE spectacle.id = ?
-      ORDER BY representation_name, representation_date
+      GROUP BY representation.id
+      ORDER BY representation_name
     ''', (spectacle_id,))
-    representation_dates = cursor.fetchall()
+    representations = cursor.fetchall()
+
+    data = {}
+    for table in tables:
+        cursor.execute(f'SELECT * FROM {table} WHERE NOT hidden ORDER BY name')
+        data[f'{table}s'] = cursor.fetchall()
+    cursor.execute('''
+      SELECT artist.id, person.name
+      FROM artist
+      JOIN person
+      ON artist.person_id = person.id
+      WHERE NOT hidden
+      ORDER BY name
+    ''')
+    artists = cursor.fetchall()
     return render_template(
-        'spectacle_update.jinja2.html',
-        representation_dates=representation_dates)
+        'spectacle_update.jinja2.html', representations=representations,
+        artists=artists, **data)
 
 
 # Roadmaps
