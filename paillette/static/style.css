@@ -9,8 +9,8 @@
 :root {
   --black: #000;
   --grey: #515151;
-  --white: #f9f9f9;
-  --white-dark: #d9d9d9;
+  --white: ##ffffff;
+  --white-dark: ##f9f9f9;
   --pink: #e090d0;
   --pink-opacity: #e090d025;
   --purple: #9050a0;
@@ -33,7 +33,7 @@ body {
 }
 
 main {
-  margin: auto;
+  margin: 4em auto auto auto;
   max-width: 1400px;
   padding: 0 1em;
 }
@@ -228,6 +228,22 @@ header nav:hover::before {
 
 header nav li:first-child a::before {
   display: none;
+}
+
+/* Footer */
+
+footer {
+  background: var(--white-dark);
+  border-bottom: 1px solid var(--purple);
+  position: fixed;
+  top: 4em;
+  width: 100%;
+}
+
+footer ul {
+  align-items: center;
+  display: flex;
+  justify-content: space-evenly;
 }
 
 /* Login */
