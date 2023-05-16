@@ -6,11 +6,8 @@
   <h2>{{ title }}</h2>
 
   <form method="post">
-    <!--
-         Sur les spectacles, y a les dates du spectacle,
-         mais y a aussi les dates d’aller et retour niveau transport.
-         Peut-être reprendre le du/au pour les dates de spectacle.
-    -->
+    <h3>Informations générales</h3>
+
     <label for="date_from">Date de départ</label>
     <input id="date_from" name="date_from" type="date" required>
 
@@ -20,12 +17,11 @@
     <label for="place">Lieu</label>
     <input id="place" name="place" required>
 
-    <!-- le temps de transport n’y est pas forcément -->
-    <label for="travel_time">Temps de transport</label>
-    <input id="travel_time" name="travel_time">
-
     <label for="event">Évènement</label>
     <input id="event" name="event" required>
+
+    <label for="travel_time">Temps de transport</label>
+    <input id="travel_time" name="travel_time">
 
     <label for="link">Lien</label>
     <input id="link" name="link">
@@ -33,37 +29,144 @@
     <label for="configuration">Configuration</label>
     <input id="configuration" name="configuration">
 
-    <label for="organizer">Organisateur</label>
+    <label for="organizer">Régisseur</label>
     <input id="organizer" name="organizer">
 
-    <label for="date_departure">Date de départ</label>
-    <input id="date_departure" name="date_departure" type="date">
+    <label>Matériel de son</label>
+    <select data-name="sound">
+      <option></option>
+      {% for sound in sounds %}
+        <option value="{{ sound.id }}">{{ sound.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="button" onClick="addElement(this)">Ajouter</button>
+    <ul></ul>
 
-    <label for="date_return">Date de retour</label>
-    <input id="date_return" name="date_return" type="date">
+    <label>Boîtes de maquillage</label>
+    <select data-name="makeup">
+      <option></option>
+      {% for makeup in makeups %}
+        <option value="{{ makeup.id }}">{{ makeup.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="button" onClick="addElement(this)">Ajouter</button>
+    <ul></ul>
 
-    <label for="spectacle">Spectacle</label>
-    <input id="spectacle_1" name="spectacle">
-    <p id="add_spectacle">Ajouter un spectacle</p>
+    <label>Costumes</label>
+    <select data-name="costume">
+      <option></option>
+      {% for costume in costumes %}
+        <option value="{{ costume.id }}">{{ costume.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="button" onClick="addElement(this)">Ajouter</button>
+    <ul></ul>
 
-    <label for="manager">Régisseur</label>
-    <input id="manager" name="manager">
+    <label>Véhicules</label>
+    <select data-name="vehicle">
+      <option></option>
+      {% for vehicle in vehicles %}
+        <option value="{{ vehicle.id }}">{{ vehicle.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="button" onClick="addElement(this)">Ajouter</button>
+    <ul></ul>
 
-    <input type="submit" value="Ajouter">
+    <h3>Spectacles</h3>
+    <label for="name">
+    <input id="name" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
+    <button type="button" onClick="addSpectacle()">Ajouter</button>
+
+    <ul id="spectacles-list">
+      <li style="display: none">
+        <input name="name">
+        <button type="button" onClick="remove(this)">Supprimer</button>
+
+        <div>
+          <label>Dates</label>
+          <input name="dates" type="date" onInput="addInputIfNeeded(this)">
+        </div>
+
+        <div>
+          <label>Artistes</label>
+          <select data-name="artist">
+            <option></option>
+            {% for artist in artists %}
+              <option value="{{ artist.id }}">{{ artist.name }}</option>
+            {% endfor %}
+          </select>
+          <button type="button" onClick="addElement(this)">Ajouter</button>
+          <ul class="artists-list"></ul>
+        </div>
+      </li>
+    </ul>
+
+    <input type="submit" value="Envoyer">
   </form>
 
   <script>
-   function add_spectacle_input() {
-       let p = document.getElementById("add_spectacle");
-       let parent = p.parentNode;
-       let id_input = Number(p.previousElementSibling.id.split("_")[1]) + 1;
-       let new_input = document.createElement("input");
-       new_input.setAttribute("id", `spectacle_${id_input}`);
-       new_input.setAttribute("name", "spectacle");
+    function addElement(button) {
+      let select = button.previousElementSibling;
+      let list = button.nextElementSibling;
+      let name = select.getAttribute("data-name");
+      let option = select.options[select.selectedIndex];
 
-       parent.insertBefore(new_input, p);
-   }
+      let li = document.createElement("li");
 
-   document.getElementById("add_spectacle").addEventListener("click", (event) => add_spectacle_input());
+      let input = document.createElement("input");
+      input.setAttribute("value", option.value);
+      input.setAttribute("name", name + "s");
+      input.setAttribute("hidden", true);
+      li.appendChild(input);
+
+      li.appendChild(document.createTextNode(option.textContent + " "));
+
+      let deleteButton = document.createElement("button");
+      deleteButton.setAttribute("type", "button");
+      deleteButton.setAttribute("onClick", "remove(this)");
+      deleteButton.textContent = "Supprimer";
+      li.appendChild(deleteButton);
+
+      list.appendChild(li);
+      select.value = null;
+    }
+
+    function addSpectacle() {
+      let id = (Math.random() + 1).toString(36).substring(7);
+      let li = document.querySelector("#spectacles-list li");
+      let newLi = li.cloneNode(true);
+      newLi.removeAttribute("style");
+      li.parentNode.appendChild(newLi);
+
+      newLi.querySelector('[name="name"]').value = document.querySelector("#name").value;
+      document.querySelector("#name").value = null;
+
+      newLi.querySelector('[name="name"]').setAttribute("name", id + "-name");
+      newLi.querySelector('[name="dates"]').setAttribute("name", id + "-dates");
+      newLi.querySelector('[data-name="artist"]').setAttribute("data-name", id + "-artist");
+
+      let previousArtists = newLi.previousElementSibling.querySelector(".artists-list");
+      let newArtists = newLi.querySelector(".artists-list");
+      [...previousArtists.children].forEach(
+        obj => {
+          let previousArtist = obj.cloneNode(true);
+          previousArtist.querySelector("input").setAttribute("name", id + "-artists");
+          newArtists.appendChild(previousArtist);
+        }
+      );
+    }
+
+    function remove(button) {
+      button.parentNode.parentNode.removeChild(button.parentNode);
+    }
+
+    function addInputIfNeeded(input) {
+      let parent = input.parentNode;
+      if (![...parent.querySelectorAll('input')].filter(node => !node.value.length).length) {
+        let newInput = input.cloneNode();
+        newInput.value = null;
+        parent.appendChild(newInput);
+      }
+    }
   </script>
 {% endblock %}

@@ -376,23 +376,86 @@ def spectacles(year=None, month=None):
 @app.route('/spectacle/create', methods=('GET', 'POST'))
 @authenticated
 def spectacle_create():
+    tables = ('sound', 'makeup', 'costume', 'vehicle')
+    cursor = get_connection().cursor()
+
     if request.method == 'POST':
-        cursor = get_connection().cursor()
         parameters = dict(request.form)
         parameters['trigram'] = parameters['place'][:3].upper()
         cursor.execute('''
           INSERT INTO
             spectacle (
-              event, place, travel_time, trigram, date_from, date_to)
+              event, place, travel_time, trigram, date_from, date_to, link,
+              configuration, organizer)
           VALUES
-            (:event, :place, :travel_time, :trigram, :date_from, :date_to)
+            (:event, :place, :travel_time, :trigram, :date_from, :date_to,
+             :link, :configuration, :organizer)
           RETURNING id
         ''', parameters)
         spectacle_id = cursor.fetchone()['id']
+
+        for table in tables:
+            for table_id in request.form.getlist(f'{table}s'):
+                cursor.execute(f'''
+                  INSERT INTO
+                    {table}_spectacle ({table}_id, spectacle_id)
+                  VALUES
+                    (?, ?)
+                ''', (table_id, spectacle_id))
+
+        for key, name in request.form.items():
+            if not key.endswith('-name'):
+                continue
+            key = key.split('-', 1)[0]
+            dates = request.form.getlist(f'{key}-dates')
+            artists = set(request.form.getlist(f'{key}-artists'))
+            if not dates or not artists:
+                continue
+            cursor.execute('''
+              INSERT INTO representation (spectacle_id, name)
+              VALUES (?, ?)
+              RETURNING id
+            ''', (spectacle_id, name))
+            representation_id = cursor.fetchone()['id']
+            for representation_date in dates:
+                if not representation_date:
+                    continue
+                cursor.execute('''
+                  INSERT INTO representation_date (representation_id, date)
+                  VALUES (?, ?)
+                  RETURNING id
+                ''', (representation_id, representation_date))
+                representation_date_id = cursor.fetchone()['id']
+                for artist_id in artists:
+                    if not artist_id:
+                        continue
+                    cursor.execute('''
+                      INSERT INTO
+                        artist_representation_date
+                        (representation_date_id, artist_id)
+                      VALUES
+                        (?, ?)
+                    ''', (representation_date_id, artist_id))
+
         cursor.connection.commit()
         flash('Le spectacle a été ajouté.')
         return redirect(url_for('spectacle', spectacle_id=spectacle_id))
-    return render_template('spectacle_create.jinja2.html')
+
+    data = {}
+    for table in tables:
+        cursor.execute(f'SELECT * FROM {table} WHERE NOT hidden ORDER BY name')
+        data[f'{table}s'] = cursor.fetchall()
+    cursor.execute('''
+      SELECT artist.id, person.name
+      FROM artist
+      JOIN person
+      ON artist.person_id = person.id
+      WHERE NOT hidden
+      ORDER BY name
+    ''')
+    artists = cursor.fetchall()
+    return render_template(
+        'spectacle_create.jinja2.html', artists=artists, **data)
 
 
 @app.route('/spectacle/<int:spectacle_id>')
