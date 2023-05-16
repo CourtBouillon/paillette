@@ -1,14 +1,298 @@
 /* Fonts */
 
+@font-face {
+  font-family: ForkAwesome;
+  src: local("ForkAwesome"), url(/static/fonts/forkawesome-webfont.woff2);
+}
 
 /* Variables */
 :root {
   --black: #000;
   --grey: #515151;
-  --white: #f9f9f9;
+  --grey-light: #f9f9f9;
+  --white: ##ffffff;
   --pink: #e090d0;
   --pink-opacity: #e090d025;
   --purple: #9050a0;
+  --purple-opacity: #9050a080
 }
 
 /* Common */
+
+html {
+  background: var(--white);
+  color: var(--black);
+  font-family: sans-serif;
+  font-size: 14pt;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+main {
+  margin: 8em auto auto auto;
+  max-width: 1400px;
+  padding: 0 1em;
+}
+
+::before {
+  display: inline-block;
+  font-family: ForkAwesome;
+  padding-right: 0.5em;
+}
+
+a {
+  color: var(--purple);
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+form > * {
+  display: block;
+}
+
+input {
+  border: 1px solid var(--pink);
+  margin: 0.5em 0 1.5em 0;
+  padding: 1em;
+}
+
+label {
+  color: var(--grey);
+  margin-top: 1em;
+}
+
+li {
+  list-style: none;
+}
+
+.button {
+  background: var(--purple);
+  border: 1px solid var(--purple);
+  color: var(--white);
+  padding: 1em;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.button:hover {
+  background: var(--purple-opacity);
+  cursor: pointer;
+}
+
+/* Flash Messages */
+
+#messages {
+  bottom: 0;
+  position: fixed;
+  right: 0;
+  width: 20em;
+}
+
+#messages section {
+  backdrop-filter: blur(0.3em);
+  background: #fffc;
+  border: 1px solid;
+  border-radius: 0.1em;
+  box-shadow: 0.1em 0.1em 0.3em #0004;
+  font-size: 0.8em;
+  line-height: 1.2;
+  margin: 1em;
+  padding: 1em 2em 1em 1em;
+  position: relative;
+}
+
+#messages section input {
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: block;
+  line-height: 0.5;
+  font-size: 1.5em;
+  margin: 0;
+  padding: 0.2em;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: min-content;
+}
+
+#messages section input::after {
+  content: '×';
+}
+
+#messages section:has(input:checked) {
+  display: none;
+}
+
+/* Nav */
+
+body::before {
+  content: url(/static/logo.jpg);
+  display: block;
+  height: 4em;
+  left: 0;
+  position: fixed;
+  top: 0;
+  transform: scale(0.75) translate(-12%, -25%);
+  z-index: 3;
+}
+
+#page-login::before {
+  display: none;
+}
+
+header {
+  background: var(--black);
+  position: fixed;
+  height: 4em;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 2
+}
+
+header nav::before {
+  align-items: center;
+  background: var(--black);
+  color: var(--purple);
+  content: "\f0c9";
+  display: flex;
+  height: 3em;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 3em;
+  z-index: 2;
+}
+
+header nav {
+  box-sizing: border-box;
+  display: block;
+  font-size: 1.3em;
+  height: 3em;
+  margin-left: auto;
+  order: -1;
+  overflow: hidden;
+  padding: 1rem;
+  position: relative;
+  transition-delay: 0.5s;
+  transition-property: z-index;
+  width: 3em;
+  z-index: 3;
+}
+
+header nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+}
+
+header nav:hover {
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  width: 33vw;
+  z-index: 1;
+}
+
+header nav:hover ul {
+  background: var(--black);
+  max-height: 20em;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+}
+
+header nav:hover li:last-child {
+  margin-left: 0;
+}
+
+header nav:hover ~ * {
+  display: block !important;
+  height: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+}
+
+header nav:hover::before {
+  display: none;
+}
+
+header nav li:first-child a::before {
+  display: none;
+}
+
+/* Footer */
+
+footer {
+  background: var(--grey-light);
+  border-bottom: 1px solid var(--purple);
+  position: fixed;
+  top: 4em;
+  width: 100%;
+  z-index: 1;
+}
+
+footer ul {
+  align-items: center;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+/* Login */
+
+#page-login {
+  align-items: center;
+  background: var(--black);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+#page-login main {
+  align-items: center;
+  display: flex;
+}
+
+#page-login h1 {
+  display: none;
+}
+
+#page-login img {
+  display: block;
+  margin: 1em 2em;
+  width: 30em;
+}
+
+#page-login input {
+  /* - borders - paddings */
+  width: calc(100% - 2px - 2em);
+}
+
+#page-login section {
+  width: 50%;
+}
+
+#page-login .button {
+  float: right;
+  margin: 0 0 0 10%;
+  width: 35%;
+}
+
+#page-login .cancel {
+  display: none;
+}

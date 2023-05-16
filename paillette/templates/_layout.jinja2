@@ -10,7 +10,6 @@
     <header>
       {% if g.person %}
         <nav>
-          <a href="{{ url_for('index') }}"><img src=""></a>
           <ul>
             <li><a href="{{ url_for('person_update') }}">Mon profil</a></li>
             <li><a href="{{ url_for('persons') }}">Utilisateurs</a></li>
