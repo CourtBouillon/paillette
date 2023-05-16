@@ -1,7 +1,7 @@
-{% set spectacle = artist_representation_dates[0] %}
-{% set first_date = (artist_representation_dates | sort(attribute='representation_date'))[0].representation_date %}
-{% set last_date = (artist_representation_dates | sort(attribute='representation_date'))[-1].representation_date %}
-{% set dates = (first_date, last_date) | date_range %}
+{% set spectacle = representations[0] %}
+{% set all_dates = (representations | join(',', attribute='representation_dates')).split(',') | sort | list %}
+{% set all_artists = (representations | join(',', attribute='artists_name_and_phone')).split(',') | sort | list %}
+{% set dates = (all_dates[0], all_dates[-1]) | date_range %}
 {% set title = '{}, {} — Feuille de route'.format(spectacle.place, dates) %}
 
 {% extends '_layout.jinja2' %}

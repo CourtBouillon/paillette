@@ -79,11 +79,13 @@ def get_spectacle_data(spectacle_id):
         spectacle.*,
         representation.id AS representation_id,
         representation.name AS representation_name,
-        representation_date.date AS representation_date,
-        representation_date.id AS representation_date_id,
-        artist_representation_date.id AS artist_representation_date_id,
-        person.name AS person_name,
-        person.phone AS person_phone
+        GROUP_CONCAT(DISTINCT representation_date.date)
+          AS representation_dates,
+        GROUP_CONCAT(
+          DISTINCT
+            replace(person.name, ',', ' ') || '||' ||
+            replace(person.phone, ',', ' '))
+          AS artists_name_and_phone
       FROM spectacle
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id
@@ -98,9 +100,10 @@ def get_spectacle_data(spectacle_id):
       LEFT JOIN person
       ON artist.person_id = person.id
       WHERE spectacle.id = ?
-      ORDER BY representation_name, representation_date
+      GROUP BY representation.id
+      ORDER BY representation_dates
     ''', (spectacle_id,))
-    artist_representation_dates = cursor.fetchall()
+    representations = cursor.fetchall()
     cursor.execute('''
       SELECT makeup.*
       FROM makeup
@@ -140,7 +143,7 @@ def get_spectacle_data(spectacle_id):
     ''', (spectacle_id,))
     images = cursor.fetchall()
     return {
-        'artist_representation_dates': artist_representation_dates,
+        'representations': representations,
         'makups': makeups,
         'sounds': sounds,
         'vehicles': vehicles,
@@ -641,7 +644,7 @@ def spectacle_update(spectacle_id):
 def roadmap(spectacle_id):
     spectacle_data = get_spectacle_data(spectacle_id)
     html = render_template('roadmap.jinja2.html', **spectacle_data)
-    place = spectacle_data['artist_representation_dates'][0]['place'].lower()
+    place = spectacle_data['representations'][0]['place'].lower()
     return render_pdf(HTML(string=html), download_filename=f'{place}.pdf')
 
 
@@ -652,7 +655,7 @@ def roadmap_send(spectacle_id):
 
     if request.method == 'POST':
         to = tuple(mail for mail in request.form.getlist('mail') if mail)
-        place = spectacle_data['artist_representation_dates'][0]['place']
+        place = spectacle_data['representations'][0]['place']
         subject = f'Feuille de route pour {place}'
         content = (
             'Bonjour,\n\n'

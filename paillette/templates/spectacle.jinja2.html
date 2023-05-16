@@ -1,7 +1,6 @@
-{% set spectacle = artist_representation_dates[0] %}
-{% set first_date = (artist_representation_dates | sort(attribute='representation_date'))[0].representation_date %}
-{% set last_date = (artist_representation_dates | sort(attribute='representation_date'))[-1].representation_date %}
-{% set dates = (first_date, last_date) | date_range %}
+{% set spectacle = representations[0] %}
+{% set all_dates = (representations | join(',', attribute='representation_dates')).split(',') | sort | list %}
+{% set dates = (all_dates[0], all_dates[-1]) | date_range %}
 {% set title = '{}, {}'.format(spectacle.place, dates) %}
 
 {% extends '_layout.jinja2' %}
@@ -29,41 +28,45 @@
       {% endif %}
     </dd>
 
-    <dt>Configuration</dt>
-    <dd>{{ spectacle.configuration }}</dd>
+    {% if spectacle.configuration %}
+      <dt>Configuration</dt>
+      <dd>{{ spectacle.configuration }}</dd>
+    {% endif %}
 
     {% if spectacle.manager %}
       <dt>Régisseur</dt>
       <dd>{{ spectacle.manager }}</dd>
     {% endif %}
 
-    <dt>Spectacles</dt>
-    {% for representation_id, artist_representation_dates in artist_representation_dates | groupby('representation_id') %}
-      {% set representation = artist_representation_dates[0] %}
-      <dd>
-        <dl>
-          <dt>Spectacle</dt>
-          <dd>{{ representation.representation_name }}</dd>
-          <dt>Dates</dt>
-          {% for representation_date_id, artist_representation_dates in artist_representation_dates | groupby('representation_date_id') %}
-            {% set representation_date = artist_representation_dates[0] %}
-            <dd>
-              <dl>
-                <dt>Date</dt>
-                <dd>{{ representation_date.representation_date.strftime('%d/%m') }}</dd>
-                <dt>Artistes</dt>
-                {% for artist_representation_date in artist_representation_dates %}
-                  <dd>{{ artist_representation_date.person_name }}</dd>
-                {% else %}
-                  <dd>Pas d’artiste</dd>
-                {% endfor %}
-              </dl>
-            </dd>
-          {% else %}
-            <dd>Pas de dates</dd>
-          {% endfor %}
-        </dl>
-      </dd>
+    {% if representations | length >= 2 %}
+      <dt>Spectacles</dt>
+    {% endif %}
+    {% for representation in representations %}
+      {% if representations | length >= 2 %}
+        <dd>
+          <dl>
+      {% endif %}
+      <dt>Spectacle</dt>
+      <dd>{{ representation.representation_name }}</dd>
+      <dt>Dates</dt>
+      {% if representation.representation_dates %}
+        {% for representation_date in representation.representation_dates.split(',') %}
+          <dd>{{ representation_date | date_simple }}</dd>
+        {% else %}
+          <dd>Pas de dates</dd>
+        {% endfor %}
+      {% endif %}
+      <dt>Artistes</dt>
+      {% for artist_name_and_phone in representation.artists_name_and_phone.split(',') %}
+        {% set name = artist_name_and_phone.split('||')[0] %}
+        <dd>{{ name }}</dd>
+      {% else %}
+        <dd>Pas d’artiste</dd>
+      {% endfor %}
+      {% if representations | length >= 2 %}
+          </dl>
+        </dd>
+      {% endif %}
     {% else %}
       <dd>Pas de spectacle</dd>
     {% endfor %}
