@@ -1,16 +1,22 @@
 import calendar
 import sqlite3
-from datetime import date, timedelta
-from email.message import EmailMessage
+from datetime import date, datetime, timedelta
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import formatdate
 from functools import wraps
+from io import BytesIO
 from locale import LC_ALL, setlocale
 from smtplib import SMTP_SSL
 from uuid import uuid4
 
 from flask import (
-    Flask, Markup, abort, flash, g, redirect, render_template, request,
+    Flask, Response, abort, flash, g, redirect, render_template, request,
     session, url_for)
 from flask_weasyprint import HTML, render_pdf
+from markupsafe import Markup
 from werkzeug.security import check_password_hash, generate_password_hash
 
 setlocale(LC_ALL, 'fr_FR.utf8')
@@ -18,7 +24,12 @@ setlocale(LC_ALL, 'fr_FR.utf8')
 app = Flask(__name__)
 app.config.update(
     SECRET_KEY=b'change_me_in_configuration_file',
-    DB='paillette.db')
+    DB='paillette.db',
+    SMTP_HOSTNAME=None,
+    SMTP_LOGIN=None,
+    SMTP_PASSWORD=None,
+    SMTP_FROM='sender@example.com',
+)
 app.config.from_envvar('PAILLETTE_CONFIG', silent=True)
 
 
@@ -77,7 +88,7 @@ def get_spectacle_data(spectacle_id):
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id
       LEFT JOIN representation_date
-      ON representation.id = representation_date.id
+      ON representation.id = representation_date.representation_id
       LEFT JOIN artist_representation_date
       ON
         representation_date.id =
@@ -122,13 +133,54 @@ def get_spectacle_data(spectacle_id):
       WHERE costume_spectacle.spectacle_id = ?
     ''', (spectacle_id,))
     costumes = cursor.fetchall()
+    cursor.execute('''
+      SELECT id
+      FROM spectacle_image
+      WHERE spectacle_id = ?
+    ''', (spectacle_id,))
+    images = cursor.fetchall()
     return {
         'artist_representation_dates': artist_representation_dates,
         'makups': makeups,
         'sounds': sounds,
         'vehicles': vehicles,
         'costumes': costumes,
+        'images': images,
     }
+
+
+def send_mail(to, subject, content, pdfs=None):
+    message = MIMEMultipart()
+    message['From'] = app.config['SMTP_FROM']
+    for to in to:
+        message['To'] = to
+    message['Date'] = formatdate(localtime=True)
+    message['Subject'] = subject
+    message.attach(MIMEText(content))
+
+    for name, pdf in (pdfs or {}).items():
+        part = MIMEBase('application', 'pdf')
+        part.set_payload(pdf)
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f'attachment; filename={name}')
+        message.attach(part)
+
+    if app.config['DEBUG']:
+        headers = str(message).split('\n\n', 1)[0]
+        markup = (
+            '<p>Message envoyé</p>'
+            f'<pre>{headers}</pre>'
+            f'<pre>{content}</pre>'
+        )
+        if pdfs:
+            markup += f'<p>+ {len(pdfs)} PDF</p>'
+        flash(Markup(markup))
+        return
+
+    smtp = SMTP_SSL(app.config['SMTP_HOSTNAME'])
+    smtp.login(app.config['SMTP_LOGIN'], app.config['SMTP_PASSWORD'])
+    smtp.send_message(message)
+    smtp.quit()
 
 
 def authenticated(function):
@@ -138,6 +190,24 @@ def authenticated(function):
             return function(*args, **kwargs)
         return abort(403)
     return wrapper
+
+
+@app.template_filter('date_range')
+def date_range(dates):
+    date_from, date_to = dates
+    if isinstance(date_from, str):
+        date_from = datetime.strptime(date_from, '%Y-%m-%d')
+    if isinstance(date_to, str):
+        date_to = datetime.strptime(date_to, '%Y-%m-%d')
+    if None in dates:
+        return 'dates indéterminées'
+    elif date_from == date_to:
+        return f'le {date_from.strftime("%d/%m")}'
+    else:
+        return (
+            f'du {date_from.strftime("%d/%m")} '
+            f'au {date_to.strftime("%d/%m")}'
+        )
 
 
 # Common
@@ -185,17 +255,10 @@ def password_lost():
         person = cursor.fetchone()
         cursor.connection.commit()
         if person:
-            url = url_for("password_reset", uuid=uuid, _external=True)
-            if app.config['DEBUG']:
-                flash(Markup(f'<a href="{url}">Nouveau mot de passe</a>.'))
-                return redirect(url_for('login'))
-            smtp = SMTP_SSL(app.config['SMTP_HOSTNAME'])
-            smtp.login(app.config['SMTP_LOGIN'], app.config['SMTP_PASSWORD'])
-            message = EmailMessage()
-            message['From'] = app.config['SMTP_FROM']
-            message['To'] = request.form['mail']
-            message['Subject'] = 'Réinitialisation de mot de passe'
-            message.set_content(
+            to = (request.form['mail'],)
+            subject = 'Réinitialisation de mot de passe'
+            url = url_for('password_reset', uuid=uuid, _external=True)
+            content = (
                 f'Bonjour {person["firstname"]} {person["lastname"]},\n\n'
                 'Vous avez demandé une réinitialisation de mot de passe '
                 'concernant votre compte Paillette. Merci de vous rendre '
@@ -204,11 +267,7 @@ def password_lost():
                 'Si vous n’êtes pas à l’origine de cette demande, vous pouvez '
                 'ignorer ce message.'
             )
-            smtp.send_message(message)
-            smtp.quit()
-        elif app.config['DEBUG']:
-            flash(f'Aucun utilisateur avec l’adresse {mail}.')
-            return redirect(url_for('login'))
+            send_mail(to, subject, content)
         flash('Un message vous a été envoyé si votre email est correct.')
         return redirect(url_for('login'))
     return render_template('password_lost.jinja2.html')
@@ -258,7 +317,7 @@ def hide(type, id):
         ''', (id,))
     else:
         cursor.execute(f'SELECT * FROM {type} WHERE id = ?', (id,))
-    element = cursor.fetchone()
+    element = cursor.fetchone() or abort(404)
     return render_template('hide.jinja2.html', element=element)
 
 
@@ -272,7 +331,7 @@ def show(type, id):
     if request.method == 'POST':
         cursor.execute(f'UPDATE {type} SET hidden = FALSE WHERE id = ?', (id,))
         cursor.connection.commit()
-        flash('L’élément a été caché.')
+        flash('L’élément n’est plus caché.')
         return redirect(url_for(f'{type}s'))
 
     if type == 'artist':
@@ -285,7 +344,7 @@ def show(type, id):
         ''', (id,))
     else:
         cursor.execute(f'SELECT * FROM {type} WHERE id = ?', (id,))
-    element = cursor.fetchone()
+    element = cursor.fetchone() or abort(404)
     return render_template('show.jinja2.html', element=element)
 
 
@@ -297,38 +356,21 @@ def spectacles(year=None, month=None):
     year, month, start, stop, previous, next = get_date_data(year, month)
     cursor = get_connection().cursor()
     cursor.execute('''
-      SELECT *
+      SELECT spectacle.*, MIN(date) AS first_date, MAX(date) AS last_date
       FROM spectacle
+      LEFT JOIN representation
+      ON spectacle.id = representation.spectacle_id
+      LEFT JOIN representation_date
+      ON representation.id = representation_date.representation_id
       WHERE date_from BETWEEN ? AND ?
       OR date_to BETWEEN ? AND ?
+      GROUP BY spectacle.id
       ORDER BY date_from
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     spectacles = cursor.fetchall()
     return render_template(
         'spectacles.jinja2.html', spectacles=spectacles, start=start,
         stop=stop, previous=previous, next=next)
-
-
-@app.route('/spectacle/create', methods=('GET', 'POST'))
-@authenticated
-def spectacle_create():
-    if request.method == 'POST':
-        cursor = get_connection().cursor()
-        parameters = dict(request.form)
-        parameters['trigram'] = parameters['place'][:3].upper()
-        cursor.execute('''
-          INSERT INTO
-            spectacle (
-              event, place, travel_time, trigram, date_from, date_to)
-          VALUES
-            (:event, :place, :travel_time, :trigram, :date_from, :date_to)
-          RETURNING id
-        ''', parameters)
-        spectacle_id = cursor.fetchone()['id']
-        cursor.connection.commit()
-        flash('Le spectacle a été ajouté.')
-        return redirect(url_for('spectacle', spectacle_id=spectacle_id))
-    return render_template('spectacle_create.jinja2.html')
 
 
 @app.route('/spectacle/<int:spectacle_id>')
@@ -338,9 +380,95 @@ def spectacle(spectacle_id):
     return render_template('spectacle.jinja2.html', **spectacle_data)
 
 
+@app.route('/spectacle/create', methods=('GET', 'POST'))
+@authenticated
+def spectacle_create():
+    tables = ('sound', 'makeup', 'costume', 'vehicle')
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        parameters = dict(request.form)
+        parameters['trigram'] = parameters['place'][:3].upper()
+        cursor.execute('''
+          INSERT INTO
+            spectacle (
+              event, place, travel_time, trigram, date_from, date_to, link,
+              configuration, organizer)
+          VALUES
+            (:event, :place, :travel_time, :trigram, :date_from, :date_to,
+             :link, :configuration, :organizer)
+          RETURNING id
+        ''', parameters)
+        spectacle_id = cursor.fetchone()['id']
+
+        for table in tables:
+            for table_id in request.form.getlist(f'{table}s'):
+                cursor.execute(f'''
+                  INSERT INTO
+                    {table}_spectacle ({table}_id, spectacle_id)
+                  VALUES
+                    (?, ?)
+                ''', (table_id, spectacle_id))
+
+        for key, name in request.form.items():
+            if not key.endswith('-name'):
+                continue
+            key = key.split('-', 1)[0]
+            dates = request.form.getlist(f'{key}-dates')
+            artists = set(request.form.getlist(f'{key}-artists'))
+            if not dates or not artists:
+                continue
+            cursor.execute('''
+              INSERT INTO representation (spectacle_id, name)
+              VALUES (?, ?)
+              RETURNING id
+            ''', (spectacle_id, name))
+            representation_id = cursor.fetchone()['id']
+            for representation_date in dates:
+                if not representation_date:
+                    continue
+                cursor.execute('''
+                  INSERT INTO representation_date (representation_id, date)
+                  VALUES (?, ?)
+                  RETURNING id
+                ''', (representation_id, representation_date))
+                representation_date_id = cursor.fetchone()['id']
+                for artist_id in artists:
+                    if not artist_id:
+                        continue
+                    cursor.execute('''
+                      INSERT INTO
+                        artist_representation_date
+                        (representation_date_id, artist_id)
+                      VALUES
+                        (?, ?)
+                    ''', (representation_date_id, artist_id))
+
+        cursor.connection.commit()
+        flash('Le spectacle a été ajouté.')
+        return redirect(url_for('spectacle', spectacle_id=spectacle_id))
+
+    data = {}
+    for table in tables:
+        cursor.execute(f'SELECT * FROM {table} WHERE NOT hidden ORDER BY name')
+        data[f'{table}s'] = cursor.fetchall()
+    cursor.execute('''
+      SELECT artist.id, person.name
+      FROM artist
+      JOIN person
+      ON artist.person_id = person.id
+      WHERE NOT hidden
+      ORDER BY name
+    ''')
+    artists = cursor.fetchall()
+    return render_template(
+        'spectacle_create.jinja2.html', artists=artists, **data)
+
+
 @app.route('/spectacle/<int:spectacle_id>/update', methods=('GET', 'POST'))
 @authenticated
 def spectacle_update(spectacle_id):
+    tables = ('sound', 'makeup', 'costume', 'vehicle')
     cursor = get_connection().cursor()
 
     if request.method == 'POST':
@@ -349,13 +477,100 @@ def spectacle_update(spectacle_id):
         cursor.execute('''
           UPDATE spectacle
           SET
+            event = :event,
+            place = :place,
+            travel_time = :travel_time,
+            trigram = :trigram,
             date_from = :date_from,
             date_to = :date_to,
-            event = :event,
-            travel_time = :travel_time,
-            trigram = :trigram
+            link = :link,
+            configuration = :configuration,
+            organizer = :organizer
           WHERE id = :id
         ''', parameters)
+
+        for table in tables:
+            cursor.execute(
+                f'DELETE FROM {table}_spectacle WHERE spectacle_id = ?',
+                (spectacle_id,))
+            for table_id in request.form.getlist(f'{table}s'):
+                cursor.execute(f'''
+                  INSERT INTO {table}_spectacle ({table}_id, spectacle_id)
+                  VALUES (?, ?)
+                ''', (table_id, spectacle_id))
+
+        cursor.execute('''
+          SELECT
+            representation.id AS representation_id,
+            representation_date.id AS representation_date_id,
+            artist_representation_date.id AS artist_representation_date_id
+          FROM representation
+          LEFT OUTER JOIN representation_date
+          ON representation.id = representation_date.representation_id
+          LEFT OUTER JOIN artist_representation_date
+          ON
+            representation_date.id =
+            artist_representation_date.representation_date_id
+          WHERE
+            representation.spectacle_id = ?
+        ''', (spectacle_id,))
+        rows = cursor.fetchall()
+        artist_representation_date_ids = {
+            row['artist_representation_date_id'] for row in rows
+            if row['artist_representation_date_id']}
+        representation_date_ids = {
+            row['representation_date_id'] for row in rows
+            if row['representation_date_id']}
+        representation_ids = {
+            row['representation_id'] for row in rows
+            if row['representation_id']}
+        cursor.execute(
+            'DELETE FROM artist_representation_date WHERE id IN '
+            f'({",".join("?" * len(artist_representation_date_ids))})',
+            tuple(artist_representation_date_ids))
+        cursor.execute(
+            'DELETE FROM representation_date WHERE id IN '
+            f'({",".join("?" * len(representation_date_ids))})',
+            tuple(representation_date_ids))
+        cursor.execute(
+            'DELETE FROM representation WHERE id IN '
+            f'({",".join("?" * len(representation_ids))})',
+            tuple(representation_ids))
+
+        for key, name in request.form.items():
+            if not key.endswith('-name'):
+                continue
+            key = key.split('-', 1)[0]
+            dates = request.form.getlist(f'{key}-dates')
+            artists = set(request.form.getlist(f'{key}-artists'))
+            if not dates or not artists:
+                continue
+            cursor.execute('''
+              INSERT INTO representation (spectacle_id, name)
+              VALUES (?, ?)
+              RETURNING id
+            ''', (spectacle_id, name))
+            representation_id = cursor.fetchone()['id']
+            for representation_date in dates:
+                if not representation_date:
+                    continue
+                cursor.execute('''
+                  INSERT INTO representation_date (representation_id, date)
+                  VALUES (?, ?)
+                  RETURNING id
+                ''', (representation_id, representation_date))
+                representation_date_id = cursor.fetchone()['id']
+                for artist_id in artists:
+                    if not artist_id:
+                        continue
+                    cursor.execute('''
+                      INSERT INTO
+                        artist_representation_date
+                        (representation_date_id, artist_id)
+                      VALUES
+                        (?, ?)
+                    ''', (representation_date_id, artist_id))
+
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
         return redirect(url_for('spectacle', spectacle_id=spectacle_id))
@@ -363,20 +578,55 @@ def spectacle_update(spectacle_id):
     cursor.execute('''
       SELECT
         spectacle.*,
+        representation_id AS representation_id,
         representation.name AS representation_name,
-        representation_date.date AS representation_date
+        GROUP_CONCAT(DISTINCT sound_spectacle.sound_id) AS sound_ids,
+        GROUP_CONCAT(DISTINCT makeup_spectacle.makeup_id) AS makeup_ids,
+        GROUP_CONCAT(DISTINCT costume_spectacle.costume_id) AS costume_ids,
+        GROUP_CONCAT(DISTINCT vehicle_spectacle.vehicle_id) AS vehicle_ids,
+        GROUP_CONCAT(DISTINCT representation_date.date)
+          AS representation_dates,
+        GROUP_CONCAT(DISTINCT artist_representation_date.artist_id)
+          AS artist_ids
       FROM spectacle
+      LEFT JOIN sound_spectacle
+      ON spectacle.id = sound_spectacle.spectacle_id
+      LEFT JOIN makeup_spectacle
+      ON spectacle.id = makeup_spectacle.spectacle_id
+      LEFT JOIN costume_spectacle
+      ON spectacle.id = costume_spectacle.spectacle_id
+      LEFT JOIN vehicle_spectacle
+      ON spectacle.id = vehicle_spectacle.spectacle_id
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id
       LEFT JOIN representation_date
-      ON representation.id = representation_date.id
+      ON representation.id = representation_date.representation_id
+      LEFT JOIN artist_representation_date
+      ON
+        representation_date.id =
+        artist_representation_date.representation_date_id
       WHERE spectacle.id = ?
-      ORDER BY representation_name, representation_date
+      GROUP BY representation.id
+      ORDER BY representation_name
     ''', (spectacle_id,))
-    representation_dates = cursor.fetchall()
+    representations = cursor.fetchall()
+
+    data = {}
+    for table in tables:
+        cursor.execute(f'SELECT * FROM {table} WHERE NOT hidden ORDER BY name')
+        data[f'{table}s'] = cursor.fetchall()
+    cursor.execute('''
+      SELECT artist.id, person.name
+      FROM artist
+      JOIN person
+      ON artist.person_id = person.id
+      WHERE NOT hidden
+      ORDER BY name
+    ''')
+    artists = cursor.fetchall()
     return render_template(
-        'spectacle_update.jinja2.html',
-        representation_dates=representation_dates)
+        'spectacle_update.jinja2.html', representations=representations,
+        artists=artists, **data)
 
 
 # Roadmaps
@@ -389,10 +639,29 @@ def roadmap(spectacle_id):
     return render_pdf(HTML(string=html), download_filename=f'{place}.pdf')
 
 
-@app.route('/roadmap/<int:spectacle_id>/send')
+@app.route('/roadmap/<int:spectacle_id>/send', methods=('GET', 'POST'))
 @authenticated
 def roadmap_send(spectacle_id):
     spectacle_data = get_spectacle_data(spectacle_id)
+
+    if request.method == 'POST':
+        to = tuple(mail for mail in request.form.getlist('mail') if mail)
+        place = spectacle_data['artist_representation_dates'][0]['place']
+        subject = f'Feuille de route pour {place}'
+        content = (
+            'Bonjour,\n\n'
+            'Veuillez trouver en pièce jointe la feuille de route '
+            f'pour {place}.\n\n'
+            'Cordialement,\n'
+            'Mademoiselle Paillette'
+        )
+        html = render_template('roadmap.jinja2.html', **spectacle_data)
+        pdf = HTML(string=html).write_pdf()
+        attachments = {f'{place.lower()}.pdf': pdf}
+        send_mail(to, subject, content, attachments)
+        flash('La feuille de route a été envoyée.')
+        return redirect(url_for('spectacle', spectacle_id=spectacle_id))
+
     cursor = get_connection().cursor()
     cursor.execute('''
       SELECT name, mail
@@ -412,10 +681,72 @@ def roadmap_send(spectacle_id):
       JOIN representation
       ON representation_date.representation_id = representation.id
       WHERE representation.spectacle_id = ?
-    ''', (spectacle_id, session['person_id']))
+    ''', (session['person_id'], spectacle_id))
     recipients = cursor.fetchall()
+    cursor.execute('SELECT name, mail FROM person ORDER BY name')
+    persons = cursor.fetchall()
     return render_template(
-        'roadmap_send.jinja2.html', recipients=recipients, **spectacle_data)
+        'roadmap_send.jinja2.html', recipients=recipients, persons=persons,
+        **spectacle_data)
+
+
+@app.route('/roadmap/<int:spectacle_id>/comment', methods=('POST',))
+@authenticated
+def roadmap_comment(spectacle_id):
+    parameters = dict(request.form)
+    parameters['spectacle_id'] = spectacle_id
+    cursor = get_connection().cursor()
+    cursor.execute('''
+      UPDATE spectacle
+      SET images_comment = :images_comment
+      WHERE id = :spectacle_id
+    ''', parameters)
+    cursor.connection.commit()
+    flash('Le commentaire des images a été mis à jour.')
+    return redirect(url_for('roadmap', spectacle_id=spectacle_id))
+
+
+@app.route('/roadmap/<int:spectacle_id>/attach', methods=('POST',))
+@authenticated
+def roadmap_attach_image(spectacle_id):
+    images = request.files.getlist('images')
+    if images:
+        cursor = get_connection().cursor()
+        for image in images:
+            bytes = BytesIO()
+            image.save(bytes)
+            cursor.execute('''
+              INSERT INTO spectacle_image (spectacle_id, image)
+              VALUES (?, ?)
+            ''', (spectacle_id, bytes.getvalue()))
+        cursor.connection.commit()
+        flash('Les images ont été ajoutées.')
+    return redirect(url_for('roadmap', spectacle_id=spectacle_id))
+
+
+@app.route('/roadmap/image/<image_id>/detach', methods=('POST',))
+@authenticated
+def roadmap_detach_image(image_id):
+    cursor = get_connection().cursor()
+    cursor.execute(
+        'DELETE FROM spectacle_image WHERE id = ? RETURNING spectacle_id',
+        (image_id,))
+    image = cursor.fetchone() or abort(404)
+    cursor.connection.commit()
+    flash('L’image a été supprimée.')
+    spectacle_id = image['spectacle_id']
+    return redirect(url_for('roadmap', spectacle_id=spectacle_id))
+
+
+@app.route('/roadmap/image/<int:image_id>')
+@authenticated
+def roadmap_image(image_id):
+    cursor = get_connection().cursor()
+    cursor.execute('SELECT * FROM spectacle_image WHERE id = ?', (image_id,))
+    image = cursor.fetchone() or abort(404)
+    data = image['image']
+    format = 'png' if data[1:4] == b'PNG' else 'jpeg'
+    return Response(data, mimetype=f'image/{format}')
 
 
 # Follow-ups
@@ -449,6 +780,7 @@ def artists_followup(year=None, month=None):
       ON representation_date.representation_id = representation.id
       LEFT JOIN spectacle
       ON representation.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT artist.hidden
       ''', (start, stop))
     artists_spectacles = cursor.fetchall()
     cursor.execute('''
@@ -490,6 +822,7 @@ def costumes_followup(year=None, month=None):
         OR date_to BETWEEN ? AND ?
       ) AS spectacle
       ON costume_spectacle.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT costume.hidden
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     costumes_spectacles = cursor.fetchall()
     return render_template(
@@ -523,6 +856,7 @@ def makeups_followup(year=None, month=None):
         OR date_to BETWEEN ? AND ?
       ) AS spectacle
       ON makeup_spectacle.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT makeup.hidden
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     makeups_spectacles = cursor.fetchall()
     return render_template(
@@ -556,6 +890,7 @@ def sounds_followup(year=None, month=None):
         OR date_to BETWEEN ? AND ?
       ) AS spectacle
       ON sound_spectacle.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT sound.hidden
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     sounds_spectacles = cursor.fetchall()
     return render_template(
@@ -589,6 +924,7 @@ def vehicles_followup(year=None, month=None):
         OR date_to BETWEEN ? AND ?
       ) AS spectacle
       ON vehicle_spectacle.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT vehicle.hidden
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     vehicles_spectacles = cursor.fetchall()
     return render_template(
@@ -690,7 +1026,7 @@ def availabilities_update(artist_id, date):
       ON artist.id = representation.artist_id
       WHERE artist.id = ?
     ''', (date, date, artist_id))
-    artist = cursor.fetchone()
+    artist = cursor.fetchone() or abort(404)
     cursor.execute('''
       SELECT *
       FROM spectacle
@@ -800,7 +1136,7 @@ def costume_update(costume_id):
         return redirect(url_for('costumes'))
 
     cursor.execute('SELECT * FROM costume WHERE id = ?', (costume_id,))
-    costume = cursor.fetchone()
+    costume = cursor.fetchone() or abort(404)
     return render_template('costume_update.jinja2.html', costume=costume)
 
 
@@ -849,7 +1185,7 @@ def makeup_update(makeup_id):
         return redirect(url_for('makeups'))
 
     cursor.execute('SELECT * FROM makeup WHERE id = ?', (makeup_id,))
-    makeup = cursor.fetchone()
+    makeup = cursor.fetchone() or abort(404)
     return render_template('makeup_update.jinja2.html', makeup=makeup)
 
 
@@ -898,7 +1234,7 @@ def sound_update(sound_id):
         return redirect(url_for('sounds'))
 
     cursor.execute('SELECT * FROM sound WHERE id = ?', (sound_id,))
-    sound = cursor.fetchone()
+    sound = cursor.fetchone() or abort(404)
     return render_template('sound_update.jinja2.html', sound=sound)
 
 
@@ -959,7 +1295,7 @@ def vehicle_update(vehicle_id):
         return redirect(url_for('vehicles'))
 
     cursor.execute('SELECT * FROM vehicle WHERE id = ?', (vehicle_id,))
-    vehicle = cursor.fetchone()
+    vehicle = cursor.fetchone() or abort(404)
     return render_template('vehicle_update.jinja2.html', vehicle=vehicle)
 
 
@@ -1051,7 +1387,7 @@ def artist_update(artist_id):
       ON artist.person_id = person.id
       WHERE artist.id = ?
     ''', (artist_id,))
-    artist = cursor.fetchone()
+    artist = cursor.fetchone() or abort(404)
     return render_template('artist_update.jinja2.html', artist=artist)
 
 

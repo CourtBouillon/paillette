@@ -16,11 +16,12 @@
   </ul>
 
   {% for spectacle in spectacles %}
+    {% set dates = (spectacle.first_date, spectacle.last_date) | date_range %}
     <section>
-      <h3><a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">{{ '{}, du {} au {}'.format(spectacle.place, spectacle.date_from.strftime('%d/%m'), spectacle.date_to.strftime('%d/%m')) }}</a></h3>
+      <h3><a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">{{ '{}, {}'.format(spectacle.place, dates) }}</a></h3>
       <dl>
         <dt>Date</dt>
-        <dd>Du {{ spectacle.date_from.strftime('%d/%m') }} au {{ spectacle.date_to.strftime('%d/%m') }}</dd>
+        <dd>{{ dates | capitalize }}</dd>
         <dt>Lieu</dt>
         <dd>{{ spectacle.place }}</dd>
         <dt>Évènement</dt>

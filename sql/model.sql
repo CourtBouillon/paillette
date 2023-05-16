@@ -18,6 +18,7 @@ CREATE TABLE spectacle (
   place TEXT NOT NULL,
   configuration TEXT NOT NULL,
   travel_time TEXT,
+  link TEXT,
   manager TEXT,
   organizer TEXT,
   trigram TEXT NOT NULL,
@@ -28,7 +29,15 @@ CREATE TABLE spectacle (
   contact TEXT,
   planning TEXT,
   hosting TEXT,
-  meal TEXT
+  meal TEXT,
+  images_comment TEXT,
+  sound_comment TEXT
+);
+
+CREATE TABLE spectacle_image (
+  id INTEGER PRIMARY KEY,
+  spectacle_id INTEGER NOT NULL REFERENCES spectacle(id),
+  image BINARY NOT NULL
 );
 
 CREATE TABLE artist (
