@@ -9,8 +9,8 @@
 :root {
   --black: #000;
   --grey: #515151;
+  --grey-light: #f9f9f9;
   --white: ##ffffff;
-  --white-dark: ##f9f9f9;
   --pink: #e090d0;
   --pink-opacity: #e090d025;
   --purple: #9050a0;
@@ -233,7 +233,7 @@ header nav li:first-child a::before {
 /* Footer */
 
 footer {
-  background: var(--white-dark);
+  background: var(--grey-light);
   border-bottom: 1px solid var(--purple);
   position: fixed;
   top: 4em;
