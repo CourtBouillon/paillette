@@ -140,9 +140,10 @@ body::before {
   display: block;
   height: 4em;
   left: 0;
-  position: absolute;
+  position: fixed;
   top: 0;
   transform: scale(0.75) translate(-12%, -25%);
+  z-index: 3;
 }
 
 #page-login::before {
@@ -151,7 +152,12 @@ body::before {
 
 header {
   background: var(--black);
+  position: fixed;
   height: 4em;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 2
 }
 
 header nav::before {
@@ -238,6 +244,7 @@ footer {
   position: fixed;
   top: 4em;
   width: 100%;
+  z-index: 1;
 }
 
 footer ul {
