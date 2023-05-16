@@ -145,6 +145,10 @@ body::before {
   transform: scale(0.75) translate(-12%, -25%);
 }
 
+#page-login::before {
+  display: none;
+}
+
 header {
   background: var(--black);
   height: 4em;
