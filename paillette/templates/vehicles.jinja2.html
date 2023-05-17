@@ -6,7 +6,7 @@
   <h2>{{ title }}</h2>
 
   <ul class="actions">
-    <li><a href="{{ url_for('vehicle_create') }}">Ajouter un vehicule</a></li>
+    <li><a class="create" href="{{ url_for('vehicle_create') }}">Ajouter un vehicule</a></li>
   </ul>
 
   {% for hidden, vehicles in vehicles | groupby('hidden') | sort %}

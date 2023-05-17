@@ -6,7 +6,7 @@
   <h2>{{ title }}</h2>
 
   <ul class="actions">
-    <li><a href="{{ url_for('makeup_create') }}">Ajouter une boîte de maquillage</a></li>
+    <li><a class="create" href="{{ url_for('makeup_create') }}">Ajouter une boîte de maquillage</a></li>
   </ul>
 
   {% for hidden, makeups in makeups | groupby('hidden') | sort %}

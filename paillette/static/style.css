@@ -249,6 +249,42 @@ footer ul {
   justify-content: space-evenly;
 }
 
+/* Actions */
+
+.actions {
+  display: flex;
+  position: absolute;
+  right: 1em;
+  top: 7em;
+}
+
+.actions *::before {
+  font-size: 2rem;
+}
+
+.create,
+.overview,
+.send,
+.update {
+  font-size: 0;
+}
+
+.create::before {
+  content: "\f196";
+}
+
+.overview::before {
+  content: "\f06e";
+}
+
+.send::before {
+  content: "\f016";
+}
+
+.update::before {
+  content: "\f044";
+}
+
 /* Login */
 
 #page-login::before,
