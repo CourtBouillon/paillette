@@ -10,7 +10,7 @@
   --black: #000;
   --grey: #515151;
   --grey-light: #f9f9f9;
-  --white: ##ffffff;
+  --white: #ffffff;
   --pink: #e090d0;
   --pink-opacity: #e090d025;
   --purple: #9050a0;
@@ -76,6 +76,9 @@ input {
 }
 
 label {
+  border-bottom: 5px solid;
+  border-image-slice: 0 0 7 0;
+  border-image-source: linear-gradient(to right, var(--pink), 10%, var(--white), 0%, transparent);
   color: var(--grey);
   margin-top: 1em;
 }
