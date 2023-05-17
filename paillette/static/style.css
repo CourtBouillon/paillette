@@ -62,7 +62,10 @@ form > * {
   display: block;
 }
 
-h1, h2 {
+h1,
+#page-spectacles h2,
+#page-spectacle h2,
+body[id$="followup"] h2 {
   display: none;
 }
 
