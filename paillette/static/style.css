@@ -262,17 +262,34 @@ footer ul {
 
 /* Before */
 
+.artist,
+.costume,
 .create,
+.makeup,
 .next,
 .overview,
 .previous,
 .send,
+.sound,
+.vehicle,
 .update {
   font-size: 0;
 }
 
+.artist::before {
+  content: "\f2c0";
+}
+
+.costume::before {
+  content: "\f006";
+}
+
 .create::before {
   content: "\f196";
+}
+
+.makeup::before {
+  content: "\f1fc";
 }
 
 .next::before {
@@ -292,6 +309,14 @@ footer ul {
   content: "\f016";
 }
 
+.sound::before {
+  content: "\f001";
+}
+
+.vehicle::before {
+  content: "\f0d1";
+}
+
 .update::before {
   content: "\f044";
 }
@@ -305,14 +330,19 @@ footer ul {
   top: 7em;
 }
 
-/* Time */
+/* Follow & Time */
 
+.follow,
 .time {
   align-items: center;
   display: flex;
   justify-content: center;
   padding: 0;
   width: 100%;
+}
+
+.follow *::before {
+  padding: 0 2em;
 }
 
 /* Login */

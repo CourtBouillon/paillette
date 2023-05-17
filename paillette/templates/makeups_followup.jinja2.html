@@ -5,12 +5,12 @@
 {% block content %}
   <h2>{{ title }}</h2>
 
-  <ul>
-    <li><a href="{{ url_for('artists_followup', year=start.year, month=start.month) }}">Artistes</a></li>
-    <li><a href="{{ url_for('costumes_followup', year=start.year, month=start.month) }}">Costumes</a></li>
-    <li><a href="{{ url_for('makeups_followup', year=start.year, month=start.month) }}">Maquillage</a></li>
-    <li><a href="{{ url_for('sounds_followup', year=start.year, month=start.month) }}">Son</a></li>
-    <li><a href="{{ url_for('vehicles_followup', year=start.year, month=start.month) }}">Véhicules</a></li>
+  <ul class="follow">
+    <li><a class="artist" href="{{ url_for('artists_followup', year=start.year, month=start.month) }}">Artistes</a></li>
+    <li><a class="costume" href="{{ url_for('costumes_followup', year=start.year, month=start.month) }}">Costumes</a></li>
+    <li><a class="makeup" href="{{ url_for('makeups_followup', year=start.year, month=start.month) }}">Maquillage</a></li>
+    <li><a class="sound" href="{{ url_for('sounds_followup', year=start.year, month=start.month) }}">Son</a></li>
+    <li><a class="vehicle" href="{{ url_for('vehicles_followup', year=start.year, month=start.month) }}">Véhicules</a></li>
   </ul>
 
   <ul class="time">
