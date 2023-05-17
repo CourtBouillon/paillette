@@ -62,6 +62,10 @@ form > * {
   display: block;
 }
 
+h1, h2 {
+  display: none;
+}
+
 input {
   border: 1px solid var(--pink);
   margin: 0.5em 0 1.5em 0;
@@ -327,10 +331,6 @@ footer ul {
 #page-login main {
   align-items: center;
   display: flex;
-}
-
-#page-login h1 {
-  display: none;
 }
 
 #page-login img {
