@@ -1,4 +1,4 @@
-{% set title = 'Vehicules' %}
+{% set title = 'Véhicules' %}
 
 {% extends '_layout.jinja2' %}
 
@@ -17,11 +17,11 @@
     <dl>
       {% for vehicle in vehicles %}
         <dt{% if vehicle.color %} data-color="{{ vehicle.color }}"{% endif %}>{{ vehicle.name }}</dt>
-        <dd><a href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">Éditer</a></dd>
+        <dd><a class="update" href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">Éditer</a></dd>
         {% if hidden %}
-          <dd><a href="{{ url_for('show', type='vehicle', id=vehicle.id) }}">Montrer</a></dd>
+          <dd><a class="show" href="{{ url_for('show', type='vehicle', id=vehicle.id) }}">Montrer</a></dd>
         {% else %}
-          <dd><a href="{{ url_for('hide', type='vehicle', id=vehicle.id) }}">Cacher</a></dd>
+          <dd><a class="hide" href="{{ url_for('hide', type='vehicle', id=vehicle.id) }}">Cacher</a></dd>
         {% endif %}
       {% endfor %}
     </dl>

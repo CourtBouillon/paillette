@@ -275,11 +275,13 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 .artist,
 .costume,
 .create,
+.hide,
 .makeup,
 .next,
 .overview,
 .previous,
 .send,
+.show,
 .sound,
 .vehicle,
 .update {
@@ -296,6 +298,10 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 
 .create::before {
   content: "\f196";
+}
+
+.hide::before {
+  content: "\f070";
 }
 
 .makeup::before {
@@ -317,6 +323,10 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 
 .send::before {
   content: "\f016";
+}
+
+.show::before {
+  content: "\f06e";
 }
 
 .sound::before {

@@ -18,11 +18,11 @@
       <dl>
         {% for sound in sounds %}
           <dt{% if sound.color %} data-color="{{ sound.color }}"{% endif %}>{{ sound.name }}</dt>
-          <dd><a href="{{ url_for('sound_update', sound_id=sound.id) }}">Éditer</a></dd>
+          <dd><a class="update" href="{{ url_for('sound_update', sound_id=sound.id) }}">Éditer</a></dd>
           {% if hidden %}
-            <dd><a href="{{ url_for('show', type='sound', id=sound.id) }}">Montrer</a></dd>
+            <dd><a class="show" href="{{ url_for('show', type='sound', id=sound.id) }}">Montrer</a></dd>
           {% else %}
-            <dd><a href="{{ url_for('hide', type='sound', id=sound.id) }}">Cacher</a></dd>
+            <dd><a class="hide" href="{{ url_for('hide', type='sound', id=sound.id) }}">Cacher</a></dd>
           {% endif %}
         {% endfor %}
       </dl>

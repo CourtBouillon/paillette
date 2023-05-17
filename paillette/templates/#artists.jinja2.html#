@@ -3,7 +3,7 @@
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>{{ title }}</h2>
+  <h2 class="artist">{{ title }}</h2>
 
   <ul class="actions">
     <li><a class="create" href="{{ url_for('artist_create') }}">Ajouter un artiste</a></li>
