@@ -5,10 +5,10 @@
 {% block content %}
   <h2>{{ title }}</h2>
 
-  <ul>
-    <li><a href="{{ url_for('spectacles', year=previous.year, month=previous.month) }}">Mois précédent</a></li>
+  <ul class="time">
+    <li><a class="previous" href="{{ url_for('spectacles', year=previous.year, month=previous.month) }}">Mois précédent</a></li>
     <li>{{ start.strftime('%B %Y') | capitalize }}</li>
-    <li><a href="{{ url_for('spectacles', year=next.year, month=next.month) }}">Mois suivant</a></li>
+    <li><a class="next" href="{{ url_for('spectacles', year=next.year, month=next.month) }}">Mois suivant</a></li>
   </ul>
 
   <ul class="actions">

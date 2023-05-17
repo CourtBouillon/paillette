@@ -38,6 +38,10 @@ main {
   padding: 0 1em;
 }
 
+main ::before {
+  font-size: 2rem;
+}
+
 ::before {
   display: inline-block;
   font-family: ForkAwesome;
@@ -249,21 +253,12 @@ footer ul {
   justify-content: space-evenly;
 }
 
-/* Actions */
-
-.actions {
-  display: flex;
-  position: absolute;
-  right: 1em;
-  top: 7em;
-}
-
-.actions *::before {
-  font-size: 2rem;
-}
+/* Before */
 
 .create,
+.next,
 .overview,
+.previous,
 .send,
 .update {
   font-size: 0;
@@ -273,8 +268,17 @@ footer ul {
   content: "\f196";
 }
 
+.next::before {
+  content: "\f105";
+  padding-left: 0.5em;
+}
+
 .overview::before {
   content: "\f06e";
+}
+
+.previous::before {
+  content: "\f104";
 }
 
 .send::before {
@@ -283,6 +287,25 @@ footer ul {
 
 .update::before {
   content: "\f044";
+}
+
+/* Actions */
+
+.actions {
+  display: flex;
+  position: absolute;
+  right: 1em;
+  top: 7em;
+}
+
+/* Time */
+
+.time {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  width: 100%;
 }
 
 /* Login */
