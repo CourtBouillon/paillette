@@ -146,10 +146,6 @@ body::before {
   z-index: 3;
 }
 
-#page-login::before {
-  display: none;
-}
-
 header {
   background: var(--black);
   position: fixed;
@@ -254,6 +250,12 @@ footer ul {
 }
 
 /* Login */
+
+#page-login::before,
+#page-login header,
+#page-login footer {
+  display: none;
+}
 
 #page-login {
   align-items: center;
