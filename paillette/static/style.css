@@ -260,7 +260,17 @@ footer ul {
   justify-content: space-evenly;
 }
 
+body[id^="page-spectacle"] footer ul li:first-of-type a,
+body[id="page-roadmap_send"] footer ul li:first-of-type a,
+body[id$="followup"] footer ul li:nth-of-type(2) a {
+  text-decoration: underline;
+}
+
 /* Before */
+
+.active::before {
+  border: 1px solid var(--purple);
+}
 
 .artist,
 .costume,
@@ -342,7 +352,8 @@ footer ul {
 }
 
 .follow *::before {
-  padding: 0 2em;
+  margin: 0 2em;
+  padding: 0.1em 0.25em;
 }
 
 /* Login */
