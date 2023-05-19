@@ -3,7 +3,7 @@
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>{{ title }}</h2>
+  <h2 class="vehicle">{{ title }}</h2>
 
   <ul class="actions">
     <li><a class="create" href="{{ url_for('vehicle_create') }}">Ajouter un vehicule</a></li>
@@ -16,13 +16,15 @@
     {% endif %}
     <dl>
       {% for vehicle in vehicles %}
-        <dt{% if vehicle.color %} data-color="{{ vehicle.color }}"{% endif %}>{{ vehicle.name }}</dt>
+      <div>
+        <dt{% if vehicle.color %} data-color="{{ vehicle.color }}"{% endif %}><a href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">{{ vehicle.name }}</a></dt>
         <dd><a class="update" href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">Éditer</a></dd>
         {% if hidden %}
           <dd><a class="show" href="{{ url_for('show', type='vehicle', id=vehicle.id) }}">Montrer</a></dd>
         {% else %}
           <dd><a class="hide" href="{{ url_for('hide', type='vehicle', id=vehicle.id) }}">Cacher</a></dd>
         {% endif %}
+      </div>
       {% endfor %}
     </dl>
     {% if hidden %}

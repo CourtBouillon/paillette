@@ -55,6 +55,7 @@ a {
 }
 
 a:hover {
+  color: var(--pink);
   text-decoration: underline;
 }
 
@@ -62,11 +63,20 @@ form > * {
   display: block;
 }
 
+dd {
+  margin: 0;
+}
+
 h1,
 #page-spectacles h2,
 #page-spectacle h2,
 body[id$="followup"] h2 {
   display: none;
+}
+
+h2,
+summary {
+  font-size: 2em;
 }
 
 input {
@@ -413,4 +423,71 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 
 #page-login .cancel {
   display: none;
+}
+
+/* Artists, Costumes, Make-up, Sounds, Vehicles */
+
+#page-artists h2,
+#page-costumes h2,
+#page-makeups h2,
+#page-sounds h2,
+#page-vehicles h2 {
+  font-size: 2em;
+}
+
+#page-artists div,
+#page-costumes div,
+#page-makeups div,
+#page-sounds div,
+#page-vehicles div
+{
+  display: flex;
+  margin-bottom: 1em;
+  width: 50%;
+}
+
+#page-artists div:hover,
+#page-costumes div:hover,
+#page-makeups div:hover,
+#page-sounds div:hover,
+#page-vehicles div:hover
+{
+  background: var(--grey-light);
+}
+
+#page-artists dl ::before,
+#page-costumes dl ::before,
+#page-makeups dl ::before,
+#page-sounds dl ::before,
+#page-vehicles dl ::before
+{
+  font-size: 1rem;
+  padding: 0;
+}
+
+#page-artists dt a,
+#page-costumes dt a,
+#page-makeups dt a,
+#page-sounds dt a,
+#page-vehicles dt a
+{
+  color: inherit;
+}
+
+#page-artists div dt,
+#page-costumes div dt,
+#page-makeups div dt,
+#page-sounds div dt,
+#page-vehicles div dt
+{
+  width: 75%;
+}
+
+#page-artists div dd,
+#page-costumes div dd,
+#page-makeups div dd,
+#page-sounds div dd,
+#page-vehicles div dd
+{
+  margin: 0 1em;
 }
