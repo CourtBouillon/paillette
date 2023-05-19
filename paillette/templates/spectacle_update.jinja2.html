@@ -40,13 +40,15 @@
     <input id="organizer" name="organizer" value="{{ spectacle.organizer or '' }}">
 
     <label>Matériel de son</label>
-    <select data-name="sound">
-      <option></option>
-      {% for sound in sounds %}
+    <div>
+      <select data-name="sound">
+        <option></option>
+        {% for sound in sounds %}
         <option value="{{ sound.id }}">{{ sound.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="button" onClick="addElement(this)">Ajouter</button>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
     <ul>
       {% if spectacle.sound_ids %}
         {% set sound_ids = spectacle.sound_ids.split(',') %}
@@ -55,7 +57,7 @@
             <li>
               <input name="sounds" value="{{ sound.id }}" hidden>
               {{ sound.name }}
-              <button type="button" onClick="remove(this)">Supprimer</button>
+              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
             </li>
           {% endif %}
         {% endfor %}
@@ -63,13 +65,15 @@
     </ul>
 
     <label>Boîtes de maquillage</label>
-    <select data-name="makeup">
-      <option></option>
-      {% for makeup in makeups %}
+    <div>
+      <select data-name="makeup">
+        <option></option>
+        {% for makeup in makeups %}
         <option value="{{ makeup.id }}">{{ makeup.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="button" onClick="addElement(this)">Ajouter</button>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
     <ul>
       {% if spectacle.makeup_ids %}
         {% set makeup_ids = spectacle.makeup_ids.split(',') %}
@@ -78,7 +82,7 @@
             <li>
               <input name="makeups" value="{{ makeup.id }}" hidden>
               {{ makeup.name }}
-              <button type="button" onClick="remove(this)">Supprimer</button>
+              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
             </li>
           {% endif %}
         {% endfor %}
@@ -86,13 +90,15 @@
     </ul>
 
     <label>Costumes</label>
-    <select data-name="costume">
-      <option></option>
-      {% for costume in costumes %}
+    <div>
+      <select data-name="costume">
+        <option></option>
+        {% for costume in costumes %}
         <option value="{{ costume.id }}">{{ costume.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="button" onClick="addElement(this)">Ajouter</button>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
     <ul>
       {% if spectacle.costume_ids %}
         {% set costume_ids = spectacle.costume_ids.split(',') %}
@@ -101,7 +107,7 @@
             <li>
               <input name="costumes" value="{{ costume.id }}" hidden>
               {{ costume.name }}
-              <button type="button" onClick="remove(this)">Supprimer</button>
+              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
             </li>
           {% endif %}
         {% endfor %}
@@ -109,13 +115,15 @@
     </ul>
 
     <label>Véhicules</label>
-    <select data-name="vehicle">
-      <option></option>
-      {% for vehicle in vehicles %}
+    <div>
+      <select data-name="vehicle">
+        <option></option>
+        {% for vehicle in vehicles %}
         <option value="{{ vehicle.id }}">{{ vehicle.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="button" onClick="addElement(this)">Ajouter</button>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
     <ul>
       {% if spectacle.vehicle_ids %}
         {% set vehicle_ids = spectacle.vehicle_ids.split(',') %}
@@ -124,7 +132,7 @@
             <li>
               <input name="vehicles" value="{{ vehicle.id }}" hidden>
               {{ vehicle.name }}
-              <button type="button" onClick="remove(this)">Supprimer</button>
+              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
             </li>
           {% endif %}
         {% endfor %}
@@ -132,57 +140,62 @@
     </ul>
 
     <h3>Spectacles</h3>
-    <label for="name">
-    <input id="name" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
-    <button type="button" onClick="addSpectacle()">Ajouter</button>
+    <label for="name">Nom</label>
+    <div>
+      <input id="name" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
+      <button class="add" type="button" onClick="addSpectacle()">Ajouter</button>
+    </div>
 
     <ul id="spectacles-list">
       <li style="display: none">
-        <input name="name">
-        <button type="button" onClick="remove(this)">Supprimer</button>
-
+        <label>Nom</label>
         <div>
-          <label>Dates</label>
-          <input name="dates" type="date" onInput="addInputIfNeeded(this)">
+          <input name="name">
+          <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
         </div>
 
+        <label>Dates</label>
+        <input name="dates" type="date" onInput="addInputIfNeeded(this)">
+
+        <label>Artistes</label>
         <div>
-          <label>Artistes</label>
           <select data-name="artist">
             <option></option>
             {% for artist in artists %}
-              <option value="{{ artist.id }}">{{ artist.name }}</option>
+            <option value="{{ artist.id }}">{{ artist.name }}</option>
             {% endfor %}
           </select>
-          <button type="button" onClick="addElement(this)">Ajouter</button>
-          <ul class="artists-list"></ul>
+          <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
         </div>
+        <ul class="artists-list"></ul>
       </li>
 
       {% for representation in representations %}
-        <li>
+      <li>
+        <label>Nom</label>
+        <div>
           <input name="{{ representation.id }}-name" value="{{ representation.representation_name }}">
-          <button type="button" onClick="remove(this)">Supprimer</button>
+          <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+        </div>
 
-          <div>
-            <label>Dates</label>
-            {% if representation.representation_dates %}
-              {% for date in representation.representation_dates.split(',') | sort %}
-                <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)" value="{{ date }}">
-              {% endfor %}
-              <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)">
-            {% endif %}
-          </div>
+        <label>Dates</label>
+        {% if representation.representation_dates %}
+          {% for date in representation.representation_dates.split(',') | sort %}
+            <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)" value="{{ date }}">
+          {% endfor %}
+          <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)">
+        {% endif %}
 
+          <label>Artistes</label>
           <div>
-            <label>Artistes</label>
             <select data-name="{{ representation.id }}-artist">
               <option></option>
               {% for artist in artists %}
-                <option value="{{ artist.id }}">{{ artist.name }}</option>
+              <option value="{{ artist.id }}">{{ artist.name }}</option>
               {% endfor %}
             </select>
-            <button type="button" onClick="addElement(this)">Ajouter</button>
+            <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+          </div>
             <ul class="artists-list">
               {% if representation.artist_ids %}
                 {% set artist_ids = representation.artist_ids.split(',') %}
@@ -191,7 +204,7 @@
                     <li>
                       <input name="{{ representation.id }}-artists" value="{{ artist.id }}" hidden>
                       {{ artist.name }}
-                      <button type="button" onClick="remove(this)">Supprimer</button>
+                      <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
                     </li>
                   {% endif %}
                 {% endfor %}
@@ -202,7 +215,7 @@
       {% endfor %}
     </ul>
 
-    <input type="submit" value="Envoyer">
+    <input class="button" type="submit" value="Mettre à jour">
   </form>
 
   <script>

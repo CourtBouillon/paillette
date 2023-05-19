@@ -33,75 +33,86 @@
     <input id="organizer" name="organizer">
 
     <label>Matériel de son</label>
-    <select data-name="sound">
-      <option></option>
-      {% for sound in sounds %}
+    <div>
+      <select data-name="sound">
+        <option></option>
+        {% for sound in sounds %}
         <option value="{{ sound.id }}">{{ sound.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="button" onClick="addElement(this)">Ajouter</button>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
     <ul></ul>
 
     <label>Boîtes de maquillage</label>
-    <select data-name="makeup">
-      <option></option>
-      {% for makeup in makeups %}
+    <div>
+      <select data-name="makeup">
+        <option></option>
+        {% for makeup in makeups %}
         <option value="{{ makeup.id }}">{{ makeup.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="button" onClick="addElement(this)">Ajouter</button>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
     <ul></ul>
 
     <label>Costumes</label>
-    <select data-name="costume">
-      <option></option>
-      {% for costume in costumes %}
+    <div>
+      <select data-name="costume">
+        <option></option>
+        {% for costume in costumes %}
         <option value="{{ costume.id }}">{{ costume.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="button" onClick="addElement(this)">Ajouter</button>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
     <ul></ul>
 
     <label>Véhicules</label>
-    <select data-name="vehicle">
-      <option></option>
-      {% for vehicle in vehicles %}
+    <div>
+      <select data-name="vehicle">
+        <option></option>
+        {% for vehicle in vehicles %}
         <option value="{{ vehicle.id }}">{{ vehicle.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="button" onClick="addElement(this)">Ajouter</button>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
     <ul></ul>
 
     <h3>Spectacles</h3>
-    <label for="name">
-    <input id="name" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
-    <button type="button" onClick="addSpectacle()">Ajouter</button>
+    <label for="name">Nom</label>
+    <div>
+      <input id="name" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
+      <button class="add" type="button" onClick="addSpectacle()">Ajouter</button>
+    </div>
 
     <ul id="spectacles-list">
       <li style="display: none">
-        <input name="name">
-        <button type="button" onClick="remove(this)">Supprimer</button>
-
+        <label>Nom</label>
         <div>
-          <label>Dates</label>
-          <input name="dates" type="date" onInput="addInputIfNeeded(this)">
+          <input name="name">
+          <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
         </div>
 
+        <label>Dates</label>
+        <input name="dates" type="date" onInput="addInputIfNeeded(this)">
+
+        <label>Artistes</label>
         <div>
-          <label>Artistes</label>
           <select data-name="artist">
             <option></option>
             {% for artist in artists %}
-              <option value="{{ artist.id }}">{{ artist.name }}</option>
+            <option value="{{ artist.id }}">{{ artist.name }}</option>
             {% endfor %}
           </select>
-          <button type="button" onClick="addElement(this)">Ajouter</button>
-          <ul class="artists-list"></ul>
+          <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
         </div>
+        <ul class="artists-list"></ul>
       </li>
     </ul>
 
-    <input type="submit" value="Envoyer">
+    <input class="button" type="submit" value="Créer">
   </form>
 
   <script>
@@ -124,6 +135,7 @@
       let deleteButton = document.createElement("button");
       deleteButton.setAttribute("type", "button");
       deleteButton.setAttribute("onClick", "remove(this)");
+      deleteButton.setAttribute("class", "delete");
       deleteButton.textContent = "Supprimer";
       li.appendChild(deleteButton);
 
