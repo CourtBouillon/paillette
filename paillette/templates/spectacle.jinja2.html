@@ -9,16 +9,18 @@
   <h2>{{ title }}</h2>
 
   <dl>
-    <dt>Date</dt>
+    <dt class="date">Date</dt>
     <dd>{{ dates | capitalize }}</dd>
-    <dt>Lieu</dt>
+    <dt class="place">Lieu</dt>
     <dd>{{ spectacle.place }}</dd>
 
     {% if spectacle.travel_time %}
-      <dt>Temps de transport</dt>
+      <dt class="vehicle">Temps de transport</dt>
       <dd>{{ spectacle.travel_time }}</dd>
     {% endif %}
+  </dl>
 
+  <dl>
     <dt>Évènement</dt>
     <dd>
       {% if spectacle.event_link %}

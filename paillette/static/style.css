@@ -72,7 +72,8 @@ body[id$="followup"] h2 {
 }
 
 h2,
-summary {
+summary,
+#page-spectacle dl:first-of-type {
   font-size: 2em;
 }
 
@@ -316,7 +317,8 @@ input[type="radio"] {
 }
 
 label,
-#page-spectacles section > dl dt{
+#page-spectacles section > dl dt,
+#page-spectacle dl:nth-of-type(2) dt {
   border-bottom: 5px solid;
   border-image-slice: 0 0 7 0;
   border-image-source: linear-gradient(to right, var(--pink), 1.5em, var(--white), 0%, transparent);
@@ -691,4 +693,26 @@ label,
 #page-spectacles .place,
 #page-spectacles .vehicle {
   font-size: 0;
+}
+
+/* Spectacle */
+
+#page-spectacle dl {
+  width: 50%;
+}
+
+#page-spectacle .date,
+#page-spectacle .place,
+#page-spectacle .vehicle {
+  font-size: 0;
+}
+
+#page-spectacle dl:first-of-type dt {
+  float: left;
+  width: 10%;
+}
+
+#page-spectacle dl:first-of-type dd {
+  float: right;
+  width: 90%;
 }
