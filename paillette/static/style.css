@@ -525,6 +525,10 @@ label {
   width: 30em;
 }
 
+#page-login input:not([type="submit"]) {
+  background: var(--white);
+}
+
 #page-login form {
   width: 100%;
 }
