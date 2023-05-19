@@ -11,8 +11,10 @@
 
   <dl>
     {% for person in persons %}
-      <dt>{{ person.name }}</dt>
+    <div>
+      <dt><a href="{{ url_for('person_update', person_id=person.id) }}">{{ person.name }}</a></dt>
       <dd><a class="update" href="{{ url_for('person_update', person_id=person.id) }}">Éditer</a></dd>
+    </div>
     {% endfor %}
   </dl>
 {% endblock %}

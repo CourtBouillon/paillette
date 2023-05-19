@@ -425,11 +425,12 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
   display: none;
 }
 
-/* Artists, Costumes, Make-up, Sounds, Vehicles */
+/* Artists, Costumes, Make-up, Persons, Sounds, Vehicles */
 
 #page-artists h2,
 #page-costumes h2,
 #page-makeups h2,
+#page-persons h2,
 #page-sounds h2,
 #page-vehicles h2 {
   font-size: 2em;
@@ -438,6 +439,7 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 #page-artists div,
 #page-costumes div,
 #page-makeups div,
+#page-persons div,
 #page-sounds div,
 #page-vehicles div
 {
@@ -449,6 +451,7 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 #page-artists div:hover,
 #page-costumes div:hover,
 #page-makeups div:hover,
+#page-persons div:hover,
 #page-sounds div:hover,
 #page-vehicles div:hover
 {
@@ -458,6 +461,7 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 #page-artists dl ::before,
 #page-costumes dl ::before,
 #page-makeups dl ::before,
+#page-persons dl ::before,
 #page-sounds dl ::before,
 #page-vehicles dl ::before
 {
@@ -468,6 +472,7 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 #page-artists dt a,
 #page-costumes dt a,
 #page-makeups dt a,
+#page-persons dt a,
 #page-sounds dt a,
 #page-vehicles dt a
 {
@@ -477,6 +482,7 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 #page-artists div dt,
 #page-costumes div dt,
 #page-makeups div dt,
+#page-persons div dt,
 #page-sounds div dt,
 #page-vehicles div dt
 {
