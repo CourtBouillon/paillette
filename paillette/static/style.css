@@ -14,7 +14,8 @@
   --pink: #e090d0;
   --pink-opacity: #e090d025;
   --purple: #9050a0;
-  --purple-opacity: #9050a080
+  --purple-opacity: #9050a080;
+  --red: #da0505;
 }
 
 /* Common */
@@ -59,10 +60,6 @@ a:hover {
   text-decoration: underline;
 }
 
-form > * {
-  display: block;
-}
-
 dd {
   margin: 0;
 }
@@ -79,36 +76,8 @@ summary {
   font-size: 2em;
 }
 
-input {
-  border: 1px solid var(--pink);
-  margin: 0.5em 0 1.5em 0;
-  padding: 1em;
-}
-
-label {
-  border-bottom: 5px solid;
-  border-image-slice: 0 0 7 0;
-  border-image-source: linear-gradient(to right, var(--pink), 10%, var(--white), 0%, transparent);
-  color: var(--grey);
-  margin-top: 1em;
-}
-
 li {
   list-style: none;
-}
-
-.button {
-  background: var(--purple);
-  border: 1px solid var(--purple);
-  color: var(--white);
-  padding: 1em;
-  text-align: center;
-  transition: 0.2s;
-}
-
-.button:hover {
-  background: var(--purple-opacity);
-  cursor: pointer;
 }
 
 /* Flash Messages */
@@ -279,6 +248,156 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
   text-decoration: underline;
 }
 
+/* Forms */
+
+fieldset {
+  align-items: center;
+  border: inherit;
+  display: flex !important;
+}
+
+fieldset label {
+  border: inherit;
+}
+
+form {
+  width: 50%;
+}
+
+form > * {
+  display: block;
+}
+
+form ul li:first-of-type,
+#spectacles-list > li:nth-of-type(2) {
+  border-top: 1px solid var(--purple-opacity);
+}
+
+form ul li:last-of-type {
+  border-bottom: 1px solid var(--purple-opacity);
+}
+
+form ul {
+  border-collapse: collapse;
+  padding: 0;
+}
+
+input,
+select,
+textarea {
+  background: inherit;
+  border: 1px solid var(--pink);
+  margin: 1em 0;
+  padding: 1em;
+  /* 100% - padding left and right - border left and right */
+  width: calc(100% - 2em - 2px);
+}
+
+option {
+  width: 100%;
+}
+
+input:focus,
+textarea:focus {
+  background: var(--grey-light);
+}
+
+input[type="color"] {
+  cursor: pointer;
+  height: 3em;
+  padding: 0.2em;
+  width: 3em;
+}
+
+input[type="radio"] {
+  height: 3em;
+  margin: 0 1em 0 0;
+  width: 3em;
+}
+
+label {
+  border-bottom: 5px solid;
+  border-image-slice: 0 0 7 0;
+  border-image-source: linear-gradient(to right, var(--pink), 1.5em, var(--white), 0%, transparent);
+  color: var(--grey);
+  margin: 1em 0;
+  padding-bottom: 0.25em;
+  width: 100%;
+}
+
+.button {
+  background: var(--purple);
+  border: 1px solid var(--purple);
+  color: var(--white);
+  padding: 1em;
+  text-align: center;
+  transition: 0.2s;
+  float: right;
+  margin: 1rem 0;
+  width: 35%;
+}
+
+.button:hover {
+  background: var(--purple-opacity);
+  cursor: pointer;
+}
+
+.add,
+.cancel,
+.delete {
+  background: inherit;
+  border: 0;
+  font-size: 0;
+}
+
+.cancel {
+  float: left;
+}
+
+.delete {
+  margin-left: 1rem;
+}
+
+.add:hover::before,
+.cancel:hover::before,
+.delete:hover::before {
+  color: var(--pink);
+  cursor: pointer;
+}
+
+.add::before {
+  color: var(--purple);
+  content: "\f196";
+  font-size: 2rem;
+}
+
+.cancel::before {
+  content: "\f190";
+}
+
+.delete::before {
+  color: var(--red);
+  content: "\f014";
+  font-size: 1.5rem;
+  padding: 0.2em;
+}
+
+.cancel::before {
+  color: var(--red);
+  font-size: 2rem;
+  margin: 1rem 0;
+}
+
+#page-spectacle_create form div,
+#page-spectacle_update form div {
+  display: flex;
+  width: 100%;
+}
+
+#spectacles-list > li:nth-child(even) {
+  background: var(--grey-light);
+}
+
 /* Before */
 
 .active::before {
@@ -406,19 +525,12 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
   width: 30em;
 }
 
-#page-login input {
-  /* - borders - paddings */
-  width: calc(100% - 2px - 2em);
+#page-login form {
+  width: 100%;
 }
 
 #page-login section {
   width: 50%;
-}
-
-#page-login .button {
-  float: right;
-  margin: 0 0 0 10%;
-  width: 35%;
 }
 
 #page-login .cancel {
