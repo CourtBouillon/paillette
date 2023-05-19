@@ -768,3 +768,59 @@ label,
   display: flex;
   width: 100%;
 }
+
+/* Follows */
+
+table {
+  display: block;
+  border-collapse: collapse;
+  overflow-x: auto;
+  scrollbar-color: var(--purple) var(--white);
+}
+
+tr:not(:last-of-type) td,
+tbody tr:not(:last-of-type) th,
+thead th {
+  border-bottom: 2px solid var(--pink-opacity);
+}
+
+th:not(:last-of-type),
+td:not(:last-of-type) {
+  border-left: 2px solid var(--pink-opacity);
+}
+
+th:first-of-type {
+  border-left: 0;
+}
+
+td,
+th {
+  padding: 0.5em;
+}
+
+tbody tr {
+  text-align: center;
+}
+
+tbody tr:nth-child(even) {
+  background: var(--grey-light);
+}
+
+th {
+  font-weight: normal;
+}
+
+thead span {
+  font-weight: bold;
+}
+
+tbody th {
+  display: flex;
+  white-space: nowrap;
+  width: 100%;
+}
+
+tbody th span {
+  font-weight: bold;
+  margin-left: 1em;
+}
