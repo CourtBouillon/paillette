@@ -716,3 +716,54 @@ label,
   float: right;
   width: 90%;
 }
+
+/* Roadmap */
+
+#images_comment {
+  display: none;
+}
+
+#add-images,
+#images li,
+#recipients li {
+  display: flex;
+  width: 100%;
+}
+
+#images {
+  padding: 0;
+  width: 50%;
+}
+
+#images li {
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+
+#images li:nth-child(even) {
+  background: var(--grey-light);
+}
+
+#images img {
+  max-width: 10em;
+}
+
+#add-images .button,
+#images .button {
+  float: initial;
+}
+
+#add-images {
+  justify-content: space-between;
+}
+
+#recipients li input {
+  width: 50%;
+}
+
+#page-roadmap_send div {
+  display: flex;
+  width: 100%;
+}

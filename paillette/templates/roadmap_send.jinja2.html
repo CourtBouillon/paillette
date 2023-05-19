@@ -14,16 +14,16 @@
     <label for="images_comment">Commentaire</label>
     <textarea id="images_comment" name="images_comment">{{ spectacle.images_comment or '' }}</textarea>
 
-    <input type="submit" value="Enregistrer">
+    <input class="button" type="submit" value="Enregistrer">
   </form>
 
   {% if images %}
-    <ul>
+    <ul id="images">
       {% for image in images %}
         <li>
           <img src="{{ url_for('roadmap_image', image_id=image.id) }}">
           <form method="post" action="{{ url_for('roadmap_detach_image', image_id=image.id) }}">
-            <input type="submit" value="Supprimer">
+            <input class="button" type="submit" value="Supprimer">
           </form>
         </li>
       {% endfor %}
@@ -34,9 +34,11 @@
 
   <form method="post" enctype="multipart/form-data" action="{{ url_for('roadmap_attach_image', spectacle_id=spectacle.id) }}">
     <label for="images">Pièces jointes</label>
-    <input id="images" name="images" type="file" accept="image/png, image/jpeg" multiple>
+    <div id="add-images">
+      <input id="images" name="images" type="file" accept="image/png, image/jpeg" multiple>
 
-    <input type="submit" value="Ajouter">
+      <input class="button" type="submit" value="Ajouter">
+    </div>
   </form>
 
   <h3>Destinataires</h3>
@@ -45,20 +47,22 @@
     <ul id="recipients">
       {% for recipient in recipients %}
         <li class="readonly">
-          <input name="mail" value="{{ recipient.mail }}" readonly><button type="button" onClick="remove(this)">Supprimer</button> ({{ recipient.name }})
+          <input name="mail" value="{{ recipient.mail }}" readonly><button class="delete" type="button" onClick="remove(this)">Supprimer</button><p>({{ recipient.name }})</p>
         </li>
       {% endfor %}
     </ul>
 
-    <select id="person">
-      <option></option>
-      {% for person in persons %}
+    <div>
+      <select id="person">
+        <option></option>
+        {% for person in persons %}
         <option value="{{ person.mail }}">{{ person.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="button" onClick="addRecipient()">Ajouter</button>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addRecipient()">Ajouter</button>
+    </div>
 
-    <input type="submit" value="Envoyer">
+    <input class="button" type="submit" value="Envoyer">
   </form>
 
   <ul class="actions">
@@ -79,6 +83,7 @@
         let button = document.createElement("button");
         button.setAttribute("type", "button");
         button.setAttribute("onClick", "remove(this)");
+        button.setAttribute("class", "delete");
         button.textContent = "Supprimer";
         li.appendChild(button);
 
@@ -102,11 +107,14 @@
 
       let button = document.createElement("button");
       button.setAttribute("type", "button");
+      button.setAttribute("class", "delete");
       button.setAttribute("onClick", "remove(this)");
       button.textContent = "Supprimer";
       li.appendChild(button);
 
-      li.appendChild(document.createTextNode(" (" + option.textContent + ")"));
+      let p = document.createElement("p");
+      p.textContent = "(" + option.textContent + ")";
+      li.appendChild(p);
 
       document.querySelector('#recipients li:not(.readonly)').before(li);
 
