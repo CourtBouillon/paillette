@@ -315,7 +315,8 @@ input[type="radio"] {
   width: 3em;
 }
 
-label {
+label,
+#page-spectacles section > dl dt{
   border-bottom: 5px solid;
   border-image-slice: 0 0 7 0;
   border-image-source: linear-gradient(to right, var(--pink), 1.5em, var(--white), 0%, transparent);
@@ -623,4 +624,71 @@ label {
   color: var(--data-color);
   content: "\f0c8";
   padding-right: 0.5em;
+}
+
+/* Spectacles */
+
+#page-spectacles h3 {
+  display: none;
+}
+
+#page-spectacles section {
+  border-bottom: 2px solid var(--pink-opacity);
+  display: flex;
+  padding: 1em 0;
+  width: 100%;
+}
+
+#page-spectacles section a {
+  background: var(--pink-opacity);
+  color: var(--grey);
+  font-size: 1.2em;
+  padding: 1em;
+  transition: 0.5s;
+  width: 25%;
+}
+
+#page-spectacles section a:hover {
+  background: var(--pink);
+  text-decoration: none;
+}
+
+#page-spectacles section > dl {
+  margin-left: 2em;
+  width: 75%;
+}
+
+#page-spectacles dt {
+  color: var(--grey);
+  font-size: 1.2em;
+}
+
+#page-spectacles a dl dt {
+  float: left;
+  width: 10%;
+}
+
+#page-spectacles a dl dd {
+  float: right;
+  margin: 1em 0;
+  width: 85%;
+}
+
+#page-spectacles ::before {
+  font-size: 1.2rem;
+  margin: 1em 0;
+}
+
+.date::before {
+  content: "\f133";
+}
+
+.place::before {
+  content: "\f041";
+}
+
+#page-spectacles .date,
+#page-spectacles .place,
+#page-spectacles .vehicle {
+  font-size: 0;
 }

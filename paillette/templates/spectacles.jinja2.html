@@ -19,15 +19,22 @@
     {% set dates = (spectacle.first_date, spectacle.last_date) | date_range %}
     <section>
       <h3><a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">{{ '{}, {}'.format(spectacle.place, dates) }}</a></h3>
+      <a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">
+        <dl>
+          <dt class="date">Date</dt>
+          <dd>{{ dates | capitalize }}</dd>
+          <dt class="place">Lieu</dt>
+          <dd>{{ spectacle.place }}</dd>
+          <dt class="vehicle">Temps de transport</dt>
+          <dd>{% if spectacle.travel_time %}{{ spectacle.travel_time }}{% else %}Temps indéterminé{% endif %}</dd>
+        </dl>
+      </a>
       <dl>
-        <dt>Date</dt>
-        <dd>{{ dates | capitalize }}</dd>
-        <dt>Lieu</dt>
-        <dd>{{ spectacle.place }}</dd>
         <dt>Évènement</dt>
         <dd>{{ spectacle.event }}</dd>
-        <dt>Temps de transport</dt>
-        <dd>{{ spectacle.travel_time }}</dd>
+        <dt>Spectacles</dt>
+        <dd>TODO la liste des noms de spectacles</dd>
+        <dd>Wouhou un spectacle</dd>
       </dl>
     </section>
   {% endfor %}
