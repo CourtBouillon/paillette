@@ -770,7 +770,7 @@ label,
   width: 50%;
 }
 
-#page-roadmap_send div {
+#page-roadmap_send div:not([class^="ql"]) {
   display: flex;
   width: 100%;
 }
