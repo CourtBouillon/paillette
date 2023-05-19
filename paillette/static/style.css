@@ -491,3 +491,14 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 {
   margin: 0 1em;
 }
+
+#page-artists div dt::before,
+#page-costumes div dt::before,
+#page-makeups div dt::before,
+#page-sounds div dt::before,
+#page-vehicles div dt::before
+{
+  color: var(--data-color);
+  content: "\f0c8";
+  padding-right: 0.5em;
+}

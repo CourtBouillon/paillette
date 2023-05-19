@@ -17,7 +17,7 @@
     <dl>
       {% for makeup in makeups %}
       <div>
-        <dt{% if makeup.color %} data-color="{{ makeup.color }}"{% endif %}><a href="{{ url_for('makeup_update', makeup_id=makeup.id) }}">{{ makeup.name }}</a></dt>
+        <dt{% if makeup.color %} style="--data-color: {{ makeup.color }}"{% endif %}><a href="{{ url_for('makeup_update', makeup_id=makeup.id) }}">{{ makeup.name }}</a></dt>
         <dd><a class="update" href="{{ url_for('makeup_update', makeup_id=makeup.id) }}">Éditer</a></dd>
         {% if hidden %}
           <dd><a class="show" href="{{ url_for('show', type='makeup', id=makeup.id) }}">Montrer</a></dd>

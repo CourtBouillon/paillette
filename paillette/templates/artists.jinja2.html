@@ -17,7 +17,7 @@
     <dl>
       {% for artist in artists %}
       <div>
-        <dt{% if artist.color %} data-color="{{ artist.color }}"{% endif %}><a href="{{ url_for('artist_update', artist_id=artist.id) }}">{{ artist.name }}</a></dt>
+        <dt{% if artist.color %} style="--data-color: {{ artist.color }}"{% endif %}><a href="{{ url_for('artist_update', artist_id=artist.id) }}">{{ artist.name }}</a></dt>
         <dd><a class="update" href="{{ url_for('artist_update', artist_id=artist.id) }}">Éditer</a></dd>
         {% if hidden %}
           <dd><a class="show" href="{{ url_for('show', type='artist', id=artist.id) }}">Montrer</a></dd>

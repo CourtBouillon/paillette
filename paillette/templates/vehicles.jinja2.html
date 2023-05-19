@@ -17,7 +17,7 @@
     <dl>
       {% for vehicle in vehicles %}
       <div>
-        <dt{% if vehicle.color %} data-color="{{ vehicle.color }}"{% endif %}><a href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">{{ vehicle.name }}</a></dt>
+        <dt{% if vehicle.color %} style="--data-color: {{ vehicle.color }}"{% endif %}><a href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">{{ vehicle.name }}</a></dt>
         <dd><a class="update" href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">Éditer</a></dd>
         {% if hidden %}
           <dd><a class="show" href="{{ url_for('show', type='vehicle', id=vehicle.id) }}">Montrer</a></dd>
