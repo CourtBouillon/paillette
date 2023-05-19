@@ -7,10 +7,10 @@
 
   <form method="post">
     <label for="date_from">Du</label>
-    <input id="date_from" name="date_from" value="{{ date }}" required>
+    <input id="date_from" name="date_from" type="date" value="{{ date }}" required>
 
     <label for="date_to">Au</label>
-    <input id="date_to" name="date_to" value="{{ date }}" required>
+    <input id="date_to" name="date_to" type="date" value="{{ date }}" required>
 
     <fieldset>
       <input id="unknown" name="availability" value="unknown" type="radio" {{ 'checked' if artist.available is none }}>
@@ -40,12 +40,12 @@
     function updateForm() {
       let available = document.querySelector('[name="availability"]:checked').value == 'available';
       document.querySelectorAll('#spectacle_id, [for="spectacle_id"]').forEach(
-        obj => obj.hidden = !available;
+        obj => obj.hidden = !available
       );
     }
 
     document.querySelectorAll('[name="availability"]').forEach(
-      obj => obj.addEventListener('click', updateForm);
+      obj => obj.addEventListener('click', updateForm)
     );
     updateForm();
   </script>

@@ -221,7 +221,8 @@
   <script>
     function addElement(button) {
       let select = button.previousElementSibling;
-      let list = button.nextElementSibling;
+      if (!select.value) return;
+      let list = button.parentNode.nextElementSibling;
       let name = select.getAttribute("data-name");
       let option = select.options[select.selectedIndex];
 
@@ -237,6 +238,7 @@
 
       let deleteButton = document.createElement("button");
       deleteButton.setAttribute("type", "button");
+      deleteButton.setAttribute("class", "delete");
       deleteButton.setAttribute("onClick", "remove(this)");
       deleteButton.textContent = "Supprimer";
       li.appendChild(deleteButton);

@@ -251,6 +251,10 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 
 /* Forms */
 
+[hidden] {
+  display: none !important;
+}
+
 fieldset {
   align-items: center;
   border: inherit;
@@ -784,18 +788,19 @@ thead th {
   border-bottom: 2px solid var(--pink-opacity);
 }
 
-th:not(:last-of-type),
-td:not(:last-of-type) {
-  border-left: 2px solid var(--pink-opacity);
-}
-
 th:first-of-type {
   border-left: 0;
 }
 
 td,
 th {
+  border-left: 2px solid var(--pink-opacity);
   padding: 0.5em;
+}
+
+td > a:empty::after {
+  content: "​"; /* Zero-width space */
+  display: block;
 }
 
 tbody tr {
@@ -815,9 +820,8 @@ thead span {
 }
 
 tbody th {
-  display: flex;
+  text-align: right;
   white-space: nowrap;
-  width: 100%;
 }
 
 tbody th span {

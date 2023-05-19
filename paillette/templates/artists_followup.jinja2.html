@@ -43,13 +43,13 @@
             {% set day = start.replace(day=i) %}
             <td>
               <a href="{{ url_for('availabilities_update', artist_id=artist.artist_id, date=day) }}">
-                {% for spectacle in spectacles | selectattr('date', 'equalto', day) %}
+                {%- for spectacle in spectacles | selectattr('date', 'equalto', day) %}
                   {{ spectacle.trigram }}
-                {% else %}
-                  {% for availability in availabilities | selectattr('date', 'equalto', day) | selectattr('id', 'equalto', artist.artist_id) %}
+                {%- else -%}
+                  {%- for availability in availabilities | selectattr('date', 'equalto', day) | selectattr('id', 'equalto', artist.artist_id) %}
                     {{ '1' if availability.available else '0' }}
-                  {% endfor %}
-                {% endfor %}
+                  {% endfor -%}
+                {% endfor -%}
               </a>
             </td>
           {% endfor %}
