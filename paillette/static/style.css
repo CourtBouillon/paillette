@@ -673,6 +673,7 @@ label,
 #page-spectacles a dl dt {
   clear: left;
   float: left;
+  text-align: center;
   width: 10%;
 }
 
