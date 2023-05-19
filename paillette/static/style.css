@@ -677,7 +677,7 @@ label,
   width: 85%;
 }
 
-#page-spectacles ::before {
+#page-spectacles section ::before {
   font-size: 1.2rem;
   margin: 1em 0;
 }
