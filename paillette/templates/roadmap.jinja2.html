@@ -7,26 +7,22 @@
 {% extends '_layout.jinja2' %}
 
 {% block content %}
-  <h2>{{ title }}</h2>
+  <h2>Feuille de route</h2>
 
-  <section>
+  <img id="logo" src="{{ url_for('static', filename='full_logo.png') }}" />
+
+  <section id="summary">
     <h3>Résumé</h3>
 
     <dl>
-      <dt>Lieu</dt>
-      <dd>{{ spectacle.place }}</dd>
-
-      <dt>Du</dt>
-      <dd>{{ first_date | date_simple }}</dd>
-
-      <dt>Au</dt>
-      <dd>{{ last_date | date_simple }}</dd>
+      <dt>{{ spectacle.place }}</dt>
+      <dd><strong>Du {{ first_date | date_simple }} au {{ last_date | date_simple }}</strong></dd>
 
       <dt>Évènement</dt>
       <dd>{{ spectacle.event }}</dd>
 
       <dt>Lien</dt>
-      <dd>{{ spectacle.link }}</dd>
+      <dd><a href="{{ spectacle.link }}">{{ spectacle.link }}</a></dd>
 
       {% if spectacle.organizer %}
         <dt>Organisateur</dt>
@@ -57,13 +53,6 @@
             <dd>Pas de dates</dd>
           {% endfor %}
         {% endif %}
-        <dt>Artistes</dt>
-        {% for artist_name_and_phone in representation.artists_name_and_phone.split(',') %}
-          {% set name, phone = artist_name_and_phone.split('||') %}
-          <dd>{{artist_name_and_phone}}{{ name }}</dd>
-        {% else %}
-          <dd>Pas d’artiste</dd>
-        {% endfor %}
         {% if representations | length >= 2 %}
             </dl>
           </dd>
@@ -85,7 +74,6 @@
       {% else %}
         <dd>Pas de boîte de maquillage</dd>
       {% endfor %}
-
     </dl>
   </section>
 
@@ -95,7 +83,7 @@
     <dl>
       {% if spectacle.organizer %}
         <dt>Régisseur</dt>
-        <dd>{{ spectacle.organizer }}</dd>
+        <dd><strong>{{ spectacle.organizer }}</strong></dd>
       {% endif %}
       <dt>Artistes</dt>
       {% for artist in all_artists %}
@@ -169,12 +157,14 @@
   {% endif %}
 
   {% if images %}
-    <h3>Images</h3>
-    {{ spectacle.images_comment | safe }}
-    <ul>
-      {% for image in images %}
+    <section id="images">
+      <h3>Images</h3>
+      {{ spectacle.images_comment | safe }}
+      <ul id="images-list">
+        {% for image in images %}
         <li><img src="{{ url_for('roadmap_image', image_id=image.id) }}"></li>
-      {% endfor %}
-    </ul>
+        {% endfor %}
+      </ul>
+    </section>
   {% endif %}
 {% endblock %}

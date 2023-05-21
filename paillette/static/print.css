@@ -1,0 +1,133 @@
+/* Fonts */
+
+@font-face {
+  font-family: ForkAwesome;
+  src: local("ForkAwesome"), url(/static/fonts/forkawesome-webfont.woff2);
+}
+
+/* Variables */
+:root {
+  --black: #000;
+  --grey: #515151;
+  --grey-light: #a6a6a6;
+  --white: #ffffff;
+  --pink: #e090d0;
+  --pink-opacity: #e090d025;
+  --purple: #9050a0;
+  --purple-opacity: #9050a080;
+  --red: #da0505;
+}
+
+/* Page */
+
+@page {
+  margin: 20mm 10mm;
+}
+
+/* Common */
+
+html {
+  font-family: sans-serif;
+  font-size: 14pt;
+}
+
+footer,
+header {
+  display: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+dl {
+  margin: 2mm 0;
+}
+
+dd,
+dt {
+  border-bottom: 0.5mm solid pink;
+  margin: 0;
+  padding: 2mm 0;
+}
+
+dd {
+  float: right;
+  margin: 0;
+  width: 50%
+}
+
+dt {
+  clear: right;
+  float: left;
+  width: 50%;
+}
+
+dd:last-of-type,
+dt:last-of-type {
+  border-bottom: none;
+}
+
+h2 {
+  background-color: var(--grey-light);
+  color: var(--white);
+  padding: 10mm 0;
+  text-align: center;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+h3 {
+  color: var(--pink);
+  text-transform: uppercase;
+  width: 100%;
+}
+
+section {
+  margin: 10mm 0;
+}
+
+section:first-of-type {
+  margin-top: 25mm;
+}
+
+section:not(#images) {
+  break-inside: avoid;
+}
+
+strong {
+  font-weight: bold;
+}
+
+/* Header */
+
+#logo {
+  display: block;
+  position: absolute;
+  top: -20mm;
+  left: -10mm;
+}
+
+/* Summary */
+
+#summary h3 {
+  display: none;
+}
+
+/* Attachments */
+
+#images img {
+  display: block;
+  margin: 5mm 0;
+  width: 50%;
+}
+
+#images-list {
+  padding: 0;
+}
+
+#images-list li {
+  list-style: none;
+}
