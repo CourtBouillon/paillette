@@ -365,7 +365,12 @@ def spectacles(year=None, month=None):
     year, month, start, stop, previous, next = get_date_data(year, month)
     cursor = get_connection().cursor()
     cursor.execute('''
-      SELECT spectacle.*, MIN(date) AS first_date, MAX(date) AS last_date
+      SELECT
+        spectacle.*,
+        MIN(date) AS first_date,
+        MAX(date) AS last_date,
+        GROUP_CONCAT(
+          DISTINCT replace(representation.name, ',', ' ')) AS representations
       FROM spectacle
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id

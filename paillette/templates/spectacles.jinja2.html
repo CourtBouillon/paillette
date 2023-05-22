@@ -33,8 +33,9 @@
         <dt>Évènement</dt>
         <dd>{{ spectacle.event }}</dd>
         <dt>Spectacles</dt>
-        <dd>TODO la liste des noms de spectacles</dd>
-        <dd>Wouhou un spectacle</dd>
+        {% for representation in spectacle.representations.split(',') %}
+          <dd>{{ representation }}</dd>
+        {% endfor %}
       </dl>
     </section>
   {% endfor %}
