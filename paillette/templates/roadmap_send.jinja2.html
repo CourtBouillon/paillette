@@ -9,14 +9,36 @@
 {% block content %}
   <h2>{{ title }}</h2>
 
-  <h3>Images</h3>
+  <h3>Données complémentaires</h3>
   <form method="post" action="{{ url_for('roadmap_comment', spectacle_id=spectacle.id) }}">
-    <label for="images_comment">Commentaire</label>
+    <label for="message">Commentaire</label>
+    <textarea id="message" name="message">{{ spectacle.message or '' }}</textarea>
+
+    <label for="payment">Moyens de paiement</label>
+    <textarea id="payment" name="payment">{{ spectacle.payment or '' }}</textarea>
+
+    <label for="contact">Contact sur place</label>
+    <textarea id="contact" name="contact">{{ spectacle.contact or '' }}</textarea>
+
+    <label for="planning">Planning</label>
+    <textarea id="planning" name="planning">{{ spectacle.planning or '' }}</textarea>
+
+    <label for="hosting">Hébergement</label>
+    <textarea id="hosting" name="hosting">{{ spectacle.hosting or '' }}</textarea>
+
+    <label for="meal">Repas</label>
+    <textarea id="meal" name="meal">{{ spectacle.meal or '' }}</textarea>
+
+    <label for="images_comment">Commentaires sur les images</label>
     <textarea id="images_comment" name="images_comment">{{ spectacle.images_comment or '' }}</textarea>
+
+    <label for="sound_comment">Commentaires sur le matériel de son</label>
+    <textarea id="sound_comment" name="sound_comment">{{ spectacle.sound_comment or '' }}</textarea>
 
     <input class="button" type="submit" value="Enregistrer">
   </form>
 
+  <h3>Images</h3>
   {% if images %}
     <ul id="images">
       {% for image in images %}
@@ -33,7 +55,7 @@
   {% endif %}
 
   <form method="post" enctype="multipart/form-data" action="{{ url_for('roadmap_attach_image', spectacle_id=spectacle.id) }}">
-    <label for="images">Pièces jointes</label>
+    <label for="images">Nouvelle image</label>
     <div id="add-images">
       <input id="images" name="images" type="file" accept="image/png, image/jpeg" multiple>
 

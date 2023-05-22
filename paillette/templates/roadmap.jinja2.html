@@ -67,6 +67,9 @@
       {% else %}
         <dd>Pas de matériel de son</dd>
       {% endfor %}
+      {% if spectacle.sound_comment %}
+        <dd>Commentaire : {{ spectacle.sound_comment | safe }}</dd>
+      {% endif %}
 
       <dt>Boîtes de maquillage</dt>
       {% for makeup in makeups %}
@@ -96,14 +99,14 @@
   {% if spectacle.message %}
     <section>
       <h3>Message important</h3>
-      {{ spectacle.message }}
+      {{ spectacle.message | safe }}
     </section>
   {% endif %}
 
   {% if spectacle.payment %}
     <section>
       <h3>Moyens de paiement</h3>
-      {{ spectacle.payment }}
+      {{ spectacle.payment | safe }}
     </section>
   {% endif %}
 
@@ -131,28 +134,28 @@
   {% if spectacle.contact %}
     <section>
       <h3>Contact sur place</h3>
-      {{ spectacle.contact }}
+      {{ spectacle.contact | safe }}
     </section>
   {% endif %}
 
   {% if spectacle.planning %}
     <section>
       <h3>Planning</h3>
-      {{ spectacle.planning }}
+      {{ spectacle.planning | safe }}
     </section>
   {% endif %}
 
   {% if spectacle.hosting %}
     <section>
       <h3>Hébergement</h3>
-      {{ spectacle.hosting }}
+      {{ spectacle.hosting | safe }}
     </section>
   {% endif %}
 
   {% if spectacle.meal %}
     <section>
       <h3>Repas</h3>
-      {{ spectacle.meal }}
+      {{ spectacle.meal | safe }}
     </section>
   {% endif %}
 

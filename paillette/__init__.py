@@ -712,11 +712,19 @@ def roadmap_comment(spectacle_id):
     cursor = get_connection().cursor()
     cursor.execute('''
       UPDATE spectacle
-      SET images_comment = :images_comment
+      SET
+        message = :message,
+        payment = :payment,
+        contact = :contact,
+        planning = :planning,
+        hosting = :hosting,
+        meal = :meal,
+        images_comment = :images_comment,
+        sound_comment = :sound_comment
       WHERE id = :spectacle_id
     ''', parameters)
     cursor.connection.commit()
-    flash('Le commentaire des images a été mis à jour.')
+    flash('Les données complémentaries ont été mises à jour.')
     return redirect(url_for('roadmap', spectacle_id=spectacle_id))
 
 
