@@ -73,7 +73,7 @@ body[id$="followup"] h2 {
 
 h2,
 summary,
-#page-spectacle dl:first-of-type {
+#page-spectacle main > dl:first-of-type {
   font-size: 2em;
 }
 
@@ -719,15 +719,21 @@ label,
   font-size: 0;
 }
 
-#page-spectacle dl:first-of-type dt {
+#page-spectacle main > dl:first-of-type dt {
   float: left;
   width: 10%;
 }
 
-#page-spectacle dl:first-of-type dd {
+#page-spectacle main > dl:first-of-type dd {
   float: right;
   width: 90%;
 }
+
+#page-spectacle dl dl {
+  border-left: 0.3em solid var(--pink);
+  padding-left: 1rem;
+}
+
 
 /* Roadmap */
 

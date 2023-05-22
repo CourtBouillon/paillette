@@ -151,11 +151,13 @@
         <label>Nom</label>
         <div>
           <input name="name">
-          <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+          <button class="delete" type="button" onClick="remove(this.parentNode)">Supprimer</button>
         </div>
 
         <label>Dates</label>
-        <input name="dates" type="date" onInput="addInputIfNeeded(this)">
+        <div>
+          <input name="dates" type="date" onInput="addInputIfNeeded(this)">
+        </div>
 
         <label>Artistes</label>
         <div>
@@ -171,46 +173,47 @@
       </li>
 
       {% for representation in representations %}
-      <li>
-        <label>Nom</label>
-        <div>
-          <input name="{{ representation.id }}-name" value="{{ representation.representation_name }}">
-          <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-        </div>
+        <li>
+          <label>Nom</label>
+          <div>
+            <input name="{{ representation.id }}-name" value="{{ representation.representation_name }}">
+            <button class="delete" type="button" onClick="remove(this.parentNode)">Supprimer</button>
+          </div>
 
-        <label>Dates</label>
-        {% if representation.representation_dates %}
-          {% for date in representation.representation_dates.split(',') | sort %}
-            <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)" value="{{ date }}">
-          {% endfor %}
-          <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)">
-        {% endif %}
+          <label>Dates</label>
+          <div>
+            {% if representation.representation_dates %}
+              {% for date in representation.representation_dates.split(',') | sort %}
+                <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)" value="{{ date }}">
+              {% endfor %}
+              <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)">
+            {% endif %}
+          </div>
 
           <label>Artistes</label>
           <div>
             <select data-name="{{ representation.id }}-artist">
               <option></option>
               {% for artist in artists %}
-              <option value="{{ artist.id }}">{{ artist.name }}</option>
+                <option value="{{ artist.id }}">{{ artist.name }}</option>
               {% endfor %}
             </select>
             <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
           </div>
-            <ul class="artists-list">
-              {% if representation.artist_ids %}
-                {% set artist_ids = representation.artist_ids.split(',') %}
-                {% for artist in artists %}
-                  {% if artist.id | string in artist_ids %}
-                    <li>
-                      <input name="{{ representation.id }}-artists" value="{{ artist.id }}" hidden>
-                      {{ artist.name }}
-                      <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-                    </li>
-                  {% endif %}
-                {% endfor %}
-              {% endif %}
-            </ul>
-          </div>
+          <ul class="artists-list">
+            {% if representation.artist_ids %}
+              {% set artist_ids = representation.artist_ids.split(',') %}
+              {% for artist in artists %}
+                {% if artist.id | string in artist_ids %}
+                  <li>
+                    <input name="{{ representation.id }}-artists" value="{{ artist.id }}" hidden>
+                    {{ artist.name }}
+                    <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </ul>
         </li>
       {% endfor %}
     </ul>
@@ -270,6 +273,8 @@
           newArtists.appendChild(previousArtist);
         }
       );
+
+      newLi.querySelector('input').focus();
     }
 
     function remove(button) {
