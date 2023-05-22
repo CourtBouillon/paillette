@@ -9,6 +9,7 @@ from email.utils import formatdate
 from functools import wraps
 from io import BytesIO
 from locale import LC_ALL, setlocale
+from pathlib import Path
 from smtplib import SMTP_SSL
 from uuid import uuid4
 
@@ -138,7 +139,7 @@ def get_spectacle_data(spectacle_id):
     ''', (spectacle_id,))
     costumes = cursor.fetchall()
     cursor.execute('''
-      SELECT id
+      SELECT id, filename
       FROM spectacle_image
       WHERE spectacle_id = ?
     ''', (spectacle_id,))
@@ -739,12 +740,16 @@ def roadmap_attach_image(spectacle_id):
     if images:
         cursor = get_connection().cursor()
         for image in images:
-            bytes = BytesIO()
-            image.save(bytes)
+            filename = secure_filename(image.filename)
+            if not filename:
+                continue
+            folder = Path(app.static_folder) / 'roadmap_images'
+            folder.mkdir(exist_ok=True)
+            image.save(folder / filename)
             cursor.execute('''
-              INSERT INTO spectacle_image (spectacle_id, image)
+              INSERT INTO spectacle_image (spectacle_id, filename)
               VALUES (?, ?)
-            ''', (spectacle_id, bytes.getvalue()))
+            ''', (spectacle_id, filename))
         cursor.connection.commit()
         flash('Les images ont été ajoutées.')
     return redirect(url_for('roadmap', spectacle_id=spectacle_id))
@@ -754,25 +759,18 @@ def roadmap_attach_image(spectacle_id):
 @authenticated
 def roadmap_detach_image(image_id):
     cursor = get_connection().cursor()
-    cursor.execute(
-        'DELETE FROM spectacle_image WHERE id = ? RETURNING spectacle_id',
-        (image_id,))
+    cursor.execute('''
+      DELETE FROM spectacle_image
+      WHERE id = ?
+      RETURNING spectacle_id, filename
+    ''', (image_id,))
     image = cursor.fetchone() or abort(404)
+    path = Path(app.static_folder) / 'roadmap_images' / image['filename']
+    path.unlink(missing_ok=True)
     cursor.connection.commit()
     flash('L’image a été supprimée.')
     spectacle_id = image['spectacle_id']
     return redirect(url_for('roadmap', spectacle_id=spectacle_id))
-
-
-@app.route('/roadmap/image/<int:image_id>')
-@authenticated
-def roadmap_image(image_id):
-    cursor = get_connection().cursor()
-    cursor.execute('SELECT * FROM spectacle_image WHERE id = ?', (image_id,))
-    image = cursor.fetchone() or abort(404)
-    data = image['image']
-    format = 'png' if data[1:4] == b'PNG' else 'jpeg'
-    return Response(data, mimetype=f'image/{format}')
 
 
 # Follow-ups

@@ -165,7 +165,7 @@
       {{ spectacle.images_comment | safe }}
       <ul id="images-list">
         {% for image in images %}
-        <li><img src="{{ url_for('roadmap_image', image_id=image.id) }}"></li>
+          <li><img src="{{ url_for('static', filename='roadmap_images/' + image.filename) }}"></li>
         {% endfor %}
       </ul>
     </section>

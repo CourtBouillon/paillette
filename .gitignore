@@ -1,4 +1,5 @@
-paillette.db
 *.pyc
 /venv
 *.egg-info
+paillette.db
+/paillette/static/roadmap_images
