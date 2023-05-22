@@ -19,6 +19,10 @@
     <li><a class="next" href="{{ url_for('artists_followup', year=next.year, month=next.month) }}">Mois suivant</a></li>
   </ul>
 
+  <ul class="actions">
+    <li><a class="filter {{ 'active' if 'artists-followup-filter' in session }}" href="{{ url_for('artists_followup_filter', year=start.year, month=start.month) }}">Filtrer</a></li>
+  </ul>
+
   <table>
     <thead>
       <tr>

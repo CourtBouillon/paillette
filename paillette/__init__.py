@@ -779,6 +779,14 @@ def artists_followup(year=None, month=None):
     year, month, start, stop, previous, next = get_date_data(year, month)
     cursor = get_connection().cursor()
     cursor.execute('''
+      SELECT artist.id, date, available
+      FROM artist
+      JOIN artist_availability
+      ON artist.id = artist_availability.artist_id
+      WHERE date BETWEEN ? AND ?
+    ''', (start, stop))
+    availabilities = cursor.fetchall()
+    query = '''
       SELECT
         artist.id AS artist_id,
         person.name || '-' || artist.id AS grouper,
@@ -802,21 +810,69 @@ def artists_followup(year=None, month=None):
       ON representation_date.representation_id = representation.id
       LEFT JOIN spectacle
       ON representation.spectacle_id = spectacle.id
-      WHERE spectacle.trigram IS NOT NULL OR NOT artist.hidden
-      ''', (start, stop))
+      WHERE (spectacle.trigram IS NOT NULL OR NOT artist.hidden)
+    '''
+    parameters = [start, stop]
+    filter = session.get('artists-followup-filter')
+    if filter:
+        if filter[0] == 'availabilities':
+            artists = {
+                row['id'] for row in availabilities
+                if row['available'] in filter[1]}
+            print(artists, filter[1])
+            query += f'AND artist.id IN ({",".join("?" * len(artists))})'
+            parameters += artists
+        elif filter[0] == 'spectacles':
+            spectacles = filter[1] or (0,)
+            query += f'AND spectacle.id IN ({",".join("?" * len(spectacles))})'
+            parameters += spectacles
+    cursor.execute(query, parameters)
     artists_spectacles = cursor.fetchall()
-    cursor.execute('''
-      SELECT artist.id, date, available
-      FROM artist
-      JOIN artist_availability
-      ON artist.id = artist_availability.artist_id
-      WHERE date BETWEEN ? AND ?
-    ''', (start, stop))
-    availabilities = cursor.fetchall()
     return render_template(
         'artists_followup.jinja2.html',
         artists_spectacles=artists_spectacles, availabilities=availabilities,
         start=start, stop=stop, previous=previous, next=next)
+
+
+# Follow-ups
+@app.route('/artists/followup/<int:year>/<int:month>/filter',
+           methods=('GET', 'POST'))
+@authenticated
+def artists_followup_filter(year, month):
+    year, month, start, stop, previous, next = get_date_data(year, month)
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        filter_type = request.form['type']
+        try:
+            if filter_type == 'availability':
+                session['artists-followup-filter'] = (
+                    'availabilities',
+                    [int(i) for i in request.form.getlist('availabilities')])
+            elif filter_type == 'spectacle':
+                session['artists-followup-filter'] = (
+                    'spectacles',
+                    [int(i) for i in request.form.getlist('spectacles')])
+            else:
+                session.pop('artists-followup-filter', None)
+        except Exception:
+            session.pop('artists-followup-filter', None)
+        return redirect(url_for('artists_followup', year=year, month=month))
+
+    cursor.execute('''
+      SELECT DISTINCT
+        spectacle.id,
+        spectacle.place || ' — ' || spectacle.event AS name
+      FROM spectacle
+      JOIN representation
+      ON spectacle.id = representation.spectacle_id
+      JOIN representation_date
+      on representation.id = representation_date.representation_id
+      WHERE date BETWEEN ? AND ?
+    ''', (start, stop))
+    spectacles = cursor.fetchall()
+    return render_template(
+        'artists_followup_filter.jinja2.html', spectacles=spectacles)
 
 
 @app.route('/costumes/followup')
