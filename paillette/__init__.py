@@ -18,6 +18,7 @@ from flask import (
 from flask_weasyprint import HTML, render_pdf
 from markupsafe import Markup
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 setlocale(LC_ALL, 'fr_FR.utf8')
 
@@ -165,7 +166,9 @@ def send_mail(to, subject, content, pdfs=None):
         part = MIMEBase('application', 'pdf')
         part.set_payload(pdf)
         encoders.encode_base64(part)
-        part.add_header('Content-Disposition', f'attachment; filename={name}')
+        part.add_header(
+            'Content-Disposition',
+            f'attachment; filename={secure_filename(name)}')
         message.attach(part)
 
     if app.config['DEBUG']:
@@ -650,7 +653,8 @@ def roadmap(spectacle_id):
     spectacle_data = get_spectacle_data(spectacle_id)
     html = render_template('roadmap.jinja2.html', **spectacle_data)
     place = spectacle_data['representations'][0]['place'].lower()
-    return render_pdf(HTML(string=html), download_filename=f'{place}.pdf')
+    return render_pdf(
+        HTML(string=html), download_filename=f'{secure_filename(place)}.pdf')
 
 
 @app.route('/roadmap/<int:spectacle_id>/send', methods=('GET', 'POST'))
