@@ -128,7 +128,7 @@
         <dt>{{ vehicle.name }}</dt>
         {% if vehicle.rented %}
           <dd>Loué à {{ vehicle.rental_company_name }}</dd>
-          <dd>{{ (vehicle.rented_from, vehicle.rented_to) | date_range | capitalize }}</dd>
+          <dd><strong>{{ (vehicle.rented_from, vehicle.rented_to) | date_range | capitalize }}</strong></dd>
           <dd>Adresse : {{ vehicle.rental_company_address }}</dd>
           <dd>Horaires : {{ vehicle.rental_company_hours }}</dd>
         {% endif %}
