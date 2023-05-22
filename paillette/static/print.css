@@ -22,13 +22,17 @@
 
 @page {
   margin: 20mm 10mm;
+
+  @bottom-right {
+    content: counter(page) "/" counter(pages);
+  }
 }
 
 /* Common */
 
 html {
   font-family: sans-serif;
-  font-size: 14pt;
+  font-size: 12pt;
 }
 
 footer,
@@ -48,26 +52,30 @@ dl {
 
 dd,
 dt {
-  border-bottom: 0.5mm solid pink;
+  border-top: 0.5mm solid pink;
   margin: 0;
   padding: 2mm 0;
+}
+
+dd + dd {
+  border-top: none;
+}
+
+dd:first-of-type,
+dt:first-of-type {
+  border: none;
 }
 
 dd {
   float: right;
   margin: 0;
-  width: 50%
+  width: 70%
 }
 
 dt {
   clear: right;
   float: left;
-  width: 50%;
-}
-
-dd:last-of-type,
-dt:last-of-type {
-  border-bottom: none;
+  width: 30%;
 }
 
 h2 {
@@ -86,15 +94,13 @@ h3 {
 }
 
 section {
-  margin: 10mm 0;
+  break-inside: avoid;
+  clear: both;
+  margin: 15mm 0;
 }
 
 section:first-of-type {
   margin-top: 25mm;
-}
-
-section:not(#images) {
-  break-inside: avoid;
 }
 
 strong {
@@ -116,12 +122,25 @@ strong {
   display: none;
 }
 
+
+/* Important */
+
+#important {
+  border: 0.5mm solid #da0505;
+  padding: 5mm;
+}
+
+#important h3 {
+  display: none;
+}
+
 /* Attachments */
 
 #images img {
   display: block;
   margin: 5mm 0;
-  width: 50%;
+  max-height: 75%;
+  max-width: 75%;
 }
 
 #images-list {
