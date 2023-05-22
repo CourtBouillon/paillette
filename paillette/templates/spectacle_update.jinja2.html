@@ -1,5 +1,5 @@
 {% set spectacle = representations[0] %}
-{% set all_dates = (representations | join(',', attribute='representation_dates')).split(',') | sort | list %}
+{% set all_dates = (representations | map(attribute='representation_dates') | select | join(',')).split(',') | sort | list %}
 {% set dates = (all_dates[0], all_dates[-1]) | date_range %}
 {% set title = '{}, {}'.format(spectacle.place, dates) %}
 
@@ -186,8 +186,8 @@
               {% for date in representation.representation_dates.split(',') | sort %}
                 <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)" value="{{ date }}">
               {% endfor %}
-              <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)">
             {% endif %}
+            <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)">
           </div>
 
           <label>Artistes</label>
