@@ -1,0 +1,45 @@
+{% set title = 'Filtrage des artistes' %}
+{% set filter = session.get('artists-followup-filter') %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <form method="post">
+    <label for="type">Type de filtrage</label>
+    <select id="type" name="type" onChange="update()">
+      <option value="none" {{ 'selected' if not filter }}>Aucun</option>
+      <option value="availability" {{ 'selected' if filter and filter[0] == 'availabilities' }}>Par disponibilité</option>
+      <option value="spectacle" {{ 'selected' if filter and filter[0] == 'spectacles' }}>Par spectacle</option>
+    </select>
+
+    <fieldset id="availability" hidden>
+      <legend>Disponibilités</legend>
+      <input id="unavailable" name="availabilities" value="0" type="checkbox" {{ 'checked' if not filter or filter[0] != 'availabilities' or 0 in filter[1] }}>
+      <label for="unavailable">Indisponible</label>
+
+      <input id="available" name="availabilities" value="1" type="checkbox" {{ 'checked' if not filter or filter[0] != 'availabilities' or 1 in filter[1] }}>
+      <label for="available">Disponible</label>
+    </fieldset>
+
+    <fieldset id="spectacle" hidden>
+      <legend>Spectacles</legend>
+      {% for spectacle in spectacles %}
+        <input id="spectacle-{{ spectacle.id }}" name="spectacles" value="{{ spectacle.id }}" type="checkbox" {{ 'checked' if not filter or filter[0] != 'spectacles' or spectacle.id in filter[1] }}>
+        <label for="spectacle-{{ spectacle.id }}">{{ spectacle.name }}</label>
+      {% endfor %}
+    </fieldset>
+    <input class="button" type="submit" value="Filtrer">
+  </form>
+
+  <script>
+    function update() {
+      let select = document.getElementById('type');
+      document.querySelectorAll("fieldset").forEach(
+        obj => obj.id != select.options[select.selectedIndex].value ? obj.setAttribute("hidden", true) : obj.removeAttribute("hidden")
+      );
+    }
+    update();
+  </script>
+{% endblock %}

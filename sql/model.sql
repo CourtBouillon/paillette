@@ -37,7 +37,7 @@ CREATE TABLE spectacle (
 CREATE TABLE spectacle_image (
   id INTEGER PRIMARY KEY,
   spectacle_id INTEGER NOT NULL REFERENCES spectacle(id),
-  image BINARY NOT NULL
+  filename TEXT
 );
 
 CREATE TABLE artist (

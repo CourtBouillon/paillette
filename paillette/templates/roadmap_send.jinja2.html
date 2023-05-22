@@ -43,7 +43,7 @@
     <ul id="images">
       {% for image in images %}
         <li>
-          <img src="{{ url_for('roadmap_image', image_id=image.id) }}">
+          <img src="{{ url_for('static', filename='roadmap_images/' + image.filename) }}">
           <form method="post" action="{{ url_for('roadmap_detach_image', image_id=image.id) }}">
             <input class="button" type="submit" value="Supprimer">
           </form>

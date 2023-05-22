@@ -16,7 +16,7 @@
 
     <dl>
       <dt>{{ spectacle.place }}</dt>
-      <dd><strong>Du {{ spectacle.first_date | date_simple }} au {{ spectacle.last_date | date_simple }}</strong></dd>
+      <dd><strong>{{ dates | capitalize }}</strong></dd>
 
       <dt>Évènement</dt>
       <dd>{{ spectacle.event }}</dd>
@@ -175,7 +175,7 @@
       {{ spectacle.images_comment | safe }}
       <ul id="images-list">
         {% for image in images %}
-        <li><img src="{{ url_for('roadmap_image', image_id=image.id) }}"></li>
+          <li><img src="{{ url_for('static', filename='roadmap_images/' + image.filename) }}"></li>
         {% endfor %}
       </ul>
     </section>

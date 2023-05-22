@@ -9,6 +9,7 @@ from email.utils import formatdate
 from functools import wraps
 from io import BytesIO
 from locale import LC_ALL, setlocale
+from pathlib import Path
 from smtplib import SMTP_SSL
 from uuid import uuid4
 
@@ -18,6 +19,7 @@ from flask import (
 from flask_weasyprint import HTML, render_pdf
 from markupsafe import Markup
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 setlocale(LC_ALL, 'fr_FR.utf8')
 
@@ -137,7 +139,7 @@ def get_spectacle_data(spectacle_id):
     ''', (spectacle_id,))
     costumes = cursor.fetchall()
     cursor.execute('''
-      SELECT id
+      SELECT id, filename
       FROM spectacle_image
       WHERE spectacle_id = ?
     ''', (spectacle_id,))
@@ -165,7 +167,9 @@ def send_mail(to, subject, content, pdfs=None):
         part = MIMEBase('application', 'pdf')
         part.set_payload(pdf)
         encoders.encode_base64(part)
-        part.add_header('Content-Disposition', f'attachment; filename={name}')
+        part.add_header(
+            'Content-Disposition',
+            f'attachment; filename={secure_filename(name)}')
         message.attach(part)
 
     if app.config['DEBUG']:
@@ -650,7 +654,8 @@ def roadmap(spectacle_id):
     spectacle_data = get_spectacle_data(spectacle_id)
     html = render_template('roadmap.jinja2.html', **spectacle_data)
     place = spectacle_data['representations'][0]['place'].lower()
-    return render_pdf(HTML(string=html), download_filename=f'{place}.pdf')
+    return render_pdf(
+        HTML(string=html), download_filename=f'{secure_filename(place)}.pdf')
 
 
 @app.route('/roadmap/<int:spectacle_id>/send', methods=('GET', 'POST'))
@@ -735,12 +740,16 @@ def roadmap_attach_image(spectacle_id):
     if images:
         cursor = get_connection().cursor()
         for image in images:
-            bytes = BytesIO()
-            image.save(bytes)
+            filename = secure_filename(image.filename)
+            if not filename:
+                continue
+            folder = Path(app.static_folder) / 'roadmap_images'
+            folder.mkdir(exist_ok=True)
+            image.save(folder / filename)
             cursor.execute('''
-              INSERT INTO spectacle_image (spectacle_id, image)
+              INSERT INTO spectacle_image (spectacle_id, filename)
               VALUES (?, ?)
-            ''', (spectacle_id, bytes.getvalue()))
+            ''', (spectacle_id, filename))
         cursor.connection.commit()
         flash('Les images ont été ajoutées.')
     return redirect(url_for('roadmap', spectacle_id=spectacle_id))
@@ -750,25 +759,18 @@ def roadmap_attach_image(spectacle_id):
 @authenticated
 def roadmap_detach_image(image_id):
     cursor = get_connection().cursor()
-    cursor.execute(
-        'DELETE FROM spectacle_image WHERE id = ? RETURNING spectacle_id',
-        (image_id,))
+    cursor.execute('''
+      DELETE FROM spectacle_image
+      WHERE id = ?
+      RETURNING spectacle_id, filename
+    ''', (image_id,))
     image = cursor.fetchone() or abort(404)
+    path = Path(app.static_folder) / 'roadmap_images' / image['filename']
+    path.unlink(missing_ok=True)
     cursor.connection.commit()
     flash('L’image a été supprimée.')
     spectacle_id = image['spectacle_id']
     return redirect(url_for('roadmap', spectacle_id=spectacle_id))
-
-
-@app.route('/roadmap/image/<int:image_id>')
-@authenticated
-def roadmap_image(image_id):
-    cursor = get_connection().cursor()
-    cursor.execute('SELECT * FROM spectacle_image WHERE id = ?', (image_id,))
-    image = cursor.fetchone() or abort(404)
-    data = image['image']
-    format = 'png' if data[1:4] == b'PNG' else 'jpeg'
-    return Response(data, mimetype=f'image/{format}')
 
 
 # Follow-ups
@@ -779,6 +781,14 @@ def artists_followup(year=None, month=None):
     year, month, start, stop, previous, next = get_date_data(year, month)
     cursor = get_connection().cursor()
     cursor.execute('''
+      SELECT artist.id, date, available
+      FROM artist
+      JOIN artist_availability
+      ON artist.id = artist_availability.artist_id
+      WHERE date BETWEEN ? AND ?
+    ''', (start, stop))
+    availabilities = cursor.fetchall()
+    query = '''
       SELECT
         artist.id AS artist_id,
         person.name || '-' || artist.id AS grouper,
@@ -802,21 +812,69 @@ def artists_followup(year=None, month=None):
       ON representation_date.representation_id = representation.id
       LEFT JOIN spectacle
       ON representation.spectacle_id = spectacle.id
-      WHERE spectacle.trigram IS NOT NULL OR NOT artist.hidden
-      ''', (start, stop))
+      WHERE (spectacle.trigram IS NOT NULL OR NOT artist.hidden)
+    '''
+    parameters = [start, stop]
+    filter = session.get('artists-followup-filter')
+    if filter:
+        if filter[0] == 'availabilities':
+            artists = {
+                row['id'] for row in availabilities
+                if row['available'] in filter[1]}
+            print(artists, filter[1])
+            query += f'AND artist.id IN ({",".join("?" * len(artists))})'
+            parameters += artists
+        elif filter[0] == 'spectacles':
+            spectacles = filter[1] or (0,)
+            query += f'AND spectacle.id IN ({",".join("?" * len(spectacles))})'
+            parameters += spectacles
+    cursor.execute(query, parameters)
     artists_spectacles = cursor.fetchall()
-    cursor.execute('''
-      SELECT artist.id, date, available
-      FROM artist
-      JOIN artist_availability
-      ON artist.id = artist_availability.artist_id
-      WHERE date BETWEEN ? AND ?
-    ''', (start, stop))
-    availabilities = cursor.fetchall()
     return render_template(
         'artists_followup.jinja2.html',
         artists_spectacles=artists_spectacles, availabilities=availabilities,
         start=start, stop=stop, previous=previous, next=next)
+
+
+# Follow-ups
+@app.route('/artists/followup/<int:year>/<int:month>/filter',
+           methods=('GET', 'POST'))
+@authenticated
+def artists_followup_filter(year, month):
+    year, month, start, stop, previous, next = get_date_data(year, month)
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        filter_type = request.form['type']
+        try:
+            if filter_type == 'availability':
+                session['artists-followup-filter'] = (
+                    'availabilities',
+                    [int(i) for i in request.form.getlist('availabilities')])
+            elif filter_type == 'spectacle':
+                session['artists-followup-filter'] = (
+                    'spectacles',
+                    [int(i) for i in request.form.getlist('spectacles')])
+            else:
+                session.pop('artists-followup-filter', None)
+        except Exception:
+            session.pop('artists-followup-filter', None)
+        return redirect(url_for('artists_followup', year=year, month=month))
+
+    cursor.execute('''
+      SELECT DISTINCT
+        spectacle.id,
+        spectacle.place || ' — ' || spectacle.event AS name
+      FROM spectacle
+      JOIN representation
+      ON spectacle.id = representation.spectacle_id
+      JOIN representation_date
+      on representation.id = representation_date.representation_id
+      WHERE date BETWEEN ? AND ?
+    ''', (start, stop))
+    spectacles = cursor.fetchall()
+    return render_template(
+        'artists_followup_filter.jinja2.html', spectacles=spectacles)
 
 
 @app.route('/costumes/followup')

@@ -415,6 +415,7 @@ label,
 .artist,
 .costume,
 .create,
+.filter,
 .hide,
 .makeup,
 .next,
@@ -438,6 +439,10 @@ label,
 
 .create::before {
   content: "\f196";
+}
+
+.filter::before {
+  content: "\f0b0";
 }
 
 .hide::before {
