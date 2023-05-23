@@ -821,7 +821,6 @@ def artists_followup(year=None, month=None):
             artists = {
                 row['id'] for row in availabilities
                 if row['available'] in filter[1]}
-            print(artists, filter[1])
             query += f'AND artist.id IN ({",".join("?" * len(artists))})'
             parameters += artists
         elif filter[0] == 'spectacles':
