@@ -174,7 +174,9 @@
   {% if images %}
     <section id="images">
       <h3>Images</h3>
-      {{ spectacle.images_comment | safe }}
+      {% if spectacle.images_comment %}
+        {{ spectacle.images_comment | safe }}
+      {% endif %}
       <ul id="images-list">
         {% for image in images %}
           <li><img src="{{ url_for('static', filename='roadmap_images/' + image.filename) }}"></li>

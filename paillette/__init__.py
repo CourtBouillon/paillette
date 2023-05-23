@@ -7,17 +7,17 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from functools import wraps
-from io import BytesIO
 from locale import LC_ALL, setlocale
 from pathlib import Path
 from smtplib import SMTP_SSL
 from uuid import uuid4
 
 from flask import (
-    Flask, Response, abort, flash, g, redirect, render_template, request,
-    session, url_for)
+    Flask, abort, flash, g, redirect, render_template, request, session,
+    url_for)
 from flask_weasyprint import HTML, render_pdf
 from markupsafe import Markup
+from PIL import Image
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
@@ -746,6 +746,9 @@ def roadmap_attach_image(spectacle_id):
             folder = Path(app.static_folder) / 'roadmap_images'
             folder.mkdir(exist_ok=True)
             image.save(folder / filename)
+            with Image.open(folder / filename) as image:
+                image.thumbnail((1000, 1000))
+                image.save(folder / filename, optimize=True)
             cursor.execute('''
               INSERT INTO spectacle_image (spectacle_id, filename)
               VALUES (?, ?)
