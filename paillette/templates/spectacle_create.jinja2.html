@@ -96,7 +96,9 @@
         </div>
 
         <label>Dates</label>
-        <input name="dates" type="date" onInput="addInputIfNeeded(this)">
+        <div>
+          <input name="dates" type="date" onInput="addInputIfNeeded(this)">
+        </div>
 
         <label>Artistes</label>
         <div>
@@ -167,6 +169,8 @@
           newArtists.appendChild(previousArtist);
         }
       );
+
+      newLi.querySelector('input').focus();
     }
 
     function remove(button) {

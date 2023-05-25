@@ -28,6 +28,8 @@
       {% for spectacle in spectacles %}
         <input id="spectacle-{{ spectacle.id }}" name="spectacles" value="{{ spectacle.id }}" type="checkbox" {{ 'checked' if not filter or filter[0] != 'spectacles' or spectacle.id in filter[1] }}>
         <label for="spectacle-{{ spectacle.id }}">{{ spectacle.name }}</label>
+      {% else %}
+        <p>Aucun spectacle ce jour-là.</p>
       {% endfor %}
     </fieldset>
     <input class="button" type="submit" value="Filtrer">

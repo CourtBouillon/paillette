@@ -34,19 +34,31 @@ body {
 }
 
 main {
+  border-top: 1px solid transparent;
   margin: 8em auto auto auto;
   max-width: 1400px;
   padding: 0 1em;
 }
 
+body[id$="followup"] main {
+  max-width: none;
+}
+
 main ::before {
+  display: inline-block;
   font-size: 2rem;
+  width: 1em;
 }
 
 ::before {
-  display: inline-block;
   font-family: ForkAwesome;
+  text-align: center;
   padding-right: 0.5em;
+}
+
+a:hover::before,
+a:focus::before {
+  text-decoration: none;
 }
 
 a {
@@ -273,7 +285,6 @@ form > * {
   display: block;
 }
 
-form ul li:first-of-type,
 #spectacles-list > li:nth-of-type(2) {
   border-top: 1px solid var(--purple-opacity);
 }
@@ -283,7 +294,7 @@ form ul li:last-of-type {
 }
 
 form ul {
-  border-collapse: collapse;
+  margin: 0 0 1rem 0;
   padding: 0;
 }
 
@@ -292,6 +303,7 @@ select,
 textarea {
   background: inherit;
   border: 1px solid var(--pink);
+  border-radius: 0;
   margin: 1em 0;
   padding: 1em;
   /* 100% - padding left and right - border left and right */
@@ -327,24 +339,29 @@ label,
   border-image-slice: 0 0 7 0;
   border-image-source: linear-gradient(to right, var(--pink), 1.5em, var(--white), 0%, transparent);
   color: var(--grey);
-  margin: 1em 0;
-  padding-bottom: 0.25em;
+  margin: 1em 0 0.5em;
+  padding-bottom: 0.15em;
   width: 100%;
+}
+
+button::before {
+  padding-right: 0;
 }
 
 .button {
   background: var(--purple);
   border: 1px solid var(--purple);
   color: var(--white);
+  float: right;
+  margin: 1rem 0;
   padding: 1em;
   text-align: center;
   transition: 0.2s;
-  float: right;
-  margin: 1rem 0;
   width: 35%;
 }
 
-.button:hover {
+.button:hover,
+.button:focus {
   background: var(--purple-opacity);
   cursor: pointer;
 }
@@ -354,6 +371,7 @@ label,
 .delete {
   background: inherit;
   border: 0;
+  cursor: pointer;
   font-size: 0;
 }
 
@@ -401,6 +419,10 @@ label,
   width: 100%;
 }
 
+#spectacles-list > li {
+  padding: 1rem;
+}
+
 #spectacles-list > li:nth-child(even) {
   background: var(--grey-light);
 }
@@ -410,6 +432,7 @@ label,
 .active::before {
   border: 2px solid var(--purple);
   border-radius: 15%;
+  padding: 0.1em 0.25em;
 }
 
 .artist,
@@ -492,7 +515,7 @@ label,
   display: flex;
   position: absolute;
   right: 1em;
-  top: 7em;
+  top: 8em;
 }
 
 /* Follow & Time */
@@ -506,6 +529,11 @@ label,
   width: 100%;
 }
 
+.time li:nth-child(2) {
+  text-align: center;
+  width: 12em;
+}
+
 .follow *::before {
   margin: 0 2em;
   padding: 0.1em 0.25em;
@@ -514,7 +542,6 @@ label,
 /* Login */
 
 #page-login::before,
-#page-login header,
 #page-login footer {
   display: none;
 }
@@ -530,6 +557,7 @@ label,
 #page-login main {
   align-items: center;
   display: flex;
+  margin: auto;
 }
 
 #page-login img {
@@ -546,12 +574,24 @@ label,
   width: 100%;
 }
 
+#page-login label {
+  color: var(--white);
+}
+
 #page-login section {
   width: 50%;
 }
 
 #page-login .cancel {
   display: none;
+}
+
+#page-login a {
+  display: block;
+  float: left;
+  line-height: 0.75;
+  margin: 1rem 0;
+  padding: 1em 0;
 }
 
 /* Artists, Costumes, Make-up, Persons, Sounds, Vehicles */
@@ -672,7 +712,10 @@ label,
 
 #page-spectacles dt {
   color: var(--grey);
-  font-size: 1.2em;
+}
+
+#page-spectacles a dl {
+  overflow: auto;
 }
 
 #page-spectacles a dl dt {
@@ -684,13 +727,13 @@ label,
 
 #page-spectacles a dl dd {
   float: right;
-  margin: 1em 0;
+  margin: 0.5em 0;
   width: 85%;
 }
 
 #page-spectacles section ::before {
   font-size: 1.2rem;
-  margin: 1em 0;
+  margin: 0.5em 0;
 }
 
 .date::before {
@@ -709,29 +752,56 @@ label,
 
 /* Spectacle */
 
-#page-spectacle dl {
-  width: 50%;
-}
-
 #page-spectacle .date,
 #page-spectacle .place,
 #page-spectacle .vehicle {
   font-size: 0;
 }
 
+#page-spectacle main > dl:first-of-type {
+  overflow: auto;
+}
+
 #page-spectacle main > dl:first-of-type dt {
   float: left;
-  width: 10%;
+  width: 3rem;
 }
 
 #page-spectacle main > dl:first-of-type dd {
-  float: right;
-  width: 90%;
+  float: left;
+  width: calc(100% - 3rem);
+}
+
+#page-spectacle main > dl + dl {
+  overflow: auto;
+}
+
+@media (min-width: 920px) {
+  #page-spectacle main > dl + dl {
+    columns: 2;
+  }
+}
+
+#page-spectacle dd {
+  break-before: avoid;
+  break-inside: avoid;
 }
 
 #page-spectacle dl dl {
-  border-left: 0.3em solid var(--pink);
   padding-left: 1rem;
+  margin-right: 10%;
+}
+
+#page-spectacle dl dl dt:first-child::before {
+  content: "•";
+  position: absolute;
+  margin-left: -1.2rem;
+  font-size: 1.2rem;
+  line-height: 1.1;
+}
+
+#page-spectacle main > dl dd + dd dl {
+  border-top: 2px solid var(--pink-opacity);
 }
 
 
@@ -811,6 +881,20 @@ th {
   padding: 0.5em;
 }
 
+thead th {
+  top: 0;
+}
+
+tbody th {
+  left: 0;
+  position: sticky;
+}
+
+thead th {
+  top: 0;
+  position: sticky;
+}
+
 td > a:empty::after {
   content: "​"; /* Zero-width space */
   display: block;
@@ -820,7 +904,11 @@ tbody tr {
   text-align: center;
 }
 
-tbody tr:nth-child(even) {
+tbody tr:nth-child(odd) > * {
+  background: var(--white);
+}
+
+tbody tr:nth-child(even) > * {
   background: var(--grey-light);
 }
 

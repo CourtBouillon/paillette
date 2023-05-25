@@ -48,7 +48,7 @@
         <dd>
           <dl>
       {% endif %}
-      <dt>Spectacle</dt>
+      <dt>Spectacle {{ loop.index }}</dt>
       <dd>{{ representation.representation_name }}</dd>
       <dt>Dates</dt>
       {% if representation.representation_dates %}
