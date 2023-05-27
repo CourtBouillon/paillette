@@ -154,7 +154,7 @@
         </div>
 
         <label>Dates</label>
-        <div>
+        <div class="dates">
           <input name="dates" type="date" onInput="addInputIfNeeded(this)">
         </div>
 
@@ -180,7 +180,7 @@
           </div>
 
           <label>Dates</label>
-          <div>
+          <div class="dates">
             {% if representation.representation_dates %}
               {% for date in representation.representation_dates.split(',') | sort %}
                 <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)" value="{{ date }}">

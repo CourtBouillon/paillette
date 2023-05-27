@@ -1,0 +1,94 @@
+@media (max-width: 920px) {
+  header::before {
+    background-position: left center;
+    background-size: contain;
+  }
+  header nav:hover {
+    line-heigth: 1;
+    margin-top: 4rem;
+    height: calc(100vh - 4rem);
+    width: 100vw;
+  }
+
+  main {
+    margin-bottom: 4em;
+    margin-top: 4em;
+  }
+
+  footer {
+    border-bottom: 0;
+    border-top: 1px solid var(--purple);
+    bottom: 0;
+    top: auto;
+  }
+
+  .actions {
+    bottom: 3em;
+    flex-direction: column;
+    right: 0;
+    top: auto;
+  }
+  .follow *::before {
+    margin: 0;
+  }
+
+  table {
+    font-size: 0.8em;
+  }
+  table td,
+  table th {
+    padding: 0.1em;
+  }
+
+  fieldset {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  fieldset input[type=radio] + label,
+  fieldset input[type=checkbox] + label {
+    margin: -1.5rem 0 1rem;
+    padding-left: 3rem;
+  }
+
+  #page-login main {
+    flex-direction: column;
+  }
+  #page-login main img {
+    max-width: 90%;
+  }
+  #page-login main section {
+    width: 100%;
+  }
+
+  #page-spectacles section > a {
+    width: 100%;
+  }
+  #page-spectacles section > a dl {
+    margin: 0;
+  }
+  #page-spectacles section > dl {
+    display: none;
+  }
+
+  #page-spectacle main > dl:first-of-type {
+    font-size: 1.5em;
+  }
+  #page-spectacle main > dl:first-of-type dd {
+    line-height: 2;
+  }
+  #page-spectacle main > dl + dl {
+    columns: 1;
+  }
+
+  #page-artists div,
+  #page-costumes div,
+  #page-makeups div,
+  #page-persons div,
+  #page-sounds div,
+  #page-vehicles div,
+  form,
+  #images
+  {
+    width: auto;
+  }
+}

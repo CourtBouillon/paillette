@@ -6,6 +6,7 @@
 }
 
 /* Variables */
+
 :root {
   --black: #000;
   --grey: #515151;
@@ -30,13 +31,13 @@ html {
 
 body {
   margin: 0;
-  min-height: 100vh;
 }
 
 main {
   border-top: 1px solid transparent;
-  margin: 8em auto auto auto;
+  margin: 8em auto 0 auto;
   max-width: 1400px;
+  overflow: auto;
   padding: 0 1em;
 }
 
@@ -85,12 +86,15 @@ h1,
 #page-spectacle h2,
 body[id$="followup"] h2 {
   display: none;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
 }
 
 h2,
-summary,
 #page-spectacle main > dl:first-of-type {
   font-size: 2em;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 li {
@@ -101,6 +105,7 @@ li {
 
 #messages {
   bottom: 0;
+  max-width: 100%;
   position: fixed;
   right: 0;
   width: 20em;
@@ -146,7 +151,6 @@ li {
 /* Nav */
 
 body::before {
-  content: url(/static/logo.jpg);
   display: block;
   height: 4em;
   left: 0;
@@ -158,27 +162,51 @@ body::before {
 
 header {
   background: var(--black);
-  position: fixed;
   height: 4em;
-  top: 0;
   left: 0;
+  position: fixed;
+  top: 0;
   width: 100vw;
   z-index: 2
+}
+
+header::before {
+  background: url(/static/logo.jpg) 1rem center / auto 100% no-repeat var(--black);
+  content: '';
+  display: block;
+  height: 100%;
+  position: absolute;
+  width: calc(100% - 5rem);
 }
 
 header nav::before {
   align-items: center;
   background: var(--black);
   color: var(--purple);
-  content: "\f0c9";
   display: flex;
   height: 3em;
   justify-content: center;
+  padding-right: 0;
   position: absolute;
   right: 0;
   top: 0;
   width: 3em;
   z-index: 2;
+}
+
+header::after {
+  display: flex;
+  color: var(--purple);
+  content: '×';
+  font-size: 2rem;
+  line-height: 4rem;
+  position: absolute;
+  right: 1.5rem;
+  top: 0;
+}
+
+header nav::before {
+  content: "\f0c9";
 }
 
 header nav {
@@ -261,6 +289,7 @@ footer ul {
   align-items: center;
   display: flex;
   justify-content: space-evenly;
+  padding: 0;
 }
 
 body[id^="page-spectacle"] footer ul li:first-of-type a,
@@ -279,6 +308,10 @@ fieldset {
   align-items: center;
   border: inherit;
   display: flex !important;
+}
+
+fieldset legend {
+  margin: 0.5rem 0;
 }
 
 fieldset label {
@@ -334,10 +367,11 @@ input[type="color"] {
   width: 3em;
 }
 
-input[type="radio"] {
-  height: 3em;
+input[type="radio"],
+input[type="checkbox"] {
+  height: 2em;
   margin: 0 1em 0 0;
-  width: 3em;
+  width: 2em;
 }
 
 label,
@@ -427,6 +461,18 @@ button::before {
   width: 100%;
 }
 
+#page-spectacle_create form .dates,
+#page-spectacle_update form .dates {
+  flex-wrap: wrap;
+  padding: 1em 0;
+}
+
+#page-spectacle_create form .dates input,
+#page-spectacle_update form .dates input {
+  margin: 0;
+  width: auto;
+}
+
 #spectacles-list > li {
   padding: 1rem;
 }
@@ -500,6 +546,7 @@ button::before {
 
 .previous::before {
   content: "\f104";
+  padding-left: 0.5em;
 }
 
 .send::before {
@@ -526,7 +573,7 @@ button::before {
 
 .actions {
   display: flex;
-  position: absolute;
+  position: fixed;
   right: 1em;
   top: 8em;
 }
@@ -554,7 +601,7 @@ button::before {
 
 /* Login */
 
-#page-login::before,
+#page-login header,
 #page-login footer {
   display: none;
 }
@@ -772,10 +819,12 @@ button::before {
 }
 
 #page-spectacle main > dl:first-of-type {
+  margin: 0.25em 0;
   overflow: auto;
 }
 
 #page-spectacle main > dl:first-of-type dt {
+  clear: left;
   float: left;
   width: 3rem;
 }
@@ -789,10 +838,8 @@ button::before {
   overflow: auto;
 }
 
-@media (min-width: 920px) {
-  #page-spectacle main > dl + dl {
-    columns: 2;
-  }
+#page-spectacle main > dl + dl {
+  columns: 2;
 }
 
 #page-spectacle dd {
@@ -815,6 +862,7 @@ button::before {
 
 #page-spectacle main > dl dd + dd dl {
   border-top: 2px solid var(--pink-opacity);
+  margin-top: 1rem;
 }
 
 
