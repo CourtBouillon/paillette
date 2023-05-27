@@ -204,6 +204,10 @@ header nav ul {
   padding: 0;
 }
 
+header nav ul li {
+  padding-right: 1rem;
+}
+
 header nav:hover {
   background: var(--black);
   display: flex;
