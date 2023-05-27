@@ -48,7 +48,7 @@
       </select>
       <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
     </div>
-    <ul>
+    <ul class="item-list">
       {% if spectacle.sound_ids %}
         {% set sound_ids = spectacle.sound_ids.split(',') %}
         {% for sound in sounds %}
@@ -73,7 +73,7 @@
       </select>
       <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
     </div>
-    <ul>
+    <ul class="item-list">
       {% if spectacle.makeup_ids %}
         {% set makeup_ids = spectacle.makeup_ids.split(',') %}
         {% for makeup in makeups %}
@@ -98,7 +98,7 @@
       </select>
       <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
     </div>
-    <ul>
+    <ul class="item-list">
       {% if spectacle.costume_ids %}
         {% set costume_ids = spectacle.costume_ids.split(',') %}
         {% for costume in costumes %}
@@ -123,7 +123,7 @@
       </select>
       <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
     </div>
-    <ul>
+    <ul class="item-list">
       {% if spectacle.vehicle_ids %}
         {% set vehicle_ids = spectacle.vehicle_ids.split(',') %}
         {% for vehicle in vehicles %}

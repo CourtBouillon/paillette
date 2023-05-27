@@ -72,6 +72,10 @@ a:hover {
   text-decoration: underline;
 }
 
+ul {
+  break-inside: avoid;
+}
+
 dd {
   margin: 0;
 }
@@ -423,6 +427,11 @@ button::before {
   padding: 1rem;
 }
 
+.item-list {
+  padding: 0 1rem 1rem;
+}
+
+.item-list > li:nth-child(even),
 #spectacles-list > li:nth-child(even) {
   background: var(--grey-light);
 }
