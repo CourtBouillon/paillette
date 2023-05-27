@@ -1,12 +1,29 @@
+@media (pointer: coarse) {
+  header::after {
+    display: flex;
+    color: var(--purple);
+    content: '×';
+    font-size: 2rem;
+    line-height: 4rem;
+    position: absolute;
+    right: 1.5rem;
+    top: 0;
+  }
+
+  header nav:hover {
+    height: calc(100vh - 4rem);
+    margin-top: 4rem;
+  }
+}
+
 @media (max-width: 920px) {
   header::before {
     background-position: left center;
     background-size: contain;
   }
   header nav:hover {
+    height: 100vh;
     line-heigth: 1;
-    margin-top: 4rem;
-    height: calc(100vh - 4rem);
     width: 100vw;
   }
 
@@ -48,6 +65,9 @@
   fieldset input[type=checkbox] + label {
     margin: -1.5rem 0 1rem;
     padding-left: 3rem;
+  }
+  fieldset legend {
+    margin: 0.5rem 0;
   }
 
   #page-login main {

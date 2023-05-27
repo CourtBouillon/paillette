@@ -194,17 +194,6 @@ header nav::before {
   z-index: 2;
 }
 
-header::after {
-  display: flex;
-  color: var(--purple);
-  content: '×';
-  font-size: 2rem;
-  line-height: 4rem;
-  position: absolute;
-  right: 1.5rem;
-  top: 0;
-}
-
 header nav::before {
   content: "\f0c9";
 }
@@ -308,10 +297,6 @@ fieldset {
   align-items: center;
   border: inherit;
   display: flex !important;
-}
-
-fieldset legend {
-  margin: 0.5rem 0;
 }
 
 fieldset label {
