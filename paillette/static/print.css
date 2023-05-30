@@ -45,16 +45,31 @@ a {
   text-decoration: none;
 }
 
+p {
+  margin: 0;
+}
 
 dl {
+  border-top: 0.01px solid transparent;
   margin: 2mm 0;
+  overflow: auto;
+}
+
+dl dl {
+  margin: -0.5em 0;
+}
+
+dd + dd dl {
+  border-top: 0.2mm dashed;
+  border-color: var(--grey);
 }
 
 dd,
 dt {
-  border-top: 0.5mm solid pink;
+  border-top: 0.2mm solid;
+  border-color: var(--pink);
   margin: 0;
-  padding: 2mm 0;
+  padding: 0.5em 0;
 }
 
 dd + dd {
@@ -89,6 +104,7 @@ h2 {
 
 h3 {
   color: var(--pink);
+  margin: 2em 0 1em;
   text-transform: uppercase;
   width: 100%;
 }
@@ -96,24 +112,14 @@ h3 {
 section {
   break-inside: avoid;
   clear: both;
-  margin: 15mm 0;
-}
-
-section:first-of-type {
-  margin-top: 25mm;
-}
-
-strong {
-  font-weight: bold;
+  margin: 2em 0;
 }
 
 /* Header */
 
 #logo {
   display: block;
-  position: absolute;
-  top: -20mm;
-  left: -10mm;
+  margin: -63mm 0 0 -10mm;
 }
 
 /* Summary */
@@ -122,11 +128,16 @@ strong {
   display: none;
 }
 
+#summary > dl:first-child > dt:first-child {
+  color: var(--pink);
+  font-weight: bold;
+  text-transform: uppercase;
+}
 
 /* Important */
 
 #important {
-  border: 0.5mm solid #da0505;
+  border: 0.2mm solid #da0505;
   padding: 5mm;
 }
 

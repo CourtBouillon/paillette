@@ -12,8 +12,6 @@
   <img id="logo" src="{{ url_for('static', filename='full_logo.png') }}" />
 
   <section id="summary">
-    <h3>Résumé</h3>
-
     <dl>
       <dt>{{ spectacle.place }}</dt>
       <dd><strong>{{ dates | capitalize }}</strong></dd>
@@ -48,8 +46,10 @@
         {% if representations | length >= 2 %}
           <dd>
             <dl>
+              <dt>Spectacle {{ loop.index }}</dt>
+        {% else %}
+          <dt>Spectacle</dt>
         {% endif %}
-        <dt>Spectacle</dt>
         <dd>{{ representation.representation_name }}</dd>
         <dt>Dates</dt>
         <dd>
@@ -96,9 +96,9 @@
     <h3>Équipe</h3>
 
     <dl>
-      {% if spectacle.organizer %}
+      {% if spectacle.manager %}
         <dt>Régisseur</dt>
-        <dd><strong>{{ spectacle.organizer }}</strong></dd>
+        <dd><strong>{{ spectacle.manager }}</strong></dd>
       {% endif %}
       <dt>Artistes</dt>
       {% for artist in all_artists %}
