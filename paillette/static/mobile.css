@@ -39,6 +39,10 @@
     top: auto;
   }
 
+  table {
+    max-height: calc(100vh - 4em);
+  }
+
   .actions {
     bottom: 3em;
     flex-direction: column;

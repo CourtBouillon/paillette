@@ -51,6 +51,11 @@ main ::before {
   width: 1em;
 }
 
+main div[class^="ql"] ::before {
+  font-size: 1em;
+  width: auto;
+}
+
 ::before {
   font-family: ForkAwesome;
   text-align: center;
@@ -315,13 +320,21 @@ form > * {
   border-top: 1px solid var(--purple-opacity);
 }
 
+form ul {
+  margin: 0 0 1rem 0;
+  padding: 0;
+}
+
 form ul li:last-of-type {
   border-bottom: 1px solid var(--purple-opacity);
 }
 
-form ul {
-  margin: 0 0 1rem 0;
-  padding: 0;
+form div[class^="ql"] ul {
+  margin: 1em 0;
+}
+
+form div[class^="ql"] ul li {
+  border-bottom: 0;
 }
 
 input,
@@ -907,7 +920,8 @@ button::before {
 table {
   display: block;
   border-collapse: collapse;
-  overflow-x: auto;
+  max-height: calc(100vh - 8em);
+  overflow: auto;
   scrollbar-color: var(--purple) var(--white);
 }
 
@@ -937,8 +951,9 @@ tbody th {
 }
 
 thead th {
-  top: 0;
+  background: var(--white);
   position: sticky;
+  top: 0;
 }
 
 td > a:empty::after {
