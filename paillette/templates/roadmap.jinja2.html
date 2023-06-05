@@ -19,14 +19,12 @@
       <dt>Évènement</dt>
       <dd>{{ spectacle.event }}</dd>
 
-      <dt>Lien</dt>
-      <dd>
-        {% if spectacle.link %}
+      {% if spectacle.link %}
+        <dt>Lien</dt>
+        <dd>
           <a href="{{ spectacle.link }}">{{ spectacle.link }}</a>
-        {% else %}
-          Pas de lien
-        {% endif %}
-      </dd>
+        </dd>
+      {% endif %}
 
       {% if spectacle.organizer %}
         <dt>Organisateur</dt>
