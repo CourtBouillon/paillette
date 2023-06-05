@@ -356,6 +356,11 @@ textarea {
   width: calc(100% - 2em - 2px);
 }
 
+input[type="file"] {
+  height: auto;
+  margin-right: 1em;
+}
+
 option {
   width: 100%;
 }
