@@ -730,7 +730,7 @@ def roadmap_comment(spectacle_id):
     ''', parameters)
     cursor.connection.commit()
     flash('Les données complémentaries ont été mises à jour.')
-    return redirect(url_for('roadmap', spectacle_id=spectacle_id))
+    return redirect(url_for('roadmap_send', spectacle_id=spectacle_id))
 
 
 @app.route('/roadmap/<int:spectacle_id>/attach', methods=('POST',))
@@ -755,7 +755,7 @@ def roadmap_attach_image(spectacle_id):
             ''', (spectacle_id, filename))
         cursor.connection.commit()
         flash('Les images ont été ajoutées.')
-    return redirect(url_for('roadmap', spectacle_id=spectacle_id))
+    return redirect(url_for('roadmap_send', spectacle_id=spectacle_id))
 
 
 @app.route('/roadmap/image/<image_id>/detach', methods=('POST',))
@@ -773,7 +773,7 @@ def roadmap_detach_image(image_id):
     cursor.connection.commit()
     flash('L’image a été supprimée.')
     spectacle_id = image['spectacle_id']
-    return redirect(url_for('roadmap', spectacle_id=spectacle_id))
+    return redirect(url_for('roadmap_send', spectacle_id=spectacle_id))
 
 
 # Follow-ups
