@@ -333,11 +333,14 @@ form ul li:last-of-type {
   border-bottom: 1px solid var(--purple-opacity);
 }
 
-form div[class^="ql"] ul {
-  margin: 1em 0;
+form div[class^="ql"] ul,
+form div[class^="ql"] ol {
+  margin: 0;
+  padding: 0;
 }
 
-form div[class^="ql"] ul li {
+form div[class^="ql"] ul li,
+form div[class^="ql"] ol li {
   border-bottom: 0;
 }
 
