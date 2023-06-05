@@ -11,17 +11,17 @@
   <form method="post">
     <h3>Informations générales</h3>
 
-    <label for="date_from">Date de départ</label>
-    <input id="date_from" name="date_from" type="date" value="{{ spectacle.date_from }}" required>
-
-    <label for="date_to">Date de retour</label>
-    <input id="date_to" name="date_to" type="date" value="{{ spectacle.date_to }}" required>
-
     <label for="place">Lieu</label>
     <input id="place" name="place" value="{{ spectacle.place }}" required>
 
     <label for="event">Évènement</label>
     <input id="event" name="event" value="{{ spectacle.event }}" required>
+
+    <label for="date_from">Date de départ</label>
+    <input id="date_from" name="date_from" type="date" value="{{ spectacle.date_from }}" required>
+
+    <label for="date_to">Date de retour</label>
+    <input id="date_to" name="date_to" type="date" value="{{ spectacle.date_to }}" required>
 
     <label for="trigram">Trigramme</label>
     <input id="trigram" name="trigram" value="{{ spectacle.trigram }}" required>
