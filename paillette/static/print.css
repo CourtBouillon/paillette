@@ -110,9 +110,10 @@ h3 {
 }
 
 section {
-  break-inside: avoid;
   clear: both;
   margin: 2em 0;
+  orphans: 4;
+  widows: 4;
 }
 
 /* Header */
