@@ -396,6 +396,10 @@ label,
   width: 100%;
 }
 
+label:has(+[required])::after {
+  content: "*";
+}
+
 button::before {
   padding-right: 0;
 }
