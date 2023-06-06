@@ -78,6 +78,10 @@ a:hover {
   text-decoration: underline;
 }
 
+body[id$="followup"] table a {
+  color: inherit
+}
+
 ul {
   break-inside: avoid;
 }

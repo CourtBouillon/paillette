@@ -794,6 +794,7 @@ def artists_followup(year=None, month=None):
     query = '''
       SELECT
         artist.id AS artist_id,
+        artist.color,
         person.name || '-' || artist.id AS grouper,
         person.name,
         spectacle.trigram,
@@ -890,6 +891,7 @@ def costumes_followup(year=None, month=None):
         costume.id AS costume_id,
         costume.name || '-' || costume.id AS grouper,
         costume.name,
+        costume.color,
         spectacle.trigram,
         spectacle.date_from,
         spectacle.date_to
@@ -924,6 +926,7 @@ def makeups_followup(year=None, month=None):
         makeup.id AS makeup_id,
         makeup.name || '-' || makeup.id AS grouper,
         makeup.name,
+        makeup.color,
         spectacle.trigram,
         spectacle.date_from,
         spectacle.date_to
@@ -958,6 +961,7 @@ def sounds_followup(year=None, month=None):
         sound.id AS sound_id,
         sound.name || '-' || sound.id AS grouper,
         sound.name,
+        sound.color,
         spectacle.trigram,
         spectacle.date_from,
         spectacle.date_to
@@ -992,6 +996,7 @@ def vehicles_followup(year=None, month=None):
         vehicle.id AS vehicle_id,
         vehicle.name || '-' || vehicle.id AS grouper,
         vehicle.name,
+        vehicle.color,
         spectacle.trigram,
         spectacle.date_from,
         spectacle.date_to

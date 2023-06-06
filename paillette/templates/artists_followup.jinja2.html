@@ -38,7 +38,7 @@
     <tbody>
       {% for (grouper, spectacles) in artists_spectacles | groupby('grouper') %}
         {% set artist = spectacles[0] %}
-        <tr>
+        <tr style="color: {{ artist.color or 'black' }}">
           <th>
             {{ artist.name }}
             <span class="count">{{ spectacles | selectattr('date') | list | length }}</span>
