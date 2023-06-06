@@ -47,8 +47,10 @@
       {% if representations | length >= 2 %}
         <dd>
           <dl>
+            <dt>Spectacle {{ loop.index }}</dt>
+      {% else %}
+        <dt>Spectacle</dt>
       {% endif %}
-      <dt>Spectacle {{ loop.index }}</dt>
       <dd>{{ representation.representation_name }}</dd>
       <dt>Dates</dt>
       {% if representation.representation_dates %}
