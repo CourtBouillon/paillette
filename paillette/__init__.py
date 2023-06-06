@@ -202,13 +202,13 @@ def authenticated(function):
 @app.template_filter('date_range')
 def date_range(dates):
     date_from, date_to = dates
+    if not all(dates):
+        return 'dates indéterminées'
     if isinstance(date_from, str):
         date_from = datetime.fromisoformat(date_from)
     if isinstance(date_to, str):
         date_to = datetime.fromisoformat(date_to)
-    if None in dates:
-        return 'dates indéterminées'
-    elif date_from == date_to:
+    if date_from == date_to:
         return f'le {date_simple(date_from)}'
     else:
         return f'du {date_simple(date_from)} au {date_simple(date_to)}'
