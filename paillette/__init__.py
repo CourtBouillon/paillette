@@ -434,8 +434,6 @@ def spectacle_create():
             key = key.split('-', 1)[0]
             dates = request.form.getlist(f'{key}-dates')
             artists = set(request.form.getlist(f'{key}-artists'))
-            if not dates or not artists:
-                continue
             cursor.execute('''
               INSERT INTO representation (spectacle_id, name)
               VALUES (?, ?)
@@ -561,8 +559,6 @@ def spectacle_update(spectacle_id):
             key = key.split('-', 1)[0]
             dates = request.form.getlist(f'{key}-dates')
             artists = set(request.form.getlist(f'{key}-artists'))
-            if not dates or not artists:
-                continue
             cursor.execute('''
               INSERT INTO representation (spectacle_id, name)
               VALUES (?, ?)
