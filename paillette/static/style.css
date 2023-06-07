@@ -625,6 +625,10 @@ button::before {
   display: none;
 }
 
+#page-login header {
+  height: auto;
+}
+
 #page-login {
   align-items: center;
   background: var(--black);
