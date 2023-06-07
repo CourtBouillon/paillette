@@ -78,7 +78,7 @@
     flex-direction: column;
   }
   #page-login main img {
-    max-width: 90%;
+    max-width: calc(100% - 4em);
   }
   #page-login main section {
     width: 100%;
