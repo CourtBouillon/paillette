@@ -619,7 +619,8 @@ button::before {
 
 /* Login */
 
-#page-login header,
+#page-login header::before,
+#page-login header nav,
 #page-login footer {
   display: none;
 }
@@ -644,7 +645,7 @@ button::before {
   width: 30em;
 }
 
-#page-login input:not([type="submit"]) {
+#page-login main input:not([type="submit"]) {
   background: var(--white);
 }
 
@@ -656,7 +657,7 @@ button::before {
   color: var(--white);
 }
 
-#page-login section {
+#page-login main section {
   width: 50%;
 }
 
