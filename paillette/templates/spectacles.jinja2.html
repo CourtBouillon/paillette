@@ -33,9 +33,13 @@
         <dt>Évènement</dt>
         <dd>{{ spectacle.event }}</dd>
         <dt>Spectacles</dt>
-        {% for representation in spectacle.representations.split(',') %}
-          <dd>{{ representation }}</dd>
-        {% endfor %}
+        {% if spectacle.representations %}
+          {% for representation in spectacle.representations.split(',') %}
+            <dd>{{ representation }}</dd>
+          {% endfor %}
+        {% else %}
+          <dd>Pas de spectacle</dd>
+        {% endif %}
       </dl>
     </section>
   {% else %}
