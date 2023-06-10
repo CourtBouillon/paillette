@@ -49,6 +49,11 @@ def close_connection():
         g.connection.close()
 
 
+@app.teardown_appcontext
+def teardown(exception):
+    close_connection()
+
+
 def get_person_from_id(person_id):
     cursor = get_connection().cursor()
     cursor.execute('SELECT * FROM person WHERE id = (?)', (person_id,))
