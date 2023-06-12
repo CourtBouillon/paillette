@@ -7,19 +7,19 @@
 
   <form method="post">
     <label for="firstname">Prénom</label>
-    <input id="firstname" name="firstname" value="{{ artist.firstname }}" required>
+    <input id="firstname" name="firstname" value="{{ request.form.firstname or artist.firstname }}" required>
 
     <label for="lastname">Nom</label>
-    <input id="lastname" name="lastname" value="{{ artist.lastname }}" required>
+    <input id="lastname" name="lastname" value="{{ request.form.lastname or artist.lastname }}" required>
 
     <label for"=color">Couleur</label>
-    <input id="color" name="color" type="color" value="{{ artist.color or '' }}">
+    <input id="color" name="color" type="color" value="{{ request.form.color or artist.color or '' }}">
 
     <label for="mail">Email</label>
-    <input id="mail" name="mail" value="{{ artist.mail }}" required>
+    <input id="mail" name="mail" value="{{ request.form.mail or artist.mail }}" required>
 
     <label for="phone">Téléphone</label>
-    <input id="phone" name="phone" value="{{ artist.phone }}" required>
+    <input id="phone" name="phone" value="{{ request.form.phone or artist.phone }}" required>
 
     <input class="button" type="submit" value="Mettre à jour">
   </form>

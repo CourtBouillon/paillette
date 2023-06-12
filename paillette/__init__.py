@@ -1460,18 +1460,22 @@ def artist_update(artist_id):
           RETURNING person_id
         ''', parameters)
         parameters['person_id'] = cursor.fetchone()['person_id']
-        cursor.execute('''
-          UPDATE person
-          SET
-            mail = :mail,
-            firstname = :firstname,
-            lastname = :lastname,
-            phone = :phone
-          WHERE id = :person_id
-        ''', parameters)
-        cursor.connection.commit()
-        flash('Les informations ont été sauvegardées.')
-        return redirect(url_for('artists'))
+        try:
+            cursor.execute('''
+              UPDATE person
+              SET
+                mail = :mail,
+                firstname = :firstname,
+                lastname = :lastname,
+                phone = :phone
+              WHERE id = :person_id
+            ''', parameters)
+        except sqlite3.IntegrityError:
+            flash('Cet email est déjà utilisé.')
+        else:
+            cursor.connection.commit()
+            flash('Les informations ont été sauvegardées.')
+            return redirect(url_for('artists'))
 
     cursor.execute('''
       SELECT
@@ -1496,18 +1500,22 @@ def artist_create():
     if request.method == 'POST':
         cursor = get_connection().cursor()
         parameters = dict(request.form)
-        cursor.execute('''
-          INSERT INTO person (mail, firstname, lastname, phone)
-          VALUES (:mail, :firstname, :lastname, :phone)
-          RETURNING id
-        ''', parameters)
-        parameters['person_id'] = cursor.fetchone()['id']
-        cursor.execute('''
-          INSERT INTO artist (person_id, color)
-          VALUES (:person_id, :color)
-        ''', parameters)
-        cursor.connection.commit()
-        flash('L’artiste a été ajouté.')
-        return redirect(url_for('artists'))
+        try:
+            cursor.execute('''
+              INSERT INTO person (mail, firstname, lastname, phone)
+              VALUES (:mail, :firstname, :lastname, :phone)
+              RETURNING id
+            ''', parameters)
+        except sqlite3.IntegrityError:
+            flash('Cet email est déjà utilisé.')
+        else:
+            parameters['person_id'] = cursor.fetchone()['id']
+            cursor.execute('''
+              INSERT INTO artist (person_id, color)
+              VALUES (:person_id, :color)
+            ''', parameters)
+            cursor.connection.commit()
+            flash('L’artiste a été ajouté.')
+            return redirect(url_for('artists'))
 
     return render_template('artist_create.jinja2.html')
