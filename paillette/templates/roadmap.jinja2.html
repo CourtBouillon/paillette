@@ -48,7 +48,7 @@
         {% else %}
           <dt>Spectacle</dt>
         {% endif %}
-        <dd>{{ representation.representation_name }}</dd>
+        <dd>{{ representation.representation_name or 'Pas de spectacle' }}</dd>
         <dt>Dates</dt>
         <dd>
         {% if representation.representation_dates %}
