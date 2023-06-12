@@ -1147,22 +1147,26 @@ def person_update(person_id=None):
         cursor = get_connection().cursor()
         parameters = dict(request.form)
         parameters['id'] = person['id']
-        cursor.execute('''
-          UPDATE person
-          SET
-            mail = :mail,
-            firstname = :firstname,
-            lastname = :lastname,
-            phone = :phone
-          WHERE id = :id
-        ''', parameters)
-        if (password := request.form.get('password')):
-            cursor.execute(
-                'UPDATE person SET password = ? WHERE id = ?',
-                (generate_password_hash(password), person['id']))
-        cursor.connection.commit()
-        flash('Les informations ont été sauvegardées.')
-        return redirect(url_for('person_update', person_id=person_id))
+        try:
+            cursor.execute('''
+              UPDATE person
+              SET
+                mail = :mail,
+                firstname = :firstname,
+                lastname = :lastname,
+                phone = :phone
+              WHERE id = :id
+            ''', parameters)
+        except sqlite3.IntegrityError:
+            flash('Cet email est déjà utilisé.')
+        else:
+            if (password := request.form.get('password')):
+                cursor.execute(
+                    'UPDATE person SET password = ? WHERE id = ?',
+                    (generate_password_hash(password), person['id']))
+            cursor.connection.commit()
+            flash('Les informations ont été sauvegardées.')
+            return redirect(url_for('persons'))
 
     return render_template('person_update.jinja2.html', person=person)
 
@@ -1189,13 +1193,17 @@ def person_create():
     if request.method == 'POST':
         cursor = get_connection().cursor()
         parameters = dict(request.form)
-        cursor.execute('''
-          INSERT INTO person (firstname, lastname, mail, phone)
-          VALUES (:firstname, :lastname, :mail, :phone)
-        ''', parameters)
-        cursor.connection.commit()
-        flash('La personne a été ajoutée.')
-        return redirect(url_for('persons'))
+        try:
+            cursor.execute('''
+              INSERT INTO person (firstname, lastname, mail, phone)
+              VALUES (:firstname, :lastname, :mail, :phone)
+            ''', parameters)
+        except sqlite3.IntegrityError:
+            flash('Cet email est déjà utilisé.')
+        else:
+            cursor.connection.commit()
+            flash('La personne a été ajoutée.')
+            return redirect(url_for('persons'))
     return render_template('person_create.jinja2.html')
 
 

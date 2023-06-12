@@ -7,16 +7,16 @@
 
   <form method="post">
     <label for="firstname">Prénom</label>
-    <input id="firstname" name="firstname" value="{{ person.firstname }}" required>
+    <input id="firstname" name="firstname" value="{{ request.form.firstname or person.firstname }}" required>
 
     <label for="lastname">Nom</label>
-    <input id="lastname" name="lastname" value="{{ person.lastname }}" required>
+    <input id="lastname" name="lastname" value="{{ request.form.lastname or person.lastname }}" required>
 
     <label for="mail">Email</label>
-    <input id="mail" name="mail" type="email" value="{{ person.mail }}" required>
+    <input id="mail" name="mail" type="email" value="{{ request.form.mail or person.mail }}" required>
 
     <label for="phone">Numéro de téléphone</label>
-    <input id="phone" name="phone" value="{{ person.phone }}" required>
+    <input id="phone" name="phone" value="{{ request.form.phone or person.phone }}" required>
 
     <label for="password">Nouveau mot de passe</label>
     <input id="password" name="password">
