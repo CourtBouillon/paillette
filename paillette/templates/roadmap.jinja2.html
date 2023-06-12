@@ -100,8 +100,12 @@
       {% endif %}
       <dt>Artistes</dt>
       {% for artist in all_artists %}
-        {% set name, phone = artist.split('||') %}
-        <dd>{{ name }} — {{ phone }}</dd>
+        {% if artist %}
+          {% set name, phone = artist.split('||') %}
+          <dd>{{ name }} — {{ phone }}</dd>
+        {% else %}
+          <dd>Pas d’artiste</dd>
+        {% endif %}
       {% endfor %}
     </dl>
   </section>
