@@ -39,13 +39,16 @@ def get_connection():
     if not hasattr(g, 'connection'):
         g.connection = sqlite3.connect(
             app.config['DB'], detect_types=sqlite3.PARSE_DECLTYPES)
-        g.connection.execute('PRAGMA foreign_keys')
         g.connection.row_factory = sqlite3.Row
+        cursor = g.connection.cursor()
+        cursor.execute('PRAGMA foreign_keys')
+        cursor.close()
     return g.connection
 
 
 def close_connection():
     if hasattr(g, 'connection'):
+        g.connection.rollback()
         g.connection.close()
 
 
