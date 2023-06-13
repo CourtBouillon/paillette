@@ -241,9 +241,14 @@ def index():
 def login():
     if request.method == 'POST':
         cursor = get_connection().cursor()
-        cursor.execute(
-            'SELECT id, password FROM person WHERE mail = :login',
-            request.form)
+        cursor.execute('''
+          SELECT person.id, password
+          FROM person
+          LEFT JOIN artist
+          ON person.id = artist.person_id
+          WHERE artist.id IS NULL
+          AND mail = :login
+        ''', request.form)
         person = cursor.fetchone()
         if person and (app.config['DEBUG'] or person['password']):
             passwords = person['password'], request.form['password']
@@ -271,6 +276,7 @@ def password_lost():
           UPDATE person
           SET reset_password = ?
           WHERE mail = ?
+          AND id NOT IN (SELECT person_id FROM artist)
           RETURNING id, firstname, lastname
         ''', (uuid, mail))
         person = cursor.fetchone()
