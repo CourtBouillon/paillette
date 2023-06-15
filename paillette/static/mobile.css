@@ -74,6 +74,9 @@
     margin: 0.5rem 0;
   }
 
+  #page-login header::after {
+    content: none;
+  }
   #page-login main {
     flex-direction: column;
   }
