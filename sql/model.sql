@@ -31,7 +31,8 @@ CREATE TABLE spectacle (
   hosting TEXT,
   meal TEXT,
   images_comment TEXT,
-  sound_comment TEXT
+  sound_comment TEXT,
+  light_comment TEXT
 );
 
 CREATE TABLE spectacle_image (

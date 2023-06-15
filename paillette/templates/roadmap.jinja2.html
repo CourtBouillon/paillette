@@ -87,6 +87,11 @@
           Pas de boîte de maquillage
         {% endfor %}
       </dd>
+
+      {% if spectacle.light_comment %}
+        <dt>Lumières</dt>
+        <dd>{{ spectacle.light_comment | safe }}</dd>
+      {% endif %}
     </dl>
   </section>
 

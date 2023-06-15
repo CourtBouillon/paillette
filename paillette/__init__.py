@@ -742,7 +742,8 @@ def roadmap_comment(spectacle_id):
         hosting = :hosting,
         meal = :meal,
         images_comment = :images_comment,
-        sound_comment = :sound_comment
+        sound_comment = :sound_comment,
+        light_comment = :light_comment
       WHERE id = :spectacle_id
     ''', parameters)
     cursor.connection.commit()
