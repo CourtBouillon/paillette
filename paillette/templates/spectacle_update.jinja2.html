@@ -39,7 +39,12 @@
     <input id="organizer" name="organizer" value="{{ spectacle.organizer or '' }}">
 
     <label for="manager">Régisseur</label>
-    <input id="manager" name="manager" value="{{ spectacle.manager or '' }}">
+    <input id="manager" name="manager" list="managers" value="{{ spectacle.manager or '' }}">
+    <datalist id="managers">
+      {% for manager in all_managers %}
+        <option value="{{ manager }}" />
+      {% endfor %}
+    </datalist>
 
     <label>Matériel de son</label>
     <div>
@@ -142,9 +147,15 @@
     </ul>
 
     <h3>Spectacles</h3>
+    <datalist id="representations">
+      {% for representation in all_representations %}
+        <option value="{{ representation }}" />
+      {% endfor %}
+    </datalist>
+
     <label for="name">Nom</label>
     <div>
-      <input id="name" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
+      <input id="name" list="representations" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
       <button class="add" type="button" onClick="addSpectacle()">Ajouter</button>
     </div>
 
@@ -152,7 +163,7 @@
       <li style="display: none">
         <label>Nom</label>
         <div>
-          <input name="name">
+          <input name="name" list="representations">
           <button class="delete" type="button" onClick="remove(this.parentNode)">Supprimer</button>
         </div>
 
@@ -165,8 +176,8 @@
         <div>
           <select data-name="artist">
             <option></option>
-            {% for artist in artists %}
-            <option value="{{ artist.id }}">{{ artist.name }}</option>
+            {% for artist in all_artists %}
+              <option value="{{ artist.id }}">{{ artist.name }}</option>
             {% endfor %}
           </select>
           <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
@@ -178,7 +189,7 @@
         <li>
           <label>Nom</label>
           <div>
-            <input name="{{ representation.id }}-name" value="{{ representation.representation_name }}">
+            <input name="{{ representation.id }}-name" list="representations" value="{{ representation.representation_name }}">
             <button class="delete" type="button" onClick="remove(this.parentNode)">Supprimer</button>
           </div>
 
@@ -196,7 +207,7 @@
           <div>
             <select data-name="{{ representation.id }}-artist">
               <option></option>
-              {% for artist in artists %}
+              {% for artist in all_artists %}
                 <option value="{{ artist.id }}">{{ artist.name }}</option>
               {% endfor %}
             </select>
@@ -205,7 +216,7 @@
           <ul class="artists-list">
             {% if representation.artist_ids %}
               {% set artist_ids = representation.artist_ids.split(',') %}
-              {% for artist in artists %}
+              {% for artist in all_artists %}
                 {% if artist.id | string in artist_ids %}
                   <li>
                     <input name="{{ representation.id }}-artists" value="{{ artist.id }}" hidden>

@@ -33,7 +33,12 @@
     <input id="organizer" name="organizer">
 
     <label for="manager">Régisseur</label>
-    <input id="manager" name="manager">
+    <input id="manager" name="manager" list="managers">
+    <datalist id="managers">
+      {% for manager in all_managers %}
+        <option value="{{ manager }}" />
+      {% endfor %}
+    </datalist>
 
     <label>Matériel de son</label>
     <div>
@@ -84,9 +89,15 @@
     <ul class="item-list"></ul>
 
     <h3>Spectacles</h3>
+    <datalist id="representations">
+      {% for representation in all_representations %}
+        <option value="{{ representation }}" />
+      {% endfor %}
+    </datalist>
+
     <label for="name">Nom</label>
     <div>
-      <input id="name" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
+      <input id="name" list="representations" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
       <button class="add" type="button" onClick="addSpectacle()">Ajouter</button>
     </div>
 
@@ -94,7 +105,7 @@
       <li style="display: none">
         <label>Nom</label>
         <div>
-          <input name="name">
+          <input name="name" list="representations">
           <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
         </div>
 
@@ -107,7 +118,7 @@
         <div>
           <select data-name="artist">
             <option></option>
-            {% for artist in artists %}
+            {% for artist in all_artists %}
             <option value="{{ artist.id }}">{{ artist.name }}</option>
             {% endfor %}
           </select>

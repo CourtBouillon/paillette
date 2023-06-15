@@ -497,9 +497,24 @@ def spectacle_create():
       WHERE NOT hidden
       ORDER BY name
     ''')
-    artists = cursor.fetchall()
+    all_artists = cursor.fetchall()
+    cursor.execute('''
+      SELECT DISTINCT manager
+      FROM spectacle
+      WHERE manager IS NOT NULL
+      ORDER BY id DESC LIMIT 30
+    ''')
+    all_managers = tuple(row['manager'] for row in cursor.fetchall())
+    cursor.execute('''
+      SELECT DISTINCT name
+      FROM representation
+      ORDER BY id DESC LIMIT 30
+    ''')
+    all_representations = tuple(row['name'] for row in cursor.fetchall())
     return render_template(
-        'spectacle_create.jinja2.html', artists=artists, **data)
+        'spectacle_create.jinja2.html', all_artists=all_artists,
+        all_managers=all_managers, all_representations=all_representations,
+        **data)
 
 
 @app.route('/spectacle/<int:spectacle_id>/update', methods=('GET', 'POST'))
@@ -659,10 +674,24 @@ def spectacle_update(spectacle_id):
       WHERE NOT hidden
       ORDER BY name
     ''')
-    artists = cursor.fetchall()
+    all_artists = cursor.fetchall()
+    cursor.execute('''
+      SELECT DISTINCT manager
+      FROM spectacle
+      WHERE manager IS NOT NULL
+      ORDER BY id DESC LIMIT 30
+    ''')
+    all_managers = tuple(row['manager'] for row in cursor.fetchall())
+    cursor.execute('''
+      SELECT DISTINCT name
+      FROM representation
+      ORDER BY id DESC LIMIT 30
+    ''')
+    all_representations = tuple(row['name'] for row in cursor.fetchall())
     return render_template(
         'spectacle_update.jinja2.html', representations=representations,
-        artists=artists, **data)
+        all_artists=all_artists, all_managers=all_managers,
+        all_representations=all_representations, **data)
 
 
 # Roadmaps
