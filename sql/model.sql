@@ -2,7 +2,7 @@ PRAGMA foreign_keys=ON;
 
 CREATE TABLE person (
   id INTEGER PRIMARY KEY,
-  mail TEXT UNIQUE NOT NULL,
+  mail TEXT,
   firstname TEXT NOT NULL,
   lastname TEXT NOT NULL,
   name TEXT AS (firstname || ' ' || lastname),

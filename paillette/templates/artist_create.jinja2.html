@@ -16,7 +16,7 @@
     <input id="color" name="color" value="{{ request.form.color or '' }}" type="color">
 
     <label for="mail">Email</label>
-    <input id="mail" name="mail" value="{{ request.form.mail or '' }}" required>
+    <input id="mail" name="mail" type="email" value="{{ request.form.mail or '' }}">
 
     <label for="phone">Téléphone</label>
     <input id="phone" name="phone" value="{{ request.form.phone or '' }}" required>

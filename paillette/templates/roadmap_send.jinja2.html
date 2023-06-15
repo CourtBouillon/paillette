@@ -71,7 +71,7 @@
     <ul id="recipients">
       {% for recipient in recipients %}
         <li class="readonly">
-          <input name="mail" value="{{ recipient.mail }}" readonly><button class="delete" type="button" onClick="remove(this)">Supprimer</button><p>({{ recipient.name }})</p>
+          <input name="mail" value="{{ recipient.mail or '' }}" readonly><button class="delete" type="button" onClick="remove(this)">Supprimer</button><p>({{ recipient.name }})</p>
         </li>
       {% endfor %}
     </ul>
@@ -95,7 +95,7 @@
 
   <script>
     function addInputIfNeeded() {
-      if (![...document.querySelectorAll('input[name="mail"]')].filter(node => !node.value.length).length) {
+      if (![...document.querySelectorAll('li:not(.readonly) > input[name="mail"]')].filter(node => !node.value.length).length) {
         let li = document.createElement("li");
 
         let input = document.createElement("input");

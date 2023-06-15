@@ -251,9 +251,8 @@ def login():
         cursor.execute('''
           SELECT person.id, password
           FROM person
-          LEFT JOIN artist
-          ON person.id = artist.person_id
-          WHERE artist.id IS NULL
+          WHERE id NOT IN (SELECT person_id FROM artist)
+          AND mail IS NOT NULL
           AND mail = :login
         ''', request.form)
         person = cursor.fetchone()
@@ -283,6 +282,7 @@ def password_lost():
           UPDATE person
           SET reset_password = ?
           WHERE mail = ?
+          AND mail IS NOT NULL
           AND id NOT IN (SELECT person_id FROM artist)
           RETURNING id, firstname, lastname
         ''', (uuid, mail))
@@ -711,7 +711,9 @@ def roadmap_send(spectacle_id):
     spectacle_data = get_spectacle_data(spectacle_id)
 
     if request.method == 'POST':
-        to = tuple(mail for mail in request.form.getlist('mail') if mail)
+        to = tuple(
+            mail for mail in request.form.getlist('mail')
+            if mail and '@' in mail)
         place = spectacle_data['representations'][0]['place']
         subject = f'Feuille de route pour {place}'
         content = (
@@ -1191,7 +1193,17 @@ def person_update(person_id=None):
         cursor = get_connection().cursor()
         parameters = dict(request.form)
         parameters['id'] = person['id']
-        try:
+        cursor.execute('''
+          SELECT mail
+          FROM person
+          WHERE mail IS NOT NULL
+          AND id != ?
+          AND id NOT IN (SELECT person_id FROM artist)
+        ''', (person_id,))
+        mails = tuple(row['mail'] for row in cursor.fetchall())
+        if parameters['mail'] in mails:
+            flash('Cet email est déjà utilisé.')
+        else:
             cursor.execute('''
               UPDATE person
               SET
@@ -1201,9 +1213,6 @@ def person_update(person_id=None):
                 phone = :phone
               WHERE id = :id
             ''', parameters)
-        except sqlite3.IntegrityError:
-            flash('Cet email est déjà utilisé.')
-        else:
             if (password := request.form.get('password')):
                 cursor.execute(
                     'UPDATE person SET password = ? WHERE id = ?',
@@ -1237,14 +1246,20 @@ def person_create():
     if request.method == 'POST':
         cursor = get_connection().cursor()
         parameters = dict(request.form)
-        try:
+        cursor.execute('''
+          SELECT mail
+          FROM person
+          WHERE mail IS NOT NULL
+          AND id NOT IN (SELECT person_id FROM artist)
+        ''')
+        mails = tuple(row['mail'] for row in cursor.fetchall())
+        if parameters['mail'] in mails:
+            flash('Cet email est déjà utilisé.')
+        else:
             cursor.execute('''
               INSERT INTO person (firstname, lastname, mail, phone)
               VALUES (:firstname, :lastname, :mail, :phone)
             ''', parameters)
-        except sqlite3.IntegrityError:
-            flash('Cet email est déjà utilisé.')
-        else:
             cursor.connection.commit()
             flash('La personne a été ajoutée.')
             return redirect(url_for('persons'))
@@ -1504,22 +1519,18 @@ def artist_update(artist_id):
           RETURNING person_id
         ''', parameters)
         parameters['person_id'] = cursor.fetchone()['person_id']
-        try:
-            cursor.execute('''
-              UPDATE person
-              SET
-                mail = :mail,
-                firstname = :firstname,
-                lastname = :lastname,
-                phone = :phone
-              WHERE id = :person_id
-            ''', parameters)
-        except sqlite3.IntegrityError:
-            flash('Cet email est déjà utilisé.')
-        else:
-            cursor.connection.commit()
-            flash('Les informations ont été sauvegardées.')
-            return redirect(url_for('artists'))
+        cursor.execute('''
+          UPDATE person
+          SET
+            mail = :mail,
+            firstname = :firstname,
+            lastname = :lastname,
+            phone = :phone
+          WHERE id = :person_id
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        return redirect(url_for('artists'))
 
     cursor.execute('''
       SELECT
@@ -1544,22 +1555,18 @@ def artist_create():
     if request.method == 'POST':
         cursor = get_connection().cursor()
         parameters = dict(request.form)
-        try:
-            cursor.execute('''
-              INSERT INTO person (mail, firstname, lastname, phone)
-              VALUES (:mail, :firstname, :lastname, :phone)
-              RETURNING id
-            ''', parameters)
-        except sqlite3.IntegrityError:
-            flash('Cet email est déjà utilisé.')
-        else:
-            parameters['person_id'] = cursor.fetchone()['id']
-            cursor.execute('''
-              INSERT INTO artist (person_id, color)
-              VALUES (:person_id, :color)
-            ''', parameters)
-            cursor.connection.commit()
-            flash('L’artiste a été ajouté.')
-            return redirect(url_for('artists'))
+        cursor.execute('''
+          INSERT INTO person (mail, firstname, lastname, phone)
+          VALUES (:mail, :firstname, :lastname, :phone)
+          RETURNING id
+        ''', parameters)
+        parameters['person_id'] = cursor.fetchone()['id']
+        cursor.execute('''
+          INSERT INTO artist (person_id, color)
+          VALUES (:person_id, :color)
+        ''', parameters)
+        cursor.connection.commit()
+        flash('L’artiste a été ajouté.')
+        return redirect(url_for('artists'))
 
     return render_template('artist_create.jinja2.html')
