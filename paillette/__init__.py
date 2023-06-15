@@ -432,10 +432,10 @@ def spectacle_create():
           INSERT INTO
             spectacle (
               event, place, travel_time, trigram, date_from, date_to, link,
-              configuration, organizer)
+              configuration, organizer, manager)
           VALUES
             (:event, :place, :travel_time, :trigram, :date_from, :date_to,
-             :link, :configuration, :organizer)
+             :link, :configuration, :organizer, :manager)
           RETURNING id
         ''', parameters)
         spectacle_id = cursor.fetchone()['id']
@@ -522,7 +522,8 @@ def spectacle_update(spectacle_id):
             date_to = :date_to,
             link = :link,
             configuration = :configuration,
-            organizer = :organizer
+            organizer = :organizer,
+            manager = :manager
           WHERE id = :id
         ''', parameters)
 
