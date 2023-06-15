@@ -803,7 +803,7 @@ button::before {
 }
 
 #page-spectacles a dl dt {
-  clear: left;
+  clear: both;
   float: left;
   text-align: center;
   width: 10%;
