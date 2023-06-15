@@ -302,7 +302,8 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 
 /* Forms */
 
-[hidden] {
+[hidden],
+datalist {
   display: none !important;
 }
 
