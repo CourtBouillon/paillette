@@ -207,6 +207,12 @@ def authenticated(function):
     return wrapper
 
 
+@app.errorhandler(403)
+def page_not_found(error):
+    flash('Merci de vous connecter pour accéder à cette page')
+    return render_template('login.jinja2.html', redirect=request.path), 403
+
+
 @app.template_filter('date_range')
 def date_range(dates):
     date_from, date_to = dates
@@ -240,6 +246,7 @@ def index():
 @app.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
+        redirect_url = request.form.get('redirect')
         cursor = get_connection().cursor()
         cursor.execute('''
           SELECT person.id, password
@@ -254,9 +261,9 @@ def login():
             passwords = person['password'], request.form['password']
             if app.config['DEBUG'] or check_password_hash(*passwords):
                 session['person_id'] = person['id']
-                return redirect(url_for('index'))
+                return redirect(redirect_url or url_for('index'))
         flash('L’identifiant ou le mot de passe est incorrect.')
-        return redirect(url_for('login'))
+        return redirect(redirect_url or url_for('login'))
     return render_template('login.jinja2.html')
 
 

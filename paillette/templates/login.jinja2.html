@@ -1,4 +1,5 @@
 {% set title = 'Connexion' %}
+{% set page_name = 'login' %}
 
 {% extends '_layout.jinja2' %}
 
@@ -8,12 +9,16 @@
   <section>
     <h1>Gestion des paillettes</h1>
 
-    <form method="post">
+    <form method="post" action="{{ url_for('login') }}">
       <label for="login">Email</label>
       <input id="login" name="login" type="email" placeholder="Email">
 
       <label for="password">Mot de passe</label>
       <input id="password" name="password" type="password" placeholder="Mot de passe">
+
+      {% if redirect %}
+        <input name="redirect" type="hidden" value="{{ redirect }}">
+      {% endif %}
 
       <input class="button" type="submit" value="Connexion">
     </form>
