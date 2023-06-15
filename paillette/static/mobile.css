@@ -24,6 +24,7 @@
   header nav:hover {
     height: 100vh;
     line-heigth: 1;
+    overflow-y: scroll;
     width: 100vw;
   }
 
