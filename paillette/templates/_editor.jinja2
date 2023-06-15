@@ -17,7 +17,10 @@
       });
       editor.on("text-change", (delta, oldDelta, source) => {
         if (source == "user") {
-          textarea.textContent = editor.root.innerHTML;
+          if (editor.root.innerHTML == '<p><br></p>')
+            textarea.textContent = ''
+          else
+            textarea.textContent = editor.root.innerHTML;
         }
       })
     }
