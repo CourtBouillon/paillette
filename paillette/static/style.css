@@ -302,7 +302,8 @@ body[id$="followup"] footer ul li:nth-of-type(2) a {
 
 /* Forms */
 
-[hidden] {
+[hidden],
+datalist {
   display: none !important;
 }
 
@@ -802,7 +803,7 @@ button::before {
 }
 
 #page-spectacles a dl dt {
-  clear: left;
+  clear: both;
   float: left;
   text-align: center;
   width: 10%;

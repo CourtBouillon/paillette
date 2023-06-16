@@ -35,6 +35,11 @@
       <dd>{{ spectacle.configuration }}</dd>
     {% endif %}
 
+    {% if spectacle.organizer %}
+      <dt>Organisateur</dt>
+      <dd>{{ spectacle.organizer }}</dd>
+    {% endif %}
+
     {% if spectacle.manager %}
       <dt>Régisseur</dt>
       <dd>{{ spectacle.manager }}</dd>
@@ -101,11 +106,6 @@
     {% else %}
       <dd>Pas de costume</dd>
     {% endfor %}
-
-    {% if spectacle.organizer %}
-      <dt>Régisseur</dt>
-      <dd>{{ spectacle.organizer }}</dd>
-    {% endif %}
 
     <dt>Départ le</dt>
     <dd>{{ spectacle.date_from | date_simple }}</dd>

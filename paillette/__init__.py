@@ -207,6 +207,12 @@ def authenticated(function):
     return wrapper
 
 
+@app.errorhandler(403)
+def page_not_found(error):
+    flash('Merci de vous connecter pour accéder à cette page')
+    return render_template('login.jinja2.html', redirect=request.path), 403
+
+
 @app.template_filter('date_range')
 def date_range(dates):
     date_from, date_to = dates
@@ -240,13 +246,13 @@ def index():
 @app.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
+        redirect_url = request.form.get('redirect')
         cursor = get_connection().cursor()
         cursor.execute('''
           SELECT person.id, password
           FROM person
-          LEFT JOIN artist
-          ON person.id = artist.person_id
-          WHERE artist.id IS NULL
+          WHERE id NOT IN (SELECT person_id FROM artist)
+          AND mail IS NOT NULL
           AND mail = :login
         ''', request.form)
         person = cursor.fetchone()
@@ -254,9 +260,9 @@ def login():
             passwords = person['password'], request.form['password']
             if app.config['DEBUG'] or check_password_hash(*passwords):
                 session['person_id'] = person['id']
-                return redirect(url_for('index'))
+                return redirect(redirect_url or url_for('index'))
         flash('L’identifiant ou le mot de passe est incorrect.')
-        return redirect(url_for('login'))
+        return redirect(redirect_url or url_for('login'))
     return render_template('login.jinja2.html')
 
 
@@ -276,6 +282,7 @@ def password_lost():
           UPDATE person
           SET reset_password = ?
           WHERE mail = ?
+          AND mail IS NOT NULL
           AND id NOT IN (SELECT person_id FROM artist)
           RETURNING id, firstname, lastname
         ''', (uuid, mail))
@@ -425,10 +432,10 @@ def spectacle_create():
           INSERT INTO
             spectacle (
               event, place, travel_time, trigram, date_from, date_to, link,
-              configuration, organizer)
+              configuration, organizer, manager)
           VALUES
             (:event, :place, :travel_time, :trigram, :date_from, :date_to,
-             :link, :configuration, :organizer)
+             :link, :configuration, :organizer, :manager)
           RETURNING id
         ''', parameters)
         spectacle_id = cursor.fetchone()['id']
@@ -490,9 +497,24 @@ def spectacle_create():
       WHERE NOT hidden
       ORDER BY name
     ''')
-    artists = cursor.fetchall()
+    all_artists = cursor.fetchall()
+    cursor.execute('''
+      SELECT DISTINCT manager
+      FROM spectacle
+      WHERE manager IS NOT NULL
+      ORDER BY id DESC LIMIT 30
+    ''')
+    all_managers = tuple(row['manager'] for row in cursor.fetchall())
+    cursor.execute('''
+      SELECT DISTINCT name
+      FROM representation
+      ORDER BY id DESC LIMIT 30
+    ''')
+    all_representations = tuple(row['name'] for row in cursor.fetchall())
     return render_template(
-        'spectacle_create.jinja2.html', artists=artists, **data)
+        'spectacle_create.jinja2.html', all_artists=all_artists,
+        all_managers=all_managers, all_representations=all_representations,
+        **data)
 
 
 @app.route('/spectacle/<int:spectacle_id>/update', methods=('GET', 'POST'))
@@ -515,7 +537,8 @@ def spectacle_update(spectacle_id):
             date_to = :date_to,
             link = :link,
             configuration = :configuration,
-            organizer = :organizer
+            organizer = :organizer,
+            manager = :manager
           WHERE id = :id
         ''', parameters)
 
@@ -651,10 +674,24 @@ def spectacle_update(spectacle_id):
       WHERE NOT hidden
       ORDER BY name
     ''')
-    artists = cursor.fetchall()
+    all_artists = cursor.fetchall()
+    cursor.execute('''
+      SELECT DISTINCT manager
+      FROM spectacle
+      WHERE manager IS NOT NULL
+      ORDER BY id DESC LIMIT 30
+    ''')
+    all_managers = tuple(row['manager'] for row in cursor.fetchall())
+    cursor.execute('''
+      SELECT DISTINCT name
+      FROM representation
+      ORDER BY id DESC LIMIT 30
+    ''')
+    all_representations = tuple(row['name'] for row in cursor.fetchall())
     return render_template(
         'spectacle_update.jinja2.html', representations=representations,
-        artists=artists, **data)
+        all_artists=all_artists, all_managers=all_managers,
+        all_representations=all_representations, **data)
 
 
 # Roadmaps
@@ -674,7 +711,9 @@ def roadmap_send(spectacle_id):
     spectacle_data = get_spectacle_data(spectacle_id)
 
     if request.method == 'POST':
-        to = tuple(mail for mail in request.form.getlist('mail') if mail)
+        to = tuple(
+            mail for mail in request.form.getlist('mail')
+            if mail and '@' in mail)
         place = spectacle_data['representations'][0]['place']
         subject = f'Feuille de route pour {place}'
         content = (
@@ -735,7 +774,8 @@ def roadmap_comment(spectacle_id):
         hosting = :hosting,
         meal = :meal,
         images_comment = :images_comment,
-        sound_comment = :sound_comment
+        sound_comment = :sound_comment,
+        light_comment = :light_comment
       WHERE id = :spectacle_id
     ''', parameters)
     cursor.connection.commit()
@@ -1153,7 +1193,17 @@ def person_update(person_id=None):
         cursor = get_connection().cursor()
         parameters = dict(request.form)
         parameters['id'] = person['id']
-        try:
+        cursor.execute('''
+          SELECT mail
+          FROM person
+          WHERE mail IS NOT NULL
+          AND id != ?
+          AND id NOT IN (SELECT person_id FROM artist)
+        ''', (person_id,))
+        mails = tuple(row['mail'] for row in cursor.fetchall())
+        if parameters['mail'] in mails:
+            flash('Cet email est déjà utilisé.')
+        else:
             cursor.execute('''
               UPDATE person
               SET
@@ -1163,9 +1213,6 @@ def person_update(person_id=None):
                 phone = :phone
               WHERE id = :id
             ''', parameters)
-        except sqlite3.IntegrityError:
-            flash('Cet email est déjà utilisé.')
-        else:
             if (password := request.form.get('password')):
                 cursor.execute(
                     'UPDATE person SET password = ? WHERE id = ?',
@@ -1199,14 +1246,20 @@ def person_create():
     if request.method == 'POST':
         cursor = get_connection().cursor()
         parameters = dict(request.form)
-        try:
+        cursor.execute('''
+          SELECT mail
+          FROM person
+          WHERE mail IS NOT NULL
+          AND id NOT IN (SELECT person_id FROM artist)
+        ''')
+        mails = tuple(row['mail'] for row in cursor.fetchall())
+        if parameters['mail'] in mails:
+            flash('Cet email est déjà utilisé.')
+        else:
             cursor.execute('''
               INSERT INTO person (firstname, lastname, mail, phone)
               VALUES (:firstname, :lastname, :mail, :phone)
             ''', parameters)
-        except sqlite3.IntegrityError:
-            flash('Cet email est déjà utilisé.')
-        else:
             cursor.connection.commit()
             flash('La personne a été ajoutée.')
             return redirect(url_for('persons'))
@@ -1466,22 +1519,18 @@ def artist_update(artist_id):
           RETURNING person_id
         ''', parameters)
         parameters['person_id'] = cursor.fetchone()['person_id']
-        try:
-            cursor.execute('''
-              UPDATE person
-              SET
-                mail = :mail,
-                firstname = :firstname,
-                lastname = :lastname,
-                phone = :phone
-              WHERE id = :person_id
-            ''', parameters)
-        except sqlite3.IntegrityError:
-            flash('Cet email est déjà utilisé.')
-        else:
-            cursor.connection.commit()
-            flash('Les informations ont été sauvegardées.')
-            return redirect(url_for('artists'))
+        cursor.execute('''
+          UPDATE person
+          SET
+            mail = :mail,
+            firstname = :firstname,
+            lastname = :lastname,
+            phone = :phone
+          WHERE id = :person_id
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        return redirect(url_for('artists'))
 
     cursor.execute('''
       SELECT
@@ -1506,22 +1555,18 @@ def artist_create():
     if request.method == 'POST':
         cursor = get_connection().cursor()
         parameters = dict(request.form)
-        try:
-            cursor.execute('''
-              INSERT INTO person (mail, firstname, lastname, phone)
-              VALUES (:mail, :firstname, :lastname, :phone)
-              RETURNING id
-            ''', parameters)
-        except sqlite3.IntegrityError:
-            flash('Cet email est déjà utilisé.')
-        else:
-            parameters['person_id'] = cursor.fetchone()['id']
-            cursor.execute('''
-              INSERT INTO artist (person_id, color)
-              VALUES (:person_id, :color)
-            ''', parameters)
-            cursor.connection.commit()
-            flash('L’artiste a été ajouté.')
-            return redirect(url_for('artists'))
+        cursor.execute('''
+          INSERT INTO person (mail, firstname, lastname, phone)
+          VALUES (:mail, :firstname, :lastname, :phone)
+          RETURNING id
+        ''', parameters)
+        parameters['person_id'] = cursor.fetchone()['id']
+        cursor.execute('''
+          INSERT INTO artist (person_id, color)
+          VALUES (:person_id, :color)
+        ''', parameters)
+        cursor.connection.commit()
+        flash('L’artiste a été ajouté.')
+        return redirect(url_for('artists'))
 
     return render_template('artist_create.jinja2.html')

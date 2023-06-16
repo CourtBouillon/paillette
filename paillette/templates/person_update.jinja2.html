@@ -19,10 +19,10 @@
     <input id="phone" name="phone" value="{{ request.form.phone or person.phone }}" required>
 
     <label for="password">Nouveau mot de passe</label>
-    <input id="password" name="password">
+    <input id="password" type="password" name="password">
 
     <label for="confirm_password">Confirmation du nouveau mot de passe</label>
-    <input id="confirm_password" name="confirm_password">
+    <input id="confirm_password" type="password" name="confirm_password">
 
     <input class="button" type="submit" value="Mettre à jour">
   </form>

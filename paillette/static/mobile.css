@@ -21,9 +21,14 @@
     background-position: left center;
     background-size: contain;
   }
+  header nav ul {
+    font-size: 1rem;
+  }
   header nav:hover {
     height: 100vh;
     line-heigth: 1;
+    overflow: scroll;
+    padding: 0;
     width: 100vw;
   }
 
@@ -74,6 +79,9 @@
     margin: 0.5rem 0;
   }
 
+  #page-login header::after {
+    content: none;
+  }
   #page-login main {
     flex-direction: column;
   }
