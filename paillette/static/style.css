@@ -974,6 +974,14 @@ thead th {
 tbody th {
   left: 0;
   position: sticky;
+  text-align: right;
+  max-width: 30vw;
+  min-width: 30vw;
+}
+
+tbody th span {
+  font-weight: bold;
+  margin-left: 1em;
 }
 
 thead th {
@@ -1005,14 +1013,4 @@ th {
 
 thead span {
   font-weight: bold;
-}
-
-tbody th {
-  text-align: right;
-  white-space: nowrap;
-}
-
-tbody th span {
-  font-weight: bold;
-  margin-left: 1em;
 }
