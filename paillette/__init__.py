@@ -922,7 +922,7 @@ def artists_followup_filter(year, month):
       JOIN representation
       ON spectacle.id = representation.spectacle_id
       JOIN representation_date
-      on representation.id = representation_date.representation_id
+      ON representation.id = representation_date.representation_id
       WHERE date BETWEEN ? AND ?
     ''', (start, stop))
     spectacles = cursor.fetchall()
