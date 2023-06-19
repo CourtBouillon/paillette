@@ -8,11 +8,16 @@
     position: absolute;
     right: 1.5rem;
     top: 0;
+    z-index: 1;
+  }
+
+  header:has(nav:not(:hover))::after {
+    color: transparent;
   }
 
   header nav:hover {
     height: calc(100vh - 4rem);
-    margin-top: 4rem;
+    padding-top: 4rem;
   }
 }
 

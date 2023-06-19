@@ -196,6 +196,7 @@ header nav::before {
   align-items: center;
   background: var(--black);
   color: var(--purple);
+  content: "\f0c9";
   display: flex;
   height: 3em;
   justify-content: center;
@@ -205,10 +206,6 @@ header nav::before {
   top: 0;
   width: 3em;
   z-index: 2;
-}
-
-header nav::before {
-  content: "\f0c9";
 }
 
 header nav {
@@ -221,7 +218,7 @@ header nav {
   overflow: hidden;
   padding: 1rem;
   position: relative;
-  transition-delay: 0.5s;
+  transition-delay: 0.25s;
   transition-property: z-index;
   width: 3em;
   z-index: 3;
