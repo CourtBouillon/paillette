@@ -17,6 +17,7 @@
 
   {% for spectacle in spectacles %}
     {% set dates = (spectacle.first_date, spectacle.last_date) | date_range %}
+    {% set travel_dates = (spectacle.date_from, spectacle.date_to) | date_range %}
     <section>
       <h3><a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">{{ '{}, {}'.format(spectacle.place, dates) }}</a></h3>
       <a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">
@@ -24,9 +25,16 @@
           <dt class="date">Date</dt>
           <dd>{{ dates | capitalize }}</dd>
           <dt class="place">Lieu</dt>
-          <dd>{{ spectacle.place }}</dd>
-          <dt class="vehicle">Temps de transport</dt>
-          <dd>{% if spectacle.travel_time %}{{ spectacle.travel_time }}{% else %}Temps indéterminé{% endif %}</dd>
+          <dd>
+            {{ spectacle.place }}
+            {% if spectacle.travel_time %}
+              ({{ spectacle.travel_time }})
+            {% endif %}
+          </dd>
+          <dt class="configuration">Configuration</dt>
+          <dd>{{ spectacle.configuration }}</dd>
+          <dt class="vehicle">Trajet</dt>
+          <dd>{{ travel_dates | capitalize }}</dd>
         </dl>
       </a>
       <dl>

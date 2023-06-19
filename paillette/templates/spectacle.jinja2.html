@@ -12,12 +12,14 @@
     <dt class="date">Date</dt>
     <dd>{{ dates | capitalize }}</dd>
     <dt class="place">Lieu</dt>
-    <dd>{{ spectacle.place }}</dd>
-
-    {% if spectacle.travel_time %}
-      <dt class="vehicle">Temps de transport</dt>
-      <dd>{{ spectacle.travel_time }}</dd>
-    {% endif %}
+    <dd>
+      {{ spectacle.place }}
+      {% if spectacle.travel_time %}
+        ({{ spectacle.travel_time }})
+      {% endif %}
+    </dd>
+    <dt class="configuration">Configuration</dt>
+    <dd>{{ spectacle.configuration }}</dd>
   </dl>
 
   <dl>

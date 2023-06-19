@@ -534,6 +534,10 @@ button::before {
   content: "\f2c0";
 }
 
+.configuration::before {
+  content: "\f0c0";
+}
+
 .costume::before {
   content: "\f006";
 }
@@ -580,12 +584,12 @@ button::before {
   content: "\f001";
 }
 
-.vehicle::before {
-  content: "\f0d1";
-}
-
 .update::before {
   content: "\f044";
+}
+
+.vehicle::before {
+  content: "\f0d1";
 }
 
 /* Actions */
@@ -771,6 +775,7 @@ button::before {
 #page-spectacles section {
   border-bottom: 2px solid var(--pink-opacity);
   display: flex;
+  align-items: center;
   padding: 1em 0;
   width: 100%;
 }
@@ -779,7 +784,7 @@ button::before {
   background: var(--pink-opacity);
   color: var(--grey);
   font-size: 1.2em;
-  padding: 1em;
+  padding: 0.5em;
   transition: 0.5s;
   width: 25%;
 }
@@ -790,7 +795,7 @@ button::before {
 }
 
 #page-spectacles section > dl {
-  margin-left: 2em;
+  margin: 0 0 0 2em;
   width: 75%;
 }
 
@@ -799,6 +804,7 @@ button::before {
 }
 
 #page-spectacles a dl {
+  margin: 0;
   overflow: auto;
 }
 
@@ -811,13 +817,13 @@ button::before {
 
 #page-spectacles a dl dd {
   float: right;
-  margin: 0.5em 0;
+  margin: 0;
   width: 85%;
 }
 
 #page-spectacles section ::before {
   font-size: 1.2rem;
-  margin: 0.5em 0;
+  margin: 0;
 }
 
 .date::before {
@@ -830,7 +836,8 @@ button::before {
 
 #page-spectacles .date,
 #page-spectacles .place,
-#page-spectacles .vehicle {
+#page-spectacles .vehicle,
+#page-spectacles .configuration {
   font-size: 0;
 }
 
@@ -838,7 +845,7 @@ button::before {
 
 #page-spectacle .date,
 #page-spectacle .place,
-#page-spectacle .vehicle {
+#page-spectacle .configuration {
   font-size: 0;
 }
 
