@@ -975,8 +975,7 @@ tbody th {
   left: 0;
   position: sticky;
   text-align: right;
-  max-width: 30vw;
-  min-width: 30vw;
+  white-space: nowrap;
 }
 
 tbody th span {
