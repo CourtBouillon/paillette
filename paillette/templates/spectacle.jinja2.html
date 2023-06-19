@@ -47,6 +47,40 @@
       <dd>{{ spectacle.manager }}</dd>
     {% endif %}
 
+    <dt>Matériel de son</dt>
+    {% for sound in sounds %}
+      <dd>{{ sound.name }}</dd>
+    {% else %}
+      <dd>Pas de matériel de son</dd>
+    {% endfor %}
+
+    <dt>Boîtes de maquillage</dt>
+    {% for makeup in makeups %}
+      <dd>{{ makeup.name }}</dd>
+    {% else %}
+      <dd>Pas de boîte de maquillage</dd>
+    {% endfor %}
+
+    <dt>Costumes</dt>
+    {% for costume in costumes %}
+      <dd>{{ costume.name }}</dd>
+    {% else %}
+      <dd>Pas de costume</dd>
+    {% endfor %}
+
+    <dt>Départ le</dt>
+    <dd>{{ spectacle.date_from | date_simple }}</dd>
+
+    <dt>Retour le</dt>
+    <dd>{{ spectacle.date_to | date_simple }}</dd>
+
+    <dt>Véhicules</dt>
+    {% for vehicle in vehicles %}
+      <dd>{{ vehicle.name }}</dd>
+    {% else %}
+      <dd>Pas de véhicule</dd>
+    {% endfor %}
+
     {% if representations | length >= 2 %}
       <dt>Spectacles</dt>
     {% endif %}
@@ -86,40 +120,6 @@
       {% endif %}
     {% else %}
       <dd>Pas de spectacle</dd>
-    {% endfor %}
-
-    <dt>Matériel de son</dt>
-    {% for sound in sounds %}
-      <dd>{{ sound.name }}</dd>
-    {% else %}
-      <dd>Pas de matériel de son</dd>
-    {% endfor %}
-
-    <dt>Boîtes de maquillage</dt>
-    {% for makeup in makeups %}
-      <dd>{{ makeup.name }}</dd>
-    {% else %}
-      <dd>Pas de boîte de maquillage</dd>
-    {% endfor %}
-
-    <dt>Costumes</dt>
-    {% for costume in costumes %}
-      <dd>{{ costume.name }}</dd>
-    {% else %}
-      <dd>Pas de costume</dd>
-    {% endfor %}
-
-    <dt>Départ le</dt>
-    <dd>{{ spectacle.date_from | date_simple }}</dd>
-
-    <dt>Retour le</dt>
-    <dd>{{ spectacle.date_to | date_simple }}</dd>
-
-    <dt>Véhicules</dt>
-    {% for vehicle in vehicles %}
-      <dd>{{ vehicle.name }}</dd>
-    {% else %}
-      <dd>Pas de véhicule</dd>
     {% endfor %}
   </dl>
 
