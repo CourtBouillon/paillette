@@ -103,13 +103,13 @@
         <dt>Régisseur</dt>
         <dd><strong>{{ spectacle.manager }}</strong></dd>
       {% endif %}
-      <dt>Artistes</dt>
+      <dt>Équipe</dt>
       {% for artist in all_artists %}
         {% if artist %}
           {% set name, phone = artist.split('||') %}
           <dd>{{ name }} — {{ phone }}</dd>
         {% else %}
-          <dd>Pas d’artiste</dd>
+          <dd>Personne dans l’équipe</dd>
         {% endif %}
       {% endfor %}
     </dl>
