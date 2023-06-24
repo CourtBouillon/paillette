@@ -165,8 +165,7 @@ def get_spectacle_data(spectacle_id):
 def send_mail(to, subject, content, pdfs=None):
     message = MIMEMultipart()
     message['From'] = app.config['SMTP_FROM']
-    for to in to:
-        message['To'] = to
+    message['To'] = ', '.join(to)
     message['Date'] = formatdate(localtime=True)
     message['Subject'] = subject
     message.attach(MIMEText(content))
