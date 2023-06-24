@@ -648,7 +648,7 @@ button::before {
 #page-login img {
   display: block;
   margin: 1em 2em;
-  width: 30em;
+  width: 40em;
 }
 
 #page-login main input:not([type="submit"]) {
