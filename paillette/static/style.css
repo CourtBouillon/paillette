@@ -305,13 +305,12 @@ datalist {
 }
 
 fieldset {
-  align-items: center;
   border: inherit;
-  display: flex !important;
 }
 
 fieldset label {
   border: inherit;
+  display: block;
 }
 
 form {
@@ -381,9 +380,9 @@ input[type="color"] {
 
 input[type="radio"],
 input[type="checkbox"] {
-  height: 2em;
+  height: 1.2em;
   margin: 0 1em 0 0;
-  width: 2em;
+  width: 1.2em;
 }
 
 label,

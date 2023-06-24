@@ -19,11 +19,14 @@
     <input id="license_plate" name="license_plate" value="{{ vehicle.license_plate or '' }}">
 
     <fieldset>
-      <input type="radio" id="rental" name="rental_status" value="rental"{% if vehicle.rented %} checked{% endif %}>
-      <label for="rental">Location</label>
-
-      <input type="radio" id="company" name="rental_status" value="company"{% if not vehicle.rented %} checked{% endif %}>
-      <label for="company">Mademoiselle Paillette</label>
+      <label for="rental">
+        <input type="radio" id="rental" name="rental_status" value="rental"{% if vehicle.rented %} checked{% endif %}>
+        Location
+      </label>
+      <label for="company">
+        <input type="radio" id="company" name="rental_status" value="company"{% if not vehicle.rented %} checked{% endif %}>
+        Mademoiselle Paillette
+      </label>
     </fieldset>
 
     <label for="rental_company_name">Agence de location</label>

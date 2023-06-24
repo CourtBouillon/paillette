@@ -13,14 +13,18 @@
     <input id="date_to" name="date_to" type="date" value="{{ date }}" required>
 
     <fieldset>
-      <input id="unknown" name="availability" value="unknown" type="radio" {{ 'checked' if artist.available is none }}>
-      <label for="unknown">Inconnu</label>
-
-      <input id="unavailable" name="availability" value="unavailable" type="radio" {{ 'checked' if artist.available == 0 }}>
-      <label for="unavailable">Indisponible</label>
-
-      <input id="available" name="availability" value="available" type="radio" {{ 'checked' if artist.available == 1 }}>
-      <label for="available">Disponible</label>
+      <label for="unknown">
+        <input id="unknown" name="availability" value="unknown" type="radio" {{ 'checked' if artist.available is none }}>
+        Inconnu
+      </label>
+      <label for="unavailable">
+        <input id="unavailable" name="availability" value="unavailable" type="radio" {{ 'checked' if artist.available == 0 }}>
+        Indisponible
+      </label>
+      <label for="available">
+        <input id="available" name="availability" value="available" type="radio" {{ 'checked' if artist.available == 1 }}>
+        Disponible
+      </label>
     </fieldset>
 
     <label for="spectacle_id">Spectacle</label>

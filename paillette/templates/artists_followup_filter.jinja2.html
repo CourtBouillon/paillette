@@ -16,18 +16,23 @@
 
     <fieldset id="availability" hidden>
       <legend>Disponibilités</legend>
-      <input id="unavailable" name="availabilities" value="0" type="checkbox" {{ 'checked' if not filter or filter[0] != 'availabilities' or 0 in filter[1] }}>
-      <label for="unavailable">Indisponible</label>
-
-      <input id="available" name="availabilities" value="1" type="checkbox" {{ 'checked' if not filter or filter[0] != 'availabilities' or 1 in filter[1] }}>
-      <label for="available">Disponible</label>
+      <label for="unavailable">
+        <input id="unavailable" name="availabilities" value="0" type="checkbox" {{ 'checked' if not filter or filter[0] != 'availabilities' or 0 in filter[1] }}>
+        Indisponible
+      </label>
+      <label for="available">
+        <input id="available" name="availabilities" value="1" type="checkbox" {{ 'checked' if not filter or filter[0] != 'availabilities' or 1 in filter[1] }}>
+        Disponible
+      </label>
     </fieldset>
 
     <fieldset id="spectacle" hidden>
       <legend>Préstations</legend>
       {% for spectacle in spectacles %}
-        <input id="spectacle-{{ spectacle.id }}" name="spectacles" value="{{ spectacle.id }}" type="checkbox" {{ 'checked' if filter and (filter[0] != 'spectacles' or spectacle.id in filter[1]) }}>
-        <label for="spectacle-{{ spectacle.id }}">{{ spectacle.name }}</label>
+        <label for="spectacle-{{ spectacle.id }}">
+          <input id="spectacle-{{ spectacle.id }}" name="spectacles" value="{{ spectacle.id }}" type="checkbox" {{ 'checked' if filter and (filter[0] != 'spectacles' or spectacle.id in filter[1]) }}>
+          {{ spectacle.name }}
+        </label>
       {% else %}
         <p>Aucun spectacle ce jour-là.</p>
       {% endfor %}
