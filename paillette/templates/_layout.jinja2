@@ -14,6 +14,11 @@
   <body id="page-{{ page_name or request.endpoint }}">
     <header>
       {% if g.person %}
+        <ul>
+          <li><a href="{{ url_for('spectacles') }}">Prestations</a></li>
+          <li><a href="{{ url_for('artists_followup') }}">Suivis</a></li>
+        </ul>
+
         <nav>
           <ul>
             <li><a href="{{ url_for('person_update') }}">Mon profil</a></li>
@@ -44,15 +49,6 @@
     <main>
       {% block content %}{% endblock content %}
     </main>
-
-    <footer>
-      {% if g.person %}
-        <ul>
-          <li><a href="{{ url_for('spectacles') }}">Prestations</a></li>
-          <li><a href="{{ url_for('artists_followup') }}">Suivis</a></li>
-        </ul>
-      {% endif %}
-    </footer>
   </body>
 
   <script>
