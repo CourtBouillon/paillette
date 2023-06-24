@@ -1,3 +1,11 @@
+{%- macro follow_menu(active) -%}
+  <ul class="follow">
+    {% for key, label in (('artist', 'Artistes'), ('costume', 'Costume'), ('makeup', 'Makeup'), ('sound', 'Sound'), ('vehicle', 'Véhicules')) %}
+      <li><a class="{{ key }} {{ 'active' if key == active }}" href="{{ url_for(key + 's_followup', year=start.year, month=start.month) }}">{{ label }}</a></li>
+    {% endfor %}
+  </ul>
+{%- endmacro -%}
+
 <!DOCTYPE html>
 <html lang="fr">
   <head>

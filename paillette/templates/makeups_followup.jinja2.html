@@ -5,13 +5,7 @@
 {% block content %}
   <h2>{{ title }}</h2>
 
-  <ul class="follow">
-    <li><a class="artist" href="{{ url_for('artists_followup', year=start.year, month=start.month) }}">Équipe</a></li>
-    <li><a class="costume" href="{{ url_for('costumes_followup', year=start.year, month=start.month) }}">Costumes</a></li>
-    <li><a class="makeup active" href="{{ url_for('makeups_followup', year=start.year, month=start.month) }}">Maquillage</a></li>
-    <li><a class="sound" href="{{ url_for('sounds_followup', year=start.year, month=start.month) }}">Son</a></li>
-    <li><a class="vehicle" href="{{ url_for('vehicles_followup', year=start.year, month=start.month) }}">Véhicules</a></li>
-  </ul>
+  {{ follow_menu('makeup') }}
 
   <ul class="time">
     <li><a class="previous" href="{{ url_for('makeups_followup', year=previous.year, month=previous.month) }}">Mois précédent</a></li>
