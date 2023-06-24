@@ -90,7 +90,6 @@ dd {
   margin: 0;
 }
 
-h1,
 #page-spectacles h2,
 #page-spectacle h2,
 body[id$="followup"] h2 {
@@ -183,13 +182,19 @@ header {
   z-index: 2
 }
 
-header::before {
-  background: url(/static/logo.jpg) 1rem center / auto 100% no-repeat;
-  content: '';
+header h1 {
   display: block;
+  font-size: 0;
   height: 100%;
   position: absolute;
   width: 20rem;
+}
+
+header h1 a {
+  background: url(/static/logo.jpg) 1rem center / auto 100% no-repeat;
+  display: block;
+  height: 100%;
+  width: 100%;
 }
 
 header nav::before {
