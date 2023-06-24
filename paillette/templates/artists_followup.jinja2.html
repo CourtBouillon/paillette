@@ -45,8 +45,18 @@
           </th>
           {% for i in range(1, stop.day + 1) %}
             {% set day = start.replace(day=i) %}
+            {% set day_representation_dates = representation_dates | selectattr('date', 'eq', day) | list %}
             <td>
-              <a href="{{ url_for('availabilities_update', artist_id=artist.artist_id, date=day) }}">
+              <select onChange="update(this, {{ artist.artist_id }}, '{{ day }}')">
+                <option hidden></option>
+                <option value="-"></option>
+                <option value="0-">0</option>
+                <option value="1-">1</option>
+                {% for representation_date in day_representation_dates %}
+                  <option value="1-{{ representation_date.id }}">{{ representation_date.trigram }}</option>
+                {% endfor %}
+              </select>
+              <span>
                 {%- for spectacle in spectacles | selectattr('date', 'equalto', day) %}
                   {{ spectacle.trigram }}
                 {%- else -%}
@@ -54,11 +64,28 @@
                     {{ '1' if availability.available else '0' }}
                   {% endfor -%}
                 {% endfor -%}
-              </a>
+              </span>
             </td>
           {% endfor %}
         </tr>
       {% endfor %}
     </tbody>
   </table>
+
+  <script>
+    function update(select, artistId, date) {
+      select.nextElementSibling.textContent = '?'
+      let data = new FormData()
+      data.append("available", select.value.split('-')[0])
+      data.append("representation_date_id", select.value.split('-')[1])
+      fetch(
+        `/availabilities/${artistId}/${date}/update`,
+        {"method": "POST", "body": data}
+      ).then(
+        response => response.json()
+      ).then(
+        data => select.nextElementSibling.textContent = data.value
+      )
+    }
+  </script>
 {% endblock %}

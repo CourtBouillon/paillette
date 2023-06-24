@@ -869,10 +869,21 @@ def artists_followup(year=None, month=None):
             parameters += spectacles
     cursor.execute(query, parameters)
     artists_spectacles = cursor.fetchall()
+    cursor.execute('''
+      SELECT representation_date.id, date, trigram
+      FROM spectacle
+      JOIN representation
+      ON spectacle.id = representation.spectacle_id
+      JOIN representation_date
+      ON representation.id = representation_date.representation_id
+      WHERE date BETWEEN ? AND ?
+    ''', (start, stop))
+    representation_dates = cursor.fetchall()
     return render_template(
         'artists_followup.jinja2.html',
         artists_spectacles=artists_spectacles, availabilities=availabilities,
-        start=start, stop=stop, previous=previous, next=next)
+        representation_dates=representation_dates, start=start, stop=stop,
+        previous=previous, next=next)
 
 
 # Follow-ups
@@ -1057,108 +1068,62 @@ def vehicles_followup(year=None, month=None):
 
 
 @app.route('/availabilities/<int:artist_id>/<date>/update',
-           methods=('GET', 'POST'))
+           methods=('POST',))
 @authenticated
 def availabilities_update(artist_id, date):
     cursor = get_connection().cursor()
 
-    if request.method == 'POST':
-        parameters = dict(request.form)
-        parameters['artist_id'] = artist_id
+    parameters = dict(request.form)
+    parameters['artist_id'] = artist_id
+    parameters['date'] = date
 
-        cursor.execute('''
-          DELETE FROM artist_representation_date
-          WHERE id IN (
-            SELECT artist_representation_date.id
-            FROM artist_representation_date
-            JOIN representation_date
-            ON
-              artist_representation_date.representation_date_id =
-              representation_date.id
-            WHERE artist_id = :artist_id
-            AND date BETWEEN :date_from AND :date_to
-          )
-        ''', parameters)
-        add_availability = (
-            parameters['availability'] == 'available' and
-            'spectacle_id' in parameters)
-        if add_availability:
-            cursor.execute('''
-              INSERT INTO
-                artist_representation_date(artist_id, representation_date_id)
-              SELECT :artist_id, representation_date.id
-              FROM representation_date
-              JOIN representation
-              WHERE spectacle_id = :spectacle_id
-              AND date BETWEEN :date_from AND :date_to
-            ''', parameters)
-
-        cursor.execute('''
-          DELETE FROM artist_availability
-          WHERE artist_id = :artist_id
-          AND date BETWEEN :date_from AND :date_to
-        ''', parameters)
-        if parameters['availability'] in ('unavailable', 'available'):
-            parameters['available'] = parameters['availability'] == 'available'
-            cursor.execute('''
-              WITH RECURSIVE dates(date) AS (
-                SELECT date(:date_from)
-                UNION
-                SELECT date(date, '+1 day')
-                FROM dates
-                WHERE date < date(:date_to)
-              )
-              INSERT INTO artist_availability(artist_id, date, available)
-              SELECT :artist_id, date, :available
-              FROM dates
-            ''', parameters)
-
-        cursor.connection.commit()
-        flash('Les informations ont été sauvegardées.')
-        year, month = date[:7].split('-')
-        return redirect(url_for('artists_followup', year=year, month=month))
+    return_value = ''
 
     cursor.execute('''
-      SELECT
-        person.name,
-        artist_availability.available,
-        representation.spectacle_id
-      FROM artist
-      JOIN person
-      ON artist.person_id = person.id
-      LEFT JOIN (
-        SELECT artist_id, available
-        FROM artist_availability
-        WHERE date = ?
-      ) AS artist_availability
-      ON artist.id = artist_availability.artist_id
-      LEFT JOIN (
-        SELECT artist_id, spectacle_id
+      DELETE FROM artist_representation_date
+      WHERE id IN (
+        SELECT artist_representation_date.id
         FROM artist_representation_date
-        JOIN (
-          SELECT id, representation_id
-          FROM representation_date
-          WHERE date = ?
-        ) AS representation_date
+        JOIN representation_date
         ON
           artist_representation_date.representation_date_id =
           representation_date.id
-        JOIN representation
-        ON representation_date.representation_id = representation.id
-      ) AS representation
-      ON artist.id = representation.artist_id
-      WHERE artist.id = ?
-    ''', (date, date, artist_id))
-    artist = cursor.fetchone() or abort(404)
+        WHERE artist_id = :artist_id
+        AND date = :date
+      )
+    ''', parameters)
+    if parameters['representation_date_id']:
+        cursor.execute('''
+          INSERT INTO
+            artist_representation_date(artist_id, representation_date_id)
+          VALUES
+            (:artist_id, :representation_date_id)
+        ''', parameters)
+        cursor.execute('''
+          SELECT trigram
+          FROM spectacle
+          JOIN representation
+          ON spectacle.id = representation.spectacle_id
+          JOIN representation_date
+          ON representation.id = representation_date.representation_id
+          WHERE representation_date.id = ?
+        ''', (parameters['representation_date_id'],))
+        return_value = cursor.fetchone()['trigram']
+
     cursor.execute('''
-      SELECT *
-      FROM spectacle
-      WHERE ? BETWEEN date_from AND date_to
-    ''', (date,))
-    spectacles = cursor.fetchall()
-    return render_template(
-        'availabilities_update.jinja2.html',
-        artist=artist, spectacles=spectacles, date=date)
+      DELETE FROM artist_availability
+      WHERE artist_id = :artist_id
+      AND date = :date
+    ''', parameters)
+    if parameters['available']:
+        return_value = return_value or str(int(parameters['available']))
+        cursor.execute('''
+          INSERT INTO artist_availability(artist_id, date, available)
+          VALUES (:artist_id, :date, :available)
+        ''', parameters)
+
+    cursor.connection.commit()
+    return {'value': return_value}
 
 
 # Persons
