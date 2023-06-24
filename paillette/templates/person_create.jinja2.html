@@ -18,6 +18,9 @@
     <label for="phone">Numéro de téléphone</label>
     <input id="phone" name="phone" value="{{ request.form.phone or '' }}" required>
 
+    <label for="comment">Commentaire</label>
+    <textarea id="comment" name="comment">{{ request.form.comment or '' }}</textarea>
+
     <input class="button" type="submit" value="Ajouter">
   </form>
 {% endblock %}

@@ -21,6 +21,9 @@
     <label for="phone">Téléphone</label>
     <input id="phone" name="phone" value="{{ request.form.phone or artist.phone }}" required>
 
+    <label for="comment">Commentaire</label>
+    <textarea id="comment" name="comment">{{ request.form.comment or artist.comment or '' }}</textarea>
+
     <input class="button" type="submit" value="Mettre à jour">
   </form>
 {% endblock %}

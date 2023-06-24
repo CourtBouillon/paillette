@@ -18,6 +18,9 @@
     <label for="phone">Numéro de téléphone</label>
     <input id="phone" name="phone" value="{{ request.form.phone or person.phone }}" required>
 
+    <label for="comment">Commentaire</label>
+    <textarea id="comment" name="comment">{{ request.form.comment or person.comment or '' }}</textarea>
+
     <label for="password">Nouveau mot de passe</label>
     <input id="password" type="password" name="password">
 

@@ -121,6 +121,11 @@
     {% else %}
       <dd>Pas de spectacle</dd>
     {% endfor %}
+
+    {% if spectacle.comment %}
+      <dt>Commentaire interne</dt>
+      <dd>{{ spectacle.comment }}</dd>
+    {% endif %}
   </dl>
 
   <ul class="actions">

@@ -231,6 +231,9 @@
       {% endfor %}
     </ul>
 
+    <label for="comment">Commentaire interne</label>
+    <textarea id="comment" name="comment">{{ spectacle.comment or '' }}</textarea>
+
     <input class="button" type="submit" value="Mettre à jour">
   </form>
 

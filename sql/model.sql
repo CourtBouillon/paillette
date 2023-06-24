@@ -8,7 +8,8 @@ CREATE TABLE person (
   name TEXT AS (firstname || ' ' || lastname),
   phone TEXT NOT NULL,
   password TEXT,
-  reset_password TEXT
+  reset_password TEXT,
+  comment TEXT
 );
 
 CREATE TABLE spectacle (
@@ -32,7 +33,8 @@ CREATE TABLE spectacle (
   meal TEXT,
   images_comment TEXT,
   sound_comment TEXT,
-  light_comment TEXT
+  light_comment TEXT,
+  comment TEXT
 );
 
 CREATE TABLE spectacle_image (

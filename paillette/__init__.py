@@ -431,10 +431,10 @@ def spectacle_create():
           INSERT INTO
             spectacle (
               event, place, travel_time, trigram, date_from, date_to, link,
-              configuration, organizer, manager)
+              configuration, organizer, manager, comment)
           VALUES
             (:event, :place, :travel_time, :trigram, :date_from, :date_to,
-             :link, :configuration, :organizer, :manager)
+             :link, :configuration, :organizer, :manager, :comment)
           RETURNING id
         ''', parameters)
         spectacle_id = cursor.fetchone()['id']
@@ -537,7 +537,8 @@ def spectacle_update(spectacle_id):
             link = :link,
             configuration = :configuration,
             organizer = :organizer,
-            manager = :manager
+            manager = :manager,
+            comment = :comment
           WHERE id = :id
         ''', parameters)
 
@@ -1211,7 +1212,8 @@ def person_update(person_id=None):
                 mail = :mail,
                 firstname = :firstname,
                 lastname = :lastname,
-                phone = :phone
+                phone = :phone,
+                comment = :comment
               WHERE id = :id
             ''', parameters)
             if (password := request.form.get('password')):
@@ -1258,8 +1260,8 @@ def person_create():
             flash('Cet email est déjà utilisé.')
         else:
             cursor.execute('''
-              INSERT INTO person (firstname, lastname, mail, phone)
-              VALUES (:firstname, :lastname, :mail, :phone)
+              INSERT INTO person (firstname, lastname, mail, phone, comment)
+              VALUES (:firstname, :lastname, :mail, :phone, :comment)
             ''', parameters)
             cursor.connection.commit()
             flash('La personne a été ajoutée.')
@@ -1526,7 +1528,8 @@ def artist_update(artist_id):
             mail = :mail,
             firstname = :firstname,
             lastname = :lastname,
-            phone = :phone
+            phone = :phone,
+            comment = :comment
           WHERE id = :person_id
         ''', parameters)
         cursor.connection.commit()
@@ -1540,7 +1543,8 @@ def artist_update(artist_id):
         person.firstname,
         person.lastname,
         person.name,
-        person.phone
+        person.phone,
+        person.comment
       FROM artist
       JOIN person
       ON artist.person_id = person.id
@@ -1557,8 +1561,8 @@ def artist_create():
         cursor = get_connection().cursor()
         parameters = dict(request.form)
         cursor.execute('''
-          INSERT INTO person (mail, firstname, lastname, phone)
-          VALUES (:mail, :firstname, :lastname, :phone)
+          INSERT INTO person (mail, firstname, lastname, phone, comment)
+          VALUES (:mail, :firstname, :lastname, :phone, :comment)
           RETURNING id
         ''', parameters)
         parameters['person_id'] = cursor.fetchone()['id']
