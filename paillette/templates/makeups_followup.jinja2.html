@@ -31,15 +31,14 @@
     <tbody>
       {% for (grouper, spectacles) in makeups_spectacles | groupby('grouper') %}
         {% set makeup = spectacles[0] %}
-        <tr style="color: {{ makeup.color or 'black' }}">
-          <th>{{ makeup.name }}</th>
+        <tr>
+          <th style="background: {{ makeup.color or 'transparent' }}">{{ makeup.name }}</th>
           {% for i in range(1, stop.day + 1) %}
             {% set day = start.replace(day=i) %}
-            <td>
-              {% for spectacle in spectacles %}
-                {% if spectacle.date_from and spectacle.date_from <= day <= spectacle.date_to %}
-                  {{ spectacle.trigram }}
-                {% endif %}
+            {% set filtered_spectacles = spectacles | selectattr('date_from') | selectattr('date_from', 'le', day) | selectattr('date_to', 'ge', day) | list %}
+            <td {{ ('style="background: ' + makeup.color + '"') | safe if filtered_spectacles and makeup.color }}>
+              {% for spectacle in filtered_spectacles %}
+                {{ spectacle.trigram }}
               {% endfor %}
             </td>
           {% endfor %}

@@ -31,8 +31,8 @@
     <tbody>
       {% for (grouper, spectacles) in costumes_spectacles | groupby('grouper') %}
         {% set costume = spectacles[0] %}
-        <tr style="color: {{ costume.color or 'black' }}">
-          <th>{{ costume.name }}</th>
+        <tr>
+          <th style="background: {{ costume.color or 'transparent' }}">{{ costume.name }}</th>
           {% for i in range(1, stop.day + 1) %}
             {% set day = start.replace(day=i) %}
             <td>
