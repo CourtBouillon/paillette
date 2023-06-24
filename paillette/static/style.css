@@ -948,9 +948,11 @@ button::before {
 /* Follows */
 
 table {
-  display: block;
   border-collapse: collapse;
+  display: block;
   max-height: calc(100vh - 8em);
+  width: min-content;
+  margin: 0 auto;
   overflow: auto;
   scrollbar-color: var(--purple) var(--white);
 }
@@ -1015,5 +1017,6 @@ th {
 }
 
 thead span {
+  display: block;
   font-weight: bold;
 }
