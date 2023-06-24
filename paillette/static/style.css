@@ -47,7 +47,7 @@ body[id$="followup"] main {
 
 main ::before {
   display: inline-block;
-  font-size: 2rem;
+  font-size: 1.5rem;
   width: 1em;
 }
 
@@ -849,8 +849,9 @@ button::before {
 }
 
 #page-spectacle main > dl:first-of-type {
-  margin: 0.25em 0;
+  margin: 0.5em 0;
   overflow: auto;
+  padding-top: 0.5em;
 }
 
 #page-spectacle main > dl:first-of-type dt {
@@ -950,7 +951,7 @@ button::before {
 /* Follows */
 
 table {
-  border-collapse: collapse;
+  border-spacing: 0;
   display: block;
   max-height: calc(100vh - 4rem);
   margin: 0 auto;
@@ -985,6 +986,7 @@ tbody th {
   position: sticky;
   text-align: right;
   white-space: nowrap;
+  z-index: 1;
 }
 
 tbody th span {
@@ -996,6 +998,7 @@ thead th {
   background: var(--white);
   position: sticky;
   top: 0;
+  z-index: 1;
 }
 
 td > a:empty::after {
