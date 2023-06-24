@@ -42,11 +42,6 @@
       <dd>{{ spectacle.organizer }}</dd>
     {% endif %}
 
-    {% if spectacle.manager %}
-      <dt>Régisseur</dt>
-      <dd>{{ spectacle.manager }}</dd>
-    {% endif %}
-
     <dt>Matériel de son</dt>
     {% for sound in sounds %}
       <dd>{{ sound.name }}</dd>

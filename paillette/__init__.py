@@ -431,10 +431,10 @@ def spectacle_create():
           INSERT INTO
             spectacle (
               event, place, travel_time, trigram, date_from, date_to, link,
-              configuration, organizer, manager, comment)
+              configuration, organizer, comment)
           VALUES
             (:event, :place, :travel_time, :trigram, :date_from, :date_to,
-             :link, :configuration, :organizer, :manager, :comment)
+             :link, :configuration, :organizer, :comment)
           RETURNING id
         ''', parameters)
         spectacle_id = cursor.fetchone()['id']
@@ -498,13 +498,6 @@ def spectacle_create():
     ''')
     all_artists = cursor.fetchall()
     cursor.execute('''
-      SELECT DISTINCT manager
-      FROM spectacle
-      WHERE manager IS NOT NULL
-      ORDER BY id DESC LIMIT 100
-    ''')
-    all_managers = tuple(row['manager'] for row in cursor.fetchall())
-    cursor.execute('''
       SELECT DISTINCT name
       FROM representation
       ORDER BY id DESC LIMIT 100
@@ -512,8 +505,7 @@ def spectacle_create():
     all_representations = tuple(row['name'] for row in cursor.fetchall())
     return render_template(
         'spectacle_create.jinja2.html', all_artists=all_artists,
-        all_managers=all_managers, all_representations=all_representations,
-        **data)
+        all_representations=all_representations, **data)
 
 
 @app.route('/spectacle/<int:spectacle_id>/update', methods=('GET', 'POST'))
@@ -537,7 +529,6 @@ def spectacle_update(spectacle_id):
             link = :link,
             configuration = :configuration,
             organizer = :organizer,
-            manager = :manager,
             comment = :comment
           WHERE id = :id
         ''', parameters)
@@ -676,13 +667,6 @@ def spectacle_update(spectacle_id):
     ''')
     all_artists = cursor.fetchall()
     cursor.execute('''
-      SELECT DISTINCT manager
-      FROM spectacle
-      WHERE manager IS NOT NULL
-      ORDER BY id DESC LIMIT 100
-    ''')
-    all_managers = tuple(row['manager'] for row in cursor.fetchall())
-    cursor.execute('''
       SELECT DISTINCT name
       FROM representation
       ORDER BY id DESC LIMIT 100
@@ -690,8 +674,8 @@ def spectacle_update(spectacle_id):
     all_representations = tuple(row['name'] for row in cursor.fetchall())
     return render_template(
         'spectacle_update.jinja2.html', representations=representations,
-        all_artists=all_artists, all_managers=all_managers,
-        all_representations=all_representations, **data)
+        all_artists=all_artists, all_representations=all_representations,
+        **data)
 
 
 # Roadmaps

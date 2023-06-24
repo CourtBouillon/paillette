@@ -99,10 +99,6 @@
     <h3>Équipe</h3>
 
     <dl>
-      {% if spectacle.manager %}
-        <dt>Régisseur</dt>
-        <dd><strong>{{ spectacle.manager }}</strong></dd>
-      {% endif %}
       <dt>Équipe</dt>
       {% for artist in all_artists %}
         {% if artist %}

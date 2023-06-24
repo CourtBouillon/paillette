@@ -32,14 +32,6 @@
     <label for="organizer">Organisateur</label>
     <input id="organizer" name="organizer">
 
-    <label for="manager">Régisseur</label>
-    <input id="manager" name="manager" list="managers">
-    <datalist id="managers">
-      {% for manager in all_managers %}
-        <option value="{{ manager }}" />
-      {% endfor %}
-    </datalist>
-
     <label>Matériel de son</label>
     <div>
       <select data-name="sound">

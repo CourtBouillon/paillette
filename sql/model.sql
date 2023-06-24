@@ -20,7 +20,6 @@ CREATE TABLE spectacle (
   configuration TEXT NOT NULL,
   travel_time TEXT,
   link TEXT,
-  manager TEXT,
   organizer TEXT,
   trigram TEXT NOT NULL,
   date_from DATE NOT NULL,
