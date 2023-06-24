@@ -720,8 +720,10 @@ def roadmap_send(spectacle_id):
             'Bonjour,\n\n'
             'Veuillez trouver en pièce jointe la feuille de route '
             f'pour {place}.\n\n'
-            'Cordialement,\n'
-            'Mademoiselle Paillette'
+            'Bises pailletées,\n'
+            'Diff Prod Admin Elodie VACHERESSE : 06 87 11 49 94\n'
+            'Artistique: Isabelle CAHAGNE : 06 83 28 25 60\n'
+            'http://mademoiselle-paillette.com'
         )
         html = render_template('roadmap.jinja2.html', **spectacle_data)
         pdf = HTML(string=html).write_pdf()
