@@ -26,7 +26,7 @@
         {% for i in range(1, stop.day + 1) %}
           <th>
             {{ start.replace(day=i) | date_simple }}
-            <span class="count">{{ artists_spectacles | selectattr('date.day', 'equalto', i) | list | count }}</span>
+            <span class="count"></span>
           </th>
         {% endfor %}
       </tr>
@@ -37,7 +37,7 @@
         <tr style="color: {{ artist.color or 'black' }}">
           <th>
             {{ artist.name }}
-            <span class="count">{{ spectacles | selectattr('date') | list | length }}</span>
+            <span class="count"></span>
           </th>
           {% for i in range(1, stop.day + 1) %}
             {% set day = start.replace(day=i) %}
@@ -69,6 +69,14 @@
   </table>
 
   <script>
+    function getCount(children) {
+      return (
+        [...children].filter(
+          child => !['', '0'].includes(child.lastElementChild.textContent.trim())
+        ).length
+      )
+    }
+
     function update(select, artistId, date) {
       select.nextElementSibling.textContent = '?'
       let data = new FormData()
@@ -81,7 +89,24 @@
         response => response.json()
       ).then(
         data => select.nextElementSibling.textContent = data.value
+      ).then(
+        data => {
+          let tr = select.closest("tr")
+          let table = select.closest("table")
+          let index = select.closest("td").cellIndex
+          tr.querySelector(".count").textContent = getCount(tr.querySelectorAll("td"))
+          table.querySelector(`thead th:nth-child(${index + 1}) .count`).textContent = getCount(
+            table.querySelectorAll(`td:nth-of-type(${index})`)
+          )
+        }
       )
     }
+
+    document.querySelectorAll("tbody .count").forEach(span => {
+      span.textContent = getCount(span.closest("tr").querySelectorAll("td"))
+    })
+    document.querySelectorAll("thead .count").forEach((span, index) => {
+      span.textContent = getCount(span.closest("table").querySelectorAll(`td:nth-of-type(${index + 1})`))
+    })
   </script>
 {% endblock %}
