@@ -93,13 +93,13 @@
     width: 100%;
   }
 
-  #page-spectacles section > a {
+  #page-spectacles main section > a {
     width: 100%;
   }
-  #page-spectacles section > a dl {
+  #page-spectacles main section > a dl {
     margin: 0;
   }
-  #page-spectacles section > dl {
+  #page-spectacles main section > dl {
     display: none;
   }
 
