@@ -1,3 +1,5 @@
+{% import '_macros.jinja2' as macros %}
+
 {% set title = 'Suivi des costumes' %}
 
 {% extends '_layout.jinja2' %}
@@ -5,7 +7,7 @@
 {% block content %}
   <h2>{{ title }}</h2>
 
-  {{ follow_menu('costume') }}
+  {{ macros.follow_menu('costume', start) }}
 
   <ul class="time">
     <li><a class="previous" href="{{ url_for('costumes_followup', year=previous.year, month=previous.month) }}">Mois précédent</a></li>
@@ -29,16 +31,28 @@
           <th style="background: {{ costume.color or 'transparent' }}">{{ costume.name }}</th>
           {% for i in range(1, stop.day + 1) %}
             {% set day = start.replace(day=i) %}
+            {% set day_spectacle_dates = spectacle_dates | selectattr('date_from', 'le', day) | selectattr('date_to', 'ge', day) | list %}
             <td>
-              {% for spectacle in spectacles %}
-                {% if spectacle.date_from and spectacle.date_from <= day <= spectacle.date_to %}
-                  {{ spectacle.trigram }}
-                {% endif %}
-              {% endfor %}
+              <select onChange="update(this, {{ costume.costume_id }}, '{{ day }}')">
+                <option hidden></option>
+                <option value=""></option>
+                {% for spectacle_date in day_spectacle_dates %}
+                  <option value="{{ spectacle_date.id }}">{{ spectacle_date.trigram }}</option>
+                {% endfor %}
+              </select>
+              <span>
+                {%- for spectacle in spectacles -%}
+                  {%- if spectacle.date_from and spectacle.date_from <= day <= spectacle.date_to -%}
+                    {{ spectacle.trigram + ' ' }}
+                  {%- endif -%}
+                {%- endfor -%}
+              </span>
             </td>
           {% endfor %}
         </tr>
       {% endfor %}
     </tbody>
   </table>
+
+  {{ macros.table_update_script() }}
 {% endblock %}

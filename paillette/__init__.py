@@ -956,9 +956,17 @@ def costumes_followup(year=None, month=None):
       WHERE spectacle.trigram IS NOT NULL OR NOT costume.hidden
       ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     costumes_spectacles = cursor.fetchall()
+    cursor.execute('''
+      SELECT id, date_from, date_to, trigram
+      FROM spectacle
+      WHERE date_from BETWEEN ? AND ?
+      OR date_to BETWEEN ? AND ?
+    ''', (start, stop) * 2)
+    spectacle_dates = cursor.fetchall()
     return render_template(
         'costumes_followup.jinja2.html',
-        costumes_spectacles=costumes_spectacles, start=start, stop=stop,
+        costumes_spectacles=costumes_spectacles,
+        spectacle_dates=spectacle_dates, start=start, stop=stop,
         previous=previous, next=next)
 
 
@@ -991,10 +999,17 @@ def makeups_followup(year=None, month=None):
       WHERE spectacle.trigram IS NOT NULL OR NOT makeup.hidden
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     makeups_spectacles = cursor.fetchall()
+    cursor.execute('''
+      SELECT id, date_from, date_to, trigram
+      FROM spectacle
+      WHERE date_from BETWEEN ? AND ?
+      OR date_to BETWEEN ? AND ?
+    ''', (start, stop) * 2)
+    spectacle_dates = cursor.fetchall()
     return render_template(
         'makeups_followup.jinja2.html',
-        makeups_spectacles=makeups_spectacles, start=start, stop=stop,
-        previous=previous, next=next)
+        makeups_spectacles=makeups_spectacles, spectacle_dates=spectacle_dates,
+        start=start, stop=stop, previous=previous, next=next)
 
 
 @app.route('/sounds/followup')
@@ -1026,10 +1041,17 @@ def sounds_followup(year=None, month=None):
       WHERE spectacle.trigram IS NOT NULL OR NOT sound.hidden
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     sounds_spectacles = cursor.fetchall()
+    cursor.execute('''
+      SELECT id, date_from, date_to, trigram
+      FROM spectacle
+      WHERE date_from BETWEEN ? AND ?
+      OR date_to BETWEEN ? AND ?
+    ''', (start, stop) * 2)
+    spectacle_dates = cursor.fetchall()
     return render_template(
         'sounds_followup.jinja2.html',
-        sounds_spectacles=sounds_spectacles, start=start, stop=stop,
-        previous=previous, next=next)
+        sounds_spectacles=sounds_spectacles, spectacle_dates=spectacle_dates,
+        start=start, stop=stop, previous=previous, next=next)
 
 
 @app.route('/vehicles/followup')
@@ -1061,9 +1083,17 @@ def vehicles_followup(year=None, month=None):
       WHERE spectacle.trigram IS NOT NULL OR NOT vehicle.hidden
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     vehicles_spectacles = cursor.fetchall()
+    cursor.execute('''
+      SELECT id, date_from, date_to, trigram
+      FROM spectacle
+      WHERE date_from BETWEEN ? AND ?
+      OR date_to BETWEEN ? AND ?
+    ''', (start, stop) * 2)
+    spectacle_dates = cursor.fetchall()
     return render_template(
         'vehicles_followup.jinja2.html',
-        vehicles_spectacles=vehicles_spectacles, start=start, stop=stop,
+        vehicles_spectacles=vehicles_spectacles,
+        spectacle_dates=spectacle_dates, start=start, stop=stop,
         previous=previous, next=next)
 
 
@@ -1124,6 +1154,66 @@ def availabilities_update(artist_id, date):
 
     cursor.connection.commit()
     return {'value': return_value}
+
+
+@app.route('/followup/<type>/<int:id>/<date>/update', methods=('POST',))
+@authenticated
+def followup_update(type, id, date):
+    if type not in ('vehicle', 'makeup', 'sound', 'artist', 'costume'):
+        return abort(404)
+
+    cursor = get_connection().cursor()
+
+    parameters = dict(request.form)
+    parameters['id'] = id
+    parameters['date'] = date
+    date = datetime.fromisoformat(date).date()
+
+    if parameters['spectacle_id']:
+        cursor.execute(f'''
+          INSERT INTO {type}_spectacle ({type}_id, spectacle_id)
+          VALUES (:id, :spectacle_id)
+        ''', parameters)
+        cursor.execute('''
+          SELECT trigram, date_from, date_to
+          FROM spectacle
+          WHERE id = :spectacle_id
+        ''', parameters)
+        spectacle = cursor.fetchone()
+        return_value = spectacle['trigram']
+        previous = (date - spectacle['date_from']).days
+        next = (spectacle['date_to'] - date).days
+        removed = []
+    else:
+        cursor.execute(f'''
+          DELETE FROM {type}_spectacle
+          WHERE {type}_id = :id
+          AND spectacle_id IN (
+            SELECT id
+            FROM spectacle
+            WHERE :date BETWEEN date_from AND date_to
+          )
+          RETURNING spectacle_id
+        ''', parameters)
+        spectacle_ids = tuple(row['spectacle_id'] for row in cursor.fetchall())
+        cursor.execute(
+            'SELECT trigram, date_from, date_to FROM spectacle WHERE id IN '
+            f'({",".join("?" * len(spectacle_ids))})',
+            tuple(spectacle_ids))
+        removed = tuple({
+            'value': spectacle['trigram'],
+            'previous': (date - spectacle['date_from']).days,
+            'next': (spectacle['date_to'] - date).days,
+        } for spectacle in cursor.fetchall())
+        return_value, previous, next = '', 0, 0
+
+    cursor.connection.commit()
+    return {
+        'value': return_value,
+        'previous': previous,
+        'next': next,
+        'removed': removed,
+    }
 
 
 # Persons

@@ -1,3 +1,5 @@
+{% import '_macros.jinja2' as macros %}
+
 {% set title = 'Suivi des artistes' %}
 
 {% extends '_layout.jinja2' %}
@@ -5,7 +7,7 @@
 {% block content %}
   <h2>{{ title }}</h2>
 
-  {{ follow_menu('artist') }}
+  {{ macros.follow_menu('artist', start) }}
 
   <ul class="time">
     <li><a class="previous" href="{{ url_for('artists_followup', year=previous.year, month=previous.month) }}">Mois précédent</a></li>

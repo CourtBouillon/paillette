@@ -1,0 +1,52 @@
+{%- macro follow_menu(active, start) -%}
+  <ul class="follow">
+    {% for key, label in (('artist', 'Artistes'), ('costume', 'Costume'), ('makeup', 'Makeup'), ('sound', 'Sound'), ('vehicle', 'Véhicules')) %}
+      <li><a class="{{ key }} {{ 'active' if key == active }}" href="{{ url_for(key + 's_followup', year=start.year, month=start.month) }}">{{ label }}</a></li>
+    {% endfor %}
+  </ul>
+{%- endmacro -%}
+
+{%- macro table_update_script() -%}
+  <script>
+    function update(select, elementId, date) {
+      oldTextContent = select.nextElementSibling.textContent
+      select.nextElementSibling.textContent = "?"
+      let data = new FormData()
+      data.append("spectacle_id", select.value)
+      fetch(
+        `/followup/vehicle/${elementId}/${date}/update`,
+        {"method": "POST", "body": data}
+      ).then(
+        response => response.json()
+      ).then(data => {
+        let currentCell = select.parentNode
+        select.nextElementSibling.textContent = `${oldTextContent} ${data.value}`
+        for (let i = 0; i < data.previous; i++) {
+          currentCell = currentCell.previousElementSibling
+          currentCell.querySelector("span").textContent += ` ${data.value}`
+        }
+        currentCell = select.parentNode
+        for (let i = 0; i < data.next; i++) {
+          currentCell = currentCell.nextElementSibling
+          currentCell.querySelector("span").textContent += ` ${data.value}`
+        }
+        data.removed.forEach(spectacle => {
+          currentCell = select.parentNode
+          let span = currentCell.querySelector("span")
+          span.textContent = span.textContent.replaceAll(spectacle.value, "").trim()
+          for (let i = 0; i < spectacle.previous; i++) {
+            currentCell = currentCell.previousElementSibling
+            span = currentCell.querySelector("span")
+            span.textContent = span.textContent.replaceAll(spectacle.value, "").trim()
+          }
+          currentCell = select.parentNode
+          for (let i = 0; i < spectacle.next; i++) {
+            currentCell = currentCell.nextElementSibling
+            span = currentCell.querySelector("span")
+            span.textContent = span.textContent.replaceAll(spectacle.value, "").trim()
+          }
+        })
+      })
+    }
+  </script>
+{%- endmacro -%}

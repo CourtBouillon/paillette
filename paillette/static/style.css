@@ -984,6 +984,7 @@ td {
 td select {
   appearance: none;
   border: none;
+  cursor: pointer;
   height: 100%;
   left: 0;
   margin: 0;
@@ -992,6 +993,10 @@ td select {
   position: absolute;
   top: 0;
   width: 100%;
+}
+
+td select option[hidden] {
+  display: none !important;
 }
 
 thead th {
@@ -1018,11 +1023,6 @@ thead th {
   z-index: 1;
 }
 
-td > a:empty::after {
-  content: "​"; /* Zero-width space */
-  display: block;
-}
-
 tbody tr {
   text-align: center;
 }
@@ -1042,4 +1042,8 @@ th {
 thead span {
   display: block;
   font-weight: bold;
+}
+
+#page-makeups_followup td:has(span:not(:empty)) {
+  background: var(--cell-background-color) !important;
 }
