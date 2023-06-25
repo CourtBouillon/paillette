@@ -49,7 +49,7 @@
                 <option value="0-">0</option>
                 <option value="1-">1</option>
                 {% for representation_date in day_representation_dates %}
-                  <option value="1-{{ representation_date.id }}">{{ representation_date.trigram }}</option>
+                  <option value="-{{ representation_date.id }}">{{ representation_date.trigram }}</option>
                 {% endfor %}
               </select>
               <span>

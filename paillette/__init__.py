@@ -866,6 +866,10 @@ def roadmap_detach_image(image_id):
 @authenticated
 def artists_followup(year=None, month=None):
     year, month, start, stop, previous, next = get_date_data(year, month)
+
+    filter = session.get('artists-followup-filter')
+    parameters = list(filter[2:]) if filter else [start, stop]
+
     cursor = get_connection().cursor()
     cursor.execute('''
       SELECT artist.id, date, available
@@ -873,7 +877,17 @@ def artists_followup(year=None, month=None):
       JOIN artist_availability
       ON artist.id = artist_availability.artist_id
       WHERE date BETWEEN ? AND ?
-    ''', (start, stop))
+      UNION
+      SELECT artist.id, date, 1
+      FROM artist
+      LEFT JOIN artist_representation_date
+      ON artist.id = artist_representation_date.artist_id
+      LEFT JOIN representation_date
+      ON
+        artist_representation_date.representation_date_id =
+        representation_date.id
+      WHERE date BETWEEN ? AND ?
+    ''', parameters * 2)
     availabilities = cursor.fetchall()
     query = '''
       SELECT
@@ -902,13 +916,12 @@ def artists_followup(year=None, month=None):
       ON representation.spectacle_id = spectacle.id
       WHERE (spectacle.trigram IS NOT NULL OR NOT artist.hidden)
     '''
-    parameters = [start, stop]
     filter = session.get('artists-followup-filter')
     if filter:
         if filter[0] == 'availabilities':
-            artists = {
+            artists = list({
                 row['id'] for row in availabilities
-                if row['available'] in filter[1]}
+                if row['available'] in filter[1]})
             query += f'AND artist.id IN ({",".join("?" * len(artists))})'
             parameters += artists
         elif filter[0] == 'spectacles':
@@ -948,11 +961,15 @@ def artists_followup_filter(year, month):
             if filter_type == 'availability':
                 session['artists-followup-filter'] = (
                     'availabilities',
-                    [int(i) for i in request.form.getlist('availabilities')])
+                    [int(i) for i in request.form.getlist('availabilities')],
+                    request.form['available_from'],
+                    request.form['available_to'])
             elif filter_type == 'spectacle':
                 session['artists-followup-filter'] = (
                     'spectacles',
-                    [int(i) for i in request.form.getlist('spectacles')])
+                    [int(i) for i in request.form.getlist('spectacles')],
+                    request.form['spectacle_from'],
+                    request.form['spectacle_to'])
             else:
                 session.pop('artists-followup-filter', None)
         except Exception:
@@ -972,7 +989,8 @@ def artists_followup_filter(year, month):
     ''', (start, stop))
     spectacles = cursor.fetchall()
     return render_template(
-        'artists_followup_filter.jinja2.html', spectacles=spectacles)
+        'artists_followup_filter.jinja2.html', spectacles=spectacles,
+        start=start, stop=stop)
 
 
 @app.route('/costumes/followup')
@@ -1207,7 +1225,7 @@ def availabilities_update(artist_id, date):
 @app.route('/followup/<type>/<int:id>/<date>/update', methods=('POST',))
 @authenticated
 def followup_update(type, id, date):
-    if type not in ('vehicle', 'makeup', 'sound', 'artist', 'costume'):
+    if type not in ('vehicle', 'makeup', 'sound', 'costume'):
         return abort(404)
 
     cursor = get_connection().cursor()

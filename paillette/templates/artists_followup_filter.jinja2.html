@@ -24,6 +24,8 @@
         <input id="available" name="availabilities" value="1" type="checkbox" {{ 'checked' if not filter or filter[0] != 'availabilities' or 1 in filter[1] }}>
         Disponible
       </label>
+      <label for="available_from">Du <input id="available_from" name="available_from" type="date" value="{{ filter[2] if filter and filter[0] == 'availabilities' else start }}" required></label>
+      <label for="available_to">Au <input id="available_to" name="available_to" type="date" value="{{ filter[3] if filter and filter[0] == 'availabilities' else stop }}" required></label>
     </fieldset>
 
     <fieldset id="spectacle" hidden>
@@ -36,7 +38,10 @@
       {% else %}
         <p>Aucun spectacle ce jour-là.</p>
       {% endfor %}
+      <label for="spectacle_from">Du <input id="spectacle_from" name="spectacle_from" type="date" value="{{ filter[2] if filter and filter[0] == 'spectacles' else start }}" required></label>
+      <label for="spectacle_to">Au <input id="spectacle_to" name="spectacle_to" type="date" value="{{ filter[3] if filter and filter[0] == 'spectacles' else stop }}" required></label>
     </fieldset>
+
     <input class="button" type="submit" value="Filtrer">
   </form>
 
