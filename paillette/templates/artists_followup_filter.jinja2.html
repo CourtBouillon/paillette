@@ -17,7 +17,7 @@
     <fieldset id="availability" hidden>
       <legend>Disponibilités</legend>
       <label for="unavailable">
-        <input id="unavailable" name="availabilities" value="0" type="checkbox" {{ 'checked' if not filter or filter[0] != 'availabilities' or 0 in filter[1] }}>
+        <input id="unavailable" name="availabilities" value="0" type="checkbox" {{ 'checked' if filter and filter[0] == 'availabilities' and 0 in filter[1] }}>
         Indisponible
       </label>
       <label for="available">

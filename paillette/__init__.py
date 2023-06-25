@@ -868,17 +868,16 @@ def artists_followup(year=None, month=None):
     year, month, start, stop, previous, next = get_date_data(year, month)
 
     filter = session.get('artists-followup-filter')
-    parameters = list(filter[2:]) if filter else [start, stop]
 
     cursor = get_connection().cursor()
     cursor.execute('''
-      SELECT artist.id, date, available
+      SELECT artist.id, date, available, available AS filter_column
       FROM artist
       JOIN artist_availability
       ON artist.id = artist_availability.artist_id
       WHERE date BETWEEN ? AND ?
       UNION
-      SELECT artist.id, date, 1
+      SELECT artist.id, date, 1 AS available, 1 as filter_column
       FROM artist
       LEFT JOIN artist_representation_date
       ON artist.id = artist_representation_date.artist_id
@@ -887,7 +886,7 @@ def artists_followup(year=None, month=None):
         artist_representation_date.representation_date_id =
         representation_date.id
       WHERE date BETWEEN ? AND ?
-    ''', parameters * 2)
+    ''', [start, stop] * 2)
     availabilities = cursor.fetchall()
     query = '''
       SELECT
@@ -916,18 +915,36 @@ def artists_followup(year=None, month=None):
       ON representation.spectacle_id = spectacle.id
       WHERE (spectacle.trigram IS NOT NULL OR NOT artist.hidden)
     '''
+    parameters = [start, stop]
     filter = session.get('artists-followup-filter')
     if filter:
         if filter[0] == 'availabilities':
-            artists = list({
-                row['id'] for row in availabilities
-                if row['available'] in filter[1]})
-            query += f'AND artist.id IN ({",".join("?" * len(artists))})'
-            parameters += artists
+            filter_list = availabilities
         elif filter[0] == 'spectacles':
-            spectacles = filter[1] or (0,)
-            query += f'AND spectacle.id IN ({",".join("?" * len(spectacles))})'
-            parameters += spectacles
+            cursor.execute('''
+              SELECT artist.id AS id, date, spectacle.id AS filter_column
+              FROM artist
+              LEFT JOIN artist_representation_date
+              ON artist.id = artist_representation_date.artist_id
+              LEFT JOIN representation_date
+              ON
+                artist_representation_date.representation_date_id =
+                representation_date.id
+              LEFT JOIN representation
+              ON representation_date.representation_id = representation.id
+              LEFT JOIN spectacle
+              ON representation.spectacle_id = spectacle.id
+              WHERE date BETWEEN ? AND ?
+            ''', [start, stop])
+            filter_list = cursor.fetchall()
+        filter_start = datetime.fromisoformat(filter[2]).date()
+        filter_stop = datetime.fromisoformat(filter[3]).date()
+        artists = list({
+            row['id'] for row in filter_list
+            if row['filter_column'] in filter[1]
+            and filter_start <= row['date'] <= filter_stop}) or (0,)
+        query += f'AND artist.id IN ({",".join("?" * len(artists))})'
+        parameters += artists
     cursor.execute(query, parameters)
     artists_spectacles = cursor.fetchall()
     cursor.execute('''

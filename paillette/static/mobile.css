@@ -50,9 +50,9 @@
   }
 
   .actions {
-    bottom: 3em;
+    bottom: 3rem;
     flex-direction: column;
-    right: 0;
+    right: 0.5rem;
     top: auto;
   }
   .follow *::before {
@@ -106,8 +106,8 @@
   #page-spectacle main > dl:first-of-type {
     font-size: 1.5em;
   }
-  #page-spectacle main > dl:first-of-type dd {
-    line-height: 2;
+  #page-spectacle main > dl:first-of-type > * {
+    line-height: 1.5;
   }
   #page-spectacle main > dl + dl {
     columns: 1;

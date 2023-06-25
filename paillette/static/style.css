@@ -601,10 +601,14 @@ button::before {
 /* Actions */
 
 .actions {
+  background: white;
   display: flex;
+  font-size: 2em;
+  margin: 0;
+  padding-left: 0.5em;
   position: fixed;
-  right: 1em;
-  top: 4em;
+  right: 1rem;
+  top: 5rem;
 }
 
 /* Follow & Time */
