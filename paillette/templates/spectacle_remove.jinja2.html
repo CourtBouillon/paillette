@@ -1,0 +1,23 @@
+{% set title = 'Supprimer un spectacle' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <p>
+    Voulez-vous réellement supprimer le spectacle à
+    <strong>
+      {{ spectacle.place }} ({{ spectacle.event }}),
+      {{ (spectacle.date_from, spectacle.date_to) | date_range }}
+    </strong> ?
+  </p>
+
+  <p>
+    <strong>Cette action ne peut pas être annulée.</strong>
+  </p>
+
+  <form method="post">
+    <input class="button" type="submit" value="Supprimer">
+  </form>
+{% endblock %}

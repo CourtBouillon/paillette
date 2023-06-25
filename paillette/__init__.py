@@ -678,6 +678,54 @@ def spectacle_update(spectacle_id):
         **data)
 
 
+@app.route('/spectacle/delete/<int:spectacle_id>', methods=('GET', 'POST'))
+@authenticated
+def spectacle_remove(spectacle_id):
+    cursor = get_connection().cursor()
+    if request.method == 'POST':
+        cursor.execute('''
+          DELETE FROM spectacle
+          WHERE id = :spectacle_id
+        ''', (spectacle_id,))
+        for table in ('sound', 'makeup', 'costume', 'vehicle'):
+            cursor.execute(f'''
+              DELETE FROM {table}_spectacle
+              WHERE spectacle_id = :spectacle_id
+            ''', (spectacle_id,))
+        cursor.execute('''
+          SELECT representation_date.id
+          FROM representation
+          JOIN representation_date
+          ON representation.id = representation_date.representation_id
+          WHERE spectacle_id = :spectacle_id
+        ''', (spectacle_id,))
+        representation_date_ids = tuple(row['id'] for row in cursor.fetchall())
+        cursor.execute(f'''
+          DELETE FROM artist_representation_date
+          WHERE representation_date_id
+          IN ({",".join("?" * len(representation_date_ids))})
+        ''', representation_date_ids)
+        cursor.execute(f'''
+          DELETE FROM representation_date
+          WHERE id IN ({",".join("?" * len(representation_date_ids))})
+        ''', representation_date_ids)
+        cursor.execute('''
+          DELETE FROM representation
+          WHERE spectacle_id = :spectacle_id
+        ''', (spectacle_id,))
+        cursor.connection.commit()
+        flash('Le spectacle a été supprimé.')
+        return redirect(url_for('index'))
+
+    cursor.execute('''
+      SELECT place, event, date_from, date_to
+      FROM spectacle
+      WHERE id = :spectacle_id
+    ''', (spectacle_id,))
+    spectacle = cursor.fetchone()
+    return render_template('spectacle_remove.jinja2.html', spectacle=spectacle)
+
+
 # Roadmaps
 @app.route('/roadmap/<int:spectacle_id>')
 @authenticated

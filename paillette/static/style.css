@@ -390,7 +390,7 @@ input[type="checkbox"] {
 }
 
 label,
-#page-spectacles section > dl dt,
+#page-spectacles main section > dl dt,
 #page-spectacle dl:nth-of-type(2) dt {
   border-bottom: 5px solid;
   border-image-slice: 0 0 7 0;
@@ -522,6 +522,7 @@ button::before {
 .next,
 .overview,
 .previous,
+.remove,
 .send,
 .show,
 .sound,
@@ -570,6 +571,10 @@ button::before {
 .previous::before {
   content: "\f104";
   padding-left: 0.5em;
+}
+
+.remove::before {
+  content: "\f1f8";
 }
 
 .send::before {
@@ -771,7 +776,7 @@ button::before {
   display: none;
 }
 
-#page-spectacles section {
+#page-spectacles main section {
   border-bottom: 2px solid var(--pink-opacity);
   display: flex;
   align-items: center;
@@ -779,7 +784,12 @@ button::before {
   width: 100%;
 }
 
-#page-spectacles section a {
+#page-spectacles main section ::before {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+#page-spectacles main section a {
   background: var(--pink-opacity);
   color: var(--grey);
   font-size: 1.2em;
@@ -788,12 +798,12 @@ button::before {
   width: 25%;
 }
 
-#page-spectacles section a:hover {
+#page-spectacles main section a:hover {
   background: var(--pink);
   text-decoration: none;
 }
 
-#page-spectacles section > dl {
+#page-spectacles main section > dl {
   margin: 0 0 0 2em;
   width: 75%;
 }
@@ -818,11 +828,6 @@ button::before {
   float: right;
   margin: 0;
   width: 85%;
-}
-
-#page-spectacles section ::before {
-  font-size: 1.2rem;
-  margin: 0;
 }
 
 .date::before {
