@@ -31,6 +31,9 @@ app.config.update(
     SMTP_LOGIN=None,
     SMTP_PASSWORD=None,
     SMTP_FROM='sender@example.com',
+    GIT_VERSION=(
+        Path(app.root_path).parent / '.git' / 'refs' / 'heads' / 'main'
+    ).read_text().strip()[:7],
 )
 app.config.from_envvar('PAILLETTE_CONFIG', silent=True)
 
@@ -234,6 +237,11 @@ def date_simple(date_or_string):
     if isinstance(date_or_string, str):
         date_or_string = date.fromisoformat(date_or_string)
     return date_or_string.strftime('%d/%m')
+
+
+@app.template_filter('version')
+def version(url):
+    return f'{url}?{app.config["GIT_VERSION"]}'
 
 
 # Common
