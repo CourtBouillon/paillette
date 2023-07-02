@@ -916,6 +916,7 @@ button::before {
 #add-images,
 #images li,
 #recipients li {
+  align-items: center;
   display: flex;
   width: 100%;
 }
