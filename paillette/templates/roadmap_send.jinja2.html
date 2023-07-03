@@ -59,7 +59,7 @@
   <form method="post" enctype="multipart/form-data" action="{{ url_for('roadmap_attach_image', spectacle_id=spectacle.id) }}">
     <label for="new-images">Nouvelle image</label>
     <div id="add-images">
-      <input id="new-images" name="images" type="file" accept="image/png, image/jpeg" multiple>
+      <input id="new-images" name="images" type="file" accept="image/png, image/jpeg, application/pdf" multiple>
 
       <input class="button" type="submit" value="Ajouter">
     </div>

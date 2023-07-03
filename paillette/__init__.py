@@ -10,6 +10,7 @@ from functools import wraps
 from locale import LC_ALL, setlocale
 from pathlib import Path
 from smtplib import SMTP_SSL
+from subprocess import PIPE, run
 from uuid import uuid4
 
 from flask import (
@@ -20,6 +21,9 @@ from markupsafe import Markup
 from PIL import Image
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
+
+PNG_MAGIC_NUMBER = b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0a'
+
 
 setlocale(LC_ALL, 'fr_FR.utf8')
 
@@ -837,14 +841,28 @@ def roadmap_attach_image(spectacle_id):
                 continue
             folder = Path(app.static_folder) / 'roadmap_images'
             folder.mkdir(exist_ok=True)
-            image.save(folder / filename)
-            with Image.open(folder / filename) as image:
-                image.thumbnail((1000, 1000))
-                image.save(folder / filename, optimize=True)
-            cursor.execute('''
-              INSERT INTO spectacle_image (spectacle_id, filename)
-              VALUES (?, ?)
-            ''', (spectacle_id, filename))
+            if filename.lower().endswith('.pdf'):
+                command = [
+                    'gs', '-q', '-dNOPAUSE', '-dBATCH', '-sDEVICE=png16m',
+                    '-sOutputFile=-', '-']
+                input = image.stream.read()
+                pngs = run(command, input=input, stdout=PIPE).stdout
+                sub_images = []
+                for i, png in enumerate(pngs[8:].split(PNG_MAGIC_NUMBER)):
+                    filename = f'{filename[:-4]}-page{i}.png'
+                    (folder / filename).write_bytes(PNG_MAGIC_NUMBER + png)
+                    sub_images.append(filename)
+            else:
+                image.save(folder / filename)
+                sub_images = [filename]
+            for filename in sub_images:
+                with Image.open(folder / filename) as image:
+                    image.thumbnail((1000, 1000))
+                    image.save(folder / filename, optimize=True)
+                cursor.execute('''
+                  INSERT INTO spectacle_image (spectacle_id, filename)
+                  VALUES (?, ?)
+                ''', (spectacle_id, filename))
         cursor.connection.commit()
         flash('Les images ont été ajoutées.')
     return redirect(url_for('roadmap_send', spectacle_id=spectacle_id))
