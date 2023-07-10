@@ -33,7 +33,7 @@
             {% set day = start.replace(day=i) %}
             {% set day_spectacle_dates = spectacle_dates | selectattr('date_from', 'le', day) | selectattr('date_to', 'ge', day) | list %}
             <td>
-              <select onChange="update(this, {{ sound.sound_id }}, '{{ day }}')">
+              <select onChange="update(this, 'sound', {{ sound.sound_id }}, '{{ day }}')">
                 <option hidden></option>
                 <option value=""></option>
                 {% for spectacle_date in day_spectacle_dates %}

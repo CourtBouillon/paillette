@@ -8,13 +8,13 @@
 
 {%- macro table_update_script() -%}
   <script>
-    function update(select, elementId, date) {
+    function update(select, elementType, elementId, date) {
       oldTextContent = select.nextElementSibling.textContent
       select.nextElementSibling.textContent = "?"
       let data = new FormData()
       data.append("spectacle_id", select.value)
       fetch(
-        `/followup/vehicle/${elementId}/${date}/update`,
+        `/followup/${elementType}/${elementId}/${date}/update`,
         {"method": "POST", "body": data}
       ).then(
         response => response.json()
