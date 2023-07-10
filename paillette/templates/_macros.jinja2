@@ -8,6 +8,12 @@
 
 {%- macro table_update_script() -%}
   <script>
+    function updateCellStyling(cell) {
+      /* Work around WebKit bug for cell background */
+      cell.setAttribute("style", cell.getAttribute("style") + " ");
+      cell.setAttribute("style", cell.getAttribute("style").trim());
+    }
+
     function update(select, elementType, elementId, date) {
       oldTextContent = select.nextElementSibling.textContent
       select.nextElementSibling.textContent = "?"
@@ -20,15 +26,19 @@
         response => response.json()
       ).then(data => {
         let currentCell = select.parentNode
+        updateCellStyling(currentCell);
+
         select.nextElementSibling.textContent = `${oldTextContent} ${data.value}`
         for (let i = 0; i < data.previous; i++) {
           currentCell = currentCell.previousElementSibling
           currentCell.querySelector("span").textContent += ` ${data.value}`
+          updateCellStyling(currentCell);
         }
         currentCell = select.parentNode
         for (let i = 0; i < data.next; i++) {
           currentCell = currentCell.nextElementSibling
           currentCell.querySelector("span").textContent += ` ${data.value}`
+          updateCellStyling(currentCell);
         }
         data.removed.forEach(spectacle => {
           currentCell = select.parentNode
@@ -38,12 +48,14 @@
             currentCell = currentCell.previousElementSibling
             span = currentCell.querySelector("span")
             span.textContent = span.textContent.replaceAll(spectacle.value, "").trim()
+            updateCellStyling(currentCell);
           }
           currentCell = select.parentNode
           for (let i = 0; i < spectacle.next; i++) {
             currentCell = currentCell.nextElementSibling
             span = currentCell.querySelector("span")
             span.textContent = span.textContent.replaceAll(spectacle.value, "").trim()
+            updateCellStyling(currentCell);
           }
         })
       })
