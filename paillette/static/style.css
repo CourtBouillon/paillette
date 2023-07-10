@@ -1058,3 +1058,8 @@ thead span {
 #page-makeups_followup td:has(span:not(:empty)) {
   background: var(--cell-background-color) !important;
 }
+
+#page-sounds_followup tbody th {
+  min-width: 20vw;
+  white-space: normal;
+}
