@@ -161,7 +161,7 @@ def get_spectacle_data(spectacle_id):
     images = cursor.fetchall()
     return {
         'representations': representations,
-        'makups': makeups,
+        'makeups': makeups,
         'sounds': sounds,
         'vehicles': vehicles,
         'costumes': costumes,
