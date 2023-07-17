@@ -1059,6 +1059,14 @@ thead span {
   background: var(--cell-background-color) !important;
 }
 
+/* For Firefox */
+#page-makeups_followup span:not(:empty) {
+  background: var(--cell-background-color) !important;
+  display: block;
+  margin: -0.3em;
+  padding: 0.3em;
+}
+
 #page-sounds_followup tbody th {
   min-width: 20vw;
   white-space: normal;
