@@ -49,11 +49,11 @@
       <dd>Pas de matériel de son</dd>
     {% endfor %}
 
-    <dt>Boîtes de maquillage</dt>
-    {% for makeup in makeups %}
-      <dd>{{ makeup.name }}</dd>
+    <dt>Véhicules</dt>
+    {% for vehicle in vehicles %}
+      <dd>{{ vehicle.name }}</dd>
     {% else %}
-      <dd>—</dd>
+      <dd>Pas de véhicule</dd>
     {% endfor %}
 
     <dt>Costumes</dt>
@@ -69,11 +69,11 @@
     <dt>Retour le</dt>
     <dd>{{ spectacle.date_to | date_simple }}</dd>
 
-    <dt>Véhicules</dt>
-    {% for vehicle in vehicles %}
-      <dd>{{ vehicle.name }}</dd>
+    <dt>Boîtes de maquillage</dt>
+    {% for makeup in makeups %}
+      <dd>{{ makeup.name }}</dd>
     {% else %}
-      <dd>Pas de véhicule</dd>
+      <dd>—</dd>
     {% endfor %}
 
     {% if representations | length >= 2 %}
