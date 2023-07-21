@@ -844,7 +844,7 @@ def roadmap_attach_image(spectacle_id):
             if filename.lower().endswith('.pdf'):
                 command = [
                     'gs', '-q', '-dNOPAUSE', '-dBATCH', '-sDEVICE=png16m',
-                    '-sOutputFile=-', '-']
+                    '-r480.0', '-sOutputFile=-', '-']
                 input = image.stream.read()
                 pngs = run(command, input=input, stdout=PIPE).stdout
                 sub_images = []
