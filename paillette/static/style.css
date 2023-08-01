@@ -533,7 +533,7 @@ button::before {
 }
 
 .artist::before {
-  content: "\f2c0";
+  content: "👩";
 }
 
 .configuration::before {
@@ -541,7 +541,7 @@ button::before {
 }
 
 .costume::before {
-  content: "\f006";
+  content: "💃";
 }
 
 .create::before {
@@ -557,7 +557,7 @@ button::before {
 }
 
 .makeup::before {
-  content: "\f1fc";
+  content: "💄";
 }
 
 .next::before {
@@ -587,7 +587,7 @@ button::before {
 }
 
 .sound::before {
-  content: "\f001";
+  content: "🎵";
 }
 
 .update::before {
@@ -595,6 +595,11 @@ button::before {
 }
 
 .vehicle::before {
+  content: "🚗";
+/*  content: "\f0d1";*/
+}
+
+#page-spectacles .vehicle::before {
   content: "\f0d1";
 }
 
