@@ -1075,6 +1075,7 @@ thead span {
   padding: 0.3em;
 }
 
+#page-vehicles_followup tbody th,
 #page-sounds_followup tbody th {
   min-width: 20vw;
   white-space: normal;
