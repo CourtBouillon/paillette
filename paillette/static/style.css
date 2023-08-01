@@ -782,6 +782,10 @@ button::before {
 
 /* Spectacles */
 
+#page-spectacles main {
+  font-size: 9pt;
+}
+
 #page-spectacles h3 {
   display: none;
 }
