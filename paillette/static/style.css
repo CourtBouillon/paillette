@@ -818,6 +818,7 @@ button::before {
 }
 
 #page-spectacles main section > dl {
+  columns: 2;
   margin: 0 0 0 2em;
   width: 75%;
 }
