@@ -134,4 +134,8 @@
   {
     width: auto;
   }
+
+  #images input {
+    width: auto;
+  }
 }
