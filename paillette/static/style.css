@@ -836,13 +836,13 @@ button::before {
   clear: both;
   float: left;
   text-align: center;
-  width: 10%;
+  width: 2rem;
 }
 
 #page-spectacles a dl dd {
   float: right;
-  margin: 0;
-  width: 85%;
+  margin: 2pt 0 0;
+  width: calc(100% - 2rem);
 }
 
 .date::before {
