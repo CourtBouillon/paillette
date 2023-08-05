@@ -782,19 +782,15 @@ button::before {
 
 /* Spectacles */
 
-#page-spectacles main {
-  font-size: 9pt;
-}
-
 #page-spectacles h3 {
   display: none;
 }
 
 #page-spectacles main section {
-  border-bottom: 2px solid var(--pink-opacity);
-  display: flex;
   align-items: center;
-  padding: 1em 0;
+  display: flex;
+  font-size: 10pt;
+  padding: 0.5em 0;
   width: 100%;
 }
 
@@ -806,7 +802,6 @@ button::before {
 #page-spectacles main section a {
   background: var(--pink-opacity);
   color: var(--grey);
-  font-size: 1.2em;
   padding: 0.5em;
   transition: 0.5s;
   width: 25%;
