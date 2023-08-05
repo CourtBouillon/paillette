@@ -393,11 +393,11 @@ input[type="checkbox"] {
 label,
 #page-spectacles main section > dl dt,
 #page-spectacle dl:nth-of-type(2) dt {
-  border-bottom: 3px solid;
+  border-bottom: 2px solid;
   border-image-slice: 0 0 7 0;
   border-image-source: linear-gradient(to right, var(--pink), 1.5em, var(--white), 0%, transparent);
   color: var(--grey);
-  margin: 1em 0 0 0;
+  margin: 1em 0 0.2em 0;
   padding-bottom: 0.15em;
   width: 100%;
 }
