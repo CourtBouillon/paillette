@@ -425,7 +425,7 @@ def spectacles(year=None, month=None):
       WHERE date_from BETWEEN ? AND ?
       OR date_to BETWEEN ? AND ?
       GROUP BY spectacle.id
-      ORDER BY date_from
+      ORDER BY date_from, date_to, place
     ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
     spectacles = cursor.fetchall()
     return render_template(
