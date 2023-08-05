@@ -87,6 +87,8 @@ ul {
 }
 
 dd {
+  break-before: avoid;
+  break-inside: avoid;
   margin: 0;
 }
 
@@ -397,8 +399,8 @@ label,
   border-image-slice: 0 0 7 0;
   border-image-source: linear-gradient(to right, var(--pink), 1.5em, var(--white), 0%, transparent);
   color: var(--grey);
-  margin: 1em 0 0.2em 0;
-  padding-bottom: 0.15em;
+  margin-bottom: 0.2em;
+  padding: 1em 0 0.15em 0;
   width: 100%;
 }
 
@@ -814,7 +816,7 @@ button::before {
 
 #page-spectacles main section > dl {
   columns: 2;
-  margin: 0 0 0 2em;
+  margin: -1em 0 0 2em;
   width: 75%;
 }
 
@@ -886,11 +888,6 @@ button::before {
 
 #page-spectacle main > dl + dl {
   columns: 2;
-}
-
-#page-spectacle dd {
-  break-before: avoid;
-  break-inside: avoid;
 }
 
 #page-spectacle dl dl {

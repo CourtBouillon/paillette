@@ -405,6 +405,8 @@ def spectacles(year=None, month=None):
         spectacle.*,
         MIN(date) AS first_date,
         MAX(date) AS last_date,
+        GROUP_CONCAT(DISTINCT replace(vehicle.name, ',', ' ')) AS vehicles,
+        GROUP_CONCAT(DISTINCT replace(makeup.name, ',', ' ')) AS makeups,
         GROUP_CONCAT(
           DISTINCT replace(representation.name, ',', ' ')) AS representations
       FROM spectacle
@@ -412,6 +414,14 @@ def spectacles(year=None, month=None):
       ON spectacle.id = representation.spectacle_id
       LEFT JOIN representation_date
       ON representation.id = representation_date.representation_id
+      LEFT JOIN vehicle_spectacle
+      ON spectacle.id = vehicle_spectacle.spectacle_id
+      LEFT JOIN vehicle
+      ON vehicle_spectacle.vehicle_id = vehicle.id
+      LEFT JOIN makeup_spectacle
+      ON spectacle.id = makeup_spectacle.spectacle_id
+      LEFT JOIN makeup
+      ON makeup_spectacle.makeup_id = makeup.id
       WHERE date_from BETWEEN ? AND ?
       OR date_to BETWEEN ? AND ?
       GROUP BY spectacle.id

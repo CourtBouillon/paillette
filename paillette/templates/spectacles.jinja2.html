@@ -40,14 +40,15 @@
       <dl>
         <dt>Évènement</dt>
         <dd>{{ spectacle.event }}</dd>
+
         <dt>Spectacles</dt>
-        {% if spectacle.representations %}
-          {% for representation in spectacle.representations.split(',') %}
-            <dd>{{ representation }}</dd>
-          {% endfor %}
-        {% else %}
-          <dd>Pas de spectacle</dd>
-        {% endif %}
+        <dd>{{ (spectacle.representations or 'Pas de spectacle').replace(',', ', ') }}</dd>
+
+        <dt>Boîtes de maquillage</dt>
+        <dd>{{ (spectacle.makeups or 'Pas de boîte de maquillage').replace(',', ', ') }}</dd>
+
+        <dt>Véhicules</dt>
+        <dd>{{ (spectacle.vehicles or 'Pas de véhicule').replace(',', ', ') }}</dd>
       </dl>
     </section>
   {% else %}
