@@ -948,6 +948,7 @@ button::before {
 #add-images .button,
 #images .button {
   float: initial;
+  width: auto;
 }
 
 #add-images {
