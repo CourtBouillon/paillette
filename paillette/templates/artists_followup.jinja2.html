@@ -42,18 +42,25 @@
           {% for i in range(1, stop.day + 1) %}
             {% set day = start.replace(day=i) %}
             {% set day_representation_dates = representation_dates | selectattr('date', 'eq', day) | list %}
+            {% set day_spectacles = spectacles | selectattr('date', 'equalto', day) | list %}
             <td>
-              <select onChange="update(this, {{ artist.artist_id }}, '{{ day }}')">
+              <select onChange="update(this, {{ artist.artist_id }}, '{{ day }}')" data-artist="{{ artist.artist_id }}" data-day="{{ day }}">
                 <option hidden></option>
                 <option value="-"></option>
-                <option value="0-">0</option>
-                <option value="1-">1</option>
+                <option {{ "selected" if not day_spectacles and (availabilities | selectattr('date', 'equalto', day) | selectattr('id', 'equalto', artist.artist_id) | selectattr('available', 'equalto', False)) | list }} value="0-">
+                  0
+                </option>
+                <option {{ "selected" if not day_spectacles and (availabilities | selectattr('date', 'equalto', day) | selectattr('id', 'equalto', artist.artist_id) | selectattr('available', 'equalto', True)) | list }} value="1-">
+                  1
+                </option>
                 {% for representation_date in day_representation_dates %}
-                  <option value="-{{ representation_date.id }}">{{ representation_date.trigram }}</option>
+                  <option value="-{{ representation_date.id }}" {{ "selected" if (spectacles | selectattr('date', 'equalto', day) | selectattr('trigram', 'equalto', representation_date.trigram) | list) }}>
+                    {{ representation_date.trigram }}
+                  </option>
                 {% endfor %}
               </select>
               <span>
-                {%- for spectacle in spectacles | selectattr('date', 'equalto', day) %}
+                {%- for spectacle in day_spectacles %}
                   {{ spectacle.trigram }}
                 {%- else -%}
                   {%- for availability in availabilities | selectattr('date', 'equalto', day) | selectattr('id', 'equalto', artist.artist_id) %}
@@ -77,13 +84,15 @@
       )
     }
 
-    function update(select, artistId, date) {
+    function update(select) {
+      artistId = select.getAttribute("data-artist")
+      day = select.getAttribute("data-day")
       select.nextElementSibling.textContent = '?'
       let data = new FormData()
       data.append("available", select.value.split('-')[0])
       data.append("representation_date_id", select.value.split('-')[1])
       fetch(
-        `/availabilities/${artistId}/${date}/update`,
+        `/availabilities/${artistId}/${day}/update`,
         {"method": "POST", "body": data}
       ).then(
         response => response.json()
@@ -102,11 +111,42 @@
       )
     }
 
+    function fillSelect(select) {
+      let values = [...select.options].reduce((array, option) => (
+        {...array, [option.text]: option.value}), {}
+      )
+      previousTd = select.parentElement.previousElementSibling
+      if (previousTd.tagName != "TD") return null
+      previousSelect = previousTd.querySelector("select")
+      if (previousSelect.value && previousSelect.value != "-") {
+        value = previousSelect.options[previousSelect.selectedIndex].text
+      } else {
+        value = fillSelect(previousSelect)
+      }
+      if (value && Object.keys(values).includes(value)) {
+        select.value = values[value]
+        update(select)
+        return value
+      }
+      return null
+    }
+
+    function fillRow(event) {
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault()
+        fillSelect(event.target)
+      }
+    }
+
     document.querySelectorAll("tbody .count").forEach(span => {
       span.textContent = getCount(span.closest("tr").querySelectorAll("td"))
     })
     document.querySelectorAll("thead .count").forEach((span, index) => {
       span.textContent = getCount(span.closest("table").querySelectorAll(`td:nth-of-type(${index + 1})`))
+    })
+
+    document.querySelectorAll("select").forEach(select => {
+      select.addEventListener("mousedown", fillRow, true)
     })
   </script>
 {% endblock %}
