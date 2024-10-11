@@ -349,7 +349,7 @@ def hide(type, id):
     if request.method == 'POST':
         cursor.execute(f'UPDATE {type} SET hidden = TRUE WHERE id = ?', (id,))
         cursor.connection.commit()
-        flash('L’élément a été caché.')
+        flash('L’élément a été supprimé.')
         return redirect(url_for(f'{type}s'))
 
     if type == 'artist':
@@ -364,33 +364,6 @@ def hide(type, id):
         cursor.execute(f'SELECT * FROM {type} WHERE id = ?', (id,))
     element = cursor.fetchone() or abort(404)
     return render_template('hide.jinja2.html', element=element)
-
-
-@app.route('/<type>/<int:id>/show', methods=('GET', 'POST'))
-@authenticated
-def show(type, id):
-    if type not in ('vehicle', 'makeup', 'sound', 'artist', 'costume'):
-        return abort(404)
-
-    cursor = get_connection().cursor()
-    if request.method == 'POST':
-        cursor.execute(f'UPDATE {type} SET hidden = FALSE WHERE id = ?', (id,))
-        cursor.connection.commit()
-        flash('L’élément n’est plus caché.')
-        return redirect(url_for(f'{type}s'))
-
-    if type == 'artist':
-        cursor.execute('''
-          SELECT name
-          FROM person
-          JOIN artist
-          ON person.id = artist.person_id
-          WHERE artist.id = ?
-        ''', (id,))
-    else:
-        cursor.execute(f'SELECT * FROM {type} WHERE id = ?', (id,))
-    element = cursor.fetchone() or abort(404)
-    return render_template('show.jinja2.html', element=element)
 
 
 # Spectacles

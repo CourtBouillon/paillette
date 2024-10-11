@@ -9,26 +9,13 @@
     <li><a class="create" href="{{ url_for('artist_create') }}">Ajouter un artiste</a></li>
   </ul>
 
-  {% for hidden, artists in artists | groupby('hidden') | sort %}
-    {% if hidden %}
-      <details>
-        <summary>Artistes cachés</summary>
-    {% endif %}
-    <dl>
-      {% for artist in artists %}
+  <dl>
+    {% for artist in artists | rejectattr('hidden') | sort(attribute='name') %}
       <div>
         <dt{% if artist.color %} style="--data-color: {{ artist.color }}"{% endif %}><a href="{{ url_for('artist_update', artist_id=artist.id) }}">{{ artist.name }}</a></dt>
         <dd><a class="update" href="{{ url_for('artist_update', artist_id=artist.id) }}">Éditer</a></dd>
-        {% if hidden %}
-          <dd><a class="show" href="{{ url_for('show', type='artist', id=artist.id) }}">Montrer</a></dd>
-        {% else %}
-          <dd><a class="hide" href="{{ url_for('hide', type='artist', id=artist.id) }}">Cacher</a></dd>
-        {% endif %}
+        <dd><a class="remove" href="{{ url_for('hide', type='artist', id=artist.id) }}">Supprimer</a></dd>
       </div>
-      {% endfor %}
-    </dl>
-    {% if hidden %}
-      </details>
-    {% endif %}
-  {% endfor %}
+    {% endfor %}
+  </dl>
 {% endblock %}

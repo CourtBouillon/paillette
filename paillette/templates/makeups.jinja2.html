@@ -9,26 +9,13 @@
     <li><a class="create" href="{{ url_for('makeup_create') }}">Ajouter une boîte de maquillage</a></li>
   </ul>
 
-  {% for hidden, makeups in makeups | groupby('hidden') | sort %}
-    {% if hidden %}
-      <details>
-        <summary>Boîtes de maquillage cachés</summary>
-    {% endif %}
-    <dl>
-      {% for makeup in makeups %}
+  <dl>
+    {% for makeup in makeups | rejectattr('hidden') | sort(attribute='name') %}
       <div>
         <dt{% if makeup.color %} style="--data-color: {{ makeup.color }}"{% endif %}><a href="{{ url_for('makeup_update', makeup_id=makeup.id) }}">{{ makeup.name }}</a></dt>
         <dd><a class="update" href="{{ url_for('makeup_update', makeup_id=makeup.id) }}">Éditer</a></dd>
-        {% if hidden %}
-          <dd><a class="show" href="{{ url_for('show', type='makeup', id=makeup.id) }}">Montrer</a></dd>
-        {% else %}
-          <dd><a class="hide" href="{{ url_for('hide', type='makeup', id=makeup.id) }}">Cacher</a></dd>
-        {% endif %}
+        <dd><a class="remove" href="{{ url_for('hide', type='makeup', id=makeup.id) }}">Supprimer</a></dd>
       </div>
-      {% endfor %}
-    </dl>
-    {% if hidden %}
-      </details>
-    {% endif %}
-  {% endfor %}
+    {% endfor %}
+  </dl>
 {% endblock %}

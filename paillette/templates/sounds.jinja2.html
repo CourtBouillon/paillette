@@ -9,27 +9,13 @@
     <li><a class="create" href="{{ url_for('sound_create') }}">Ajouter un matériel de son</a></li>
   </ul>
 
-  {% for hidden, sounds in sounds | groupby('hidden') | sort %}
-    {% if hidden %}
-      <details>
-        <summary>Matériels de son cachés</summary>
-    {% endif %}
-    <dl>
-      <dl>
-        {% for sound in sounds %}
-        <div>
-          <dt{% if sound.color %} style="--data-color: {{ sound.color }}"{% endif %}><a href="{{ url_for('sound_update', sound_id=sound.id) }}">{{ sound.name }}</a></dt>
-          <dd><a class="update" href="{{ url_for('sound_update', sound_id=sound.id) }}">Éditer</a></dd>
-          {% if hidden %}
-            <dd><a class="show" href="{{ url_for('show', type='sound', id=sound.id) }}">Montrer</a></dd>
-          {% else %}
-            <dd><a class="hide" href="{{ url_for('hide', type='sound', id=sound.id) }}">Cacher</a></dd>
-          {% endif %}
-        </div>
-        {% endfor %}
-      </dl>
-    {% if hidden %}
-      </details>
-    {% endif %}
-  {% endfor %}
+  <dl>
+    {% for sound in sounds | rejectattr('hidden') | sort(attribute='name') %}
+      <div>
+        <dt{% if sound.color %} style="--data-color: {{ sound.color }}"{% endif %}><a href="{{ url_for('sound_update', sound_id=sound.id) }}">{{ sound.name }}</a></dt>
+        <dd><a class="update" href="{{ url_for('sound_update', sound_id=sound.id) }}">Éditer</a></dd>
+        <dd><a class="remove" href="{{ url_for('hide', type='sound', id=sound.id) }}">Supprimer</a></dd>
+      </div>
+    {% endfor %}
+  </dl>
 {% endblock %}
