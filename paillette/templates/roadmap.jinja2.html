@@ -123,6 +123,24 @@
     </section>
   {% endif %}
 
+  {% if cards %}
+    <section>
+    <h3>Cartes bleues</h3>
+    {% for card in cards %}
+      {{ card.name }}
+    {% endfor %}
+    </section>
+  {% endif %}
+
+  {% if beepers %}
+    <section>
+    <h3>Bips d’autoroute</h3>
+    {% for beeper in beepers %}
+      {{ beeper.name }}
+    {% endfor %}
+    </section>
+  {% endif %}
+
   <section>
     <h3>Véhicules</h3>
 

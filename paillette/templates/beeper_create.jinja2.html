@@ -1,0 +1,17 @@
+{% set title = 'Ajouter un bip d’autoroute' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <form method="post">
+    <label for="name">Nom</label>
+    <input id="name" name="name" required>
+
+    <label for"=color">Couleur</label>
+    <input id="color" name="color" type="color">
+
+    <input class="button" type="submit" value="Ajouter">
+  </form>
+{% endblock %}

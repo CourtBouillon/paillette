@@ -154,6 +154,22 @@ def get_spectacle_data(spectacle_id):
     ''', (spectacle_id,))
     costumes = cursor.fetchall()
     cursor.execute('''
+      SELECT card.*
+      FROM card
+      JOIN card_spectacle
+      ON card.id = card_spectacle.card_id
+      WHERE card_spectacle.spectacle_id = ?
+    ''', (spectacle_id,))
+    cards = cursor.fetchall()
+    cursor.execute('''
+      SELECT beeper.*
+      FROM beeper
+      JOIN beeper_spectacle
+      ON beeper.id = beeper_spectacle.beeper_id
+      WHERE beeper_spectacle.spectacle_id = ?
+    ''', (spectacle_id,))
+    beepers = cursor.fetchall()
+    cursor.execute('''
       SELECT id, filename
       FROM spectacle_image
       WHERE spectacle_id = ?
@@ -165,6 +181,8 @@ def get_spectacle_data(spectacle_id):
         'sounds': sounds,
         'vehicles': vehicles,
         'costumes': costumes,
+        'cards': cards,
+        'beepers': beepers,
         'images': images,
     }
 
@@ -342,7 +360,7 @@ def password_reset(uuid):
 @app.route('/<type>/<int:id>/hide', methods=('GET', 'POST'))
 @authenticated
 def hide(type, id):
-    if type not in ('vehicle', 'makeup', 'sound', 'artist', 'costume'):
+    if type not in ('vehicle', 'makeup', 'sound', 'artist', 'costume', 'card', 'beeper'):
         return abort(404)
 
     cursor = get_connection().cursor()
@@ -380,6 +398,8 @@ def spectacles(year=None, month=None):
         MAX(date) AS last_date,
         GROUP_CONCAT(DISTINCT replace(vehicle.name, ',', ' ')) AS vehicles,
         GROUP_CONCAT(DISTINCT replace(makeup.name, ',', ' ')) AS makeups,
+        GROUP_CONCAT(DISTINCT replace(beeper.name, ',', ' ')) AS beepers,
+        GROUP_CONCAT(DISTINCT replace(card.name, ',', ' ')) AS cards,
         GROUP_CONCAT(
           DISTINCT replace(representation.name, ',', ' ')) AS representations
       FROM spectacle
@@ -395,6 +415,14 @@ def spectacles(year=None, month=None):
       ON spectacle.id = makeup_spectacle.spectacle_id
       LEFT JOIN makeup
       ON makeup_spectacle.makeup_id = makeup.id
+      LEFT JOIN beeper_spectacle
+      ON spectacle.id = beeper_spectacle.spectacle_id
+      LEFT JOIN beeper
+      ON beeper_spectacle.beeper_id = beeper.id
+      LEFT JOIN card_spectacle
+      ON spectacle.id = card_spectacle.spectacle_id
+      LEFT JOIN card
+      ON card_spectacle.card_id = card.id
       WHERE date_from BETWEEN ? AND ?
       OR date_to BETWEEN ? AND ?
       GROUP BY spectacle.id
@@ -416,7 +444,7 @@ def spectacle(spectacle_id):
 @app.route('/spectacle/create', methods=('GET', 'POST'))
 @authenticated
 def spectacle_create():
-    tables = ('sound', 'makeup', 'costume', 'vehicle')
+    tables = ('sound', 'makeup', 'costume', 'vehicle', 'card', 'beeper')
     cursor = get_connection().cursor()
 
     if request.method == 'POST':
@@ -506,7 +534,7 @@ def spectacle_create():
 @app.route('/spectacle/<int:spectacle_id>/update', methods=('GET', 'POST'))
 @authenticated
 def spectacle_update(spectacle_id):
-    tables = ('sound', 'makeup', 'costume', 'vehicle')
+    tables = ('sound', 'makeup', 'costume', 'vehicle', 'card', 'beeper')
     cursor = get_connection().cursor()
 
     if request.method == 'POST':
@@ -621,6 +649,8 @@ def spectacle_update(spectacle_id):
         GROUP_CONCAT(DISTINCT makeup_spectacle.makeup_id) AS makeup_ids,
         GROUP_CONCAT(DISTINCT costume_spectacle.costume_id) AS costume_ids,
         GROUP_CONCAT(DISTINCT vehicle_spectacle.vehicle_id) AS vehicle_ids,
+        GROUP_CONCAT(DISTINCT beeper_spectacle.beeper_id) AS beeper_ids,
+        GROUP_CONCAT(DISTINCT card_spectacle.card_id) AS card_ids,
         GROUP_CONCAT(DISTINCT representation_date.date)
           AS representation_dates,
         GROUP_CONCAT(DISTINCT artist_representation_date.artist_id)
@@ -634,6 +664,10 @@ def spectacle_update(spectacle_id):
       ON spectacle.id = costume_spectacle.spectacle_id
       LEFT JOIN vehicle_spectacle
       ON spectacle.id = vehicle_spectacle.spectacle_id
+      LEFT JOIN beeper_spectacle
+      ON spectacle.id = beeper_spectacle.spectacle_id
+      LEFT JOIN card_spectacle
+      ON spectacle.id = card_spectacle.spectacle_id
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id
       LEFT JOIN representation_date
@@ -1189,6 +1223,92 @@ def vehicles_followup(year=None, month=None):
         previous=previous, next=next)
 
 
+@app.route('/cards/followup')
+@app.route('/cards/followup/<int:year>/<int:month>')
+@authenticated
+def cards_followup(year=None, month=None):
+    year, month, start, stop, previous, next = get_date_data(year, month)
+    cursor = get_connection().cursor()
+    cursor.execute('''
+      SELECT
+        card.id AS card_id,
+        card.name || '-' || card.id AS grouper,
+        card.name,
+        card.color,
+        spectacle.trigram,
+        spectacle.date_from,
+        spectacle.date_to
+      FROM card
+      LEFT JOIN card_spectacle
+      ON card.id = card_spectacle.card_id
+      LEFT JOIN (
+        SELECT *
+        FROM spectacle
+        WHERE (date_from IS NULL AND date_to IS NULL)
+        OR date_from BETWEEN ? AND ?
+        OR date_to BETWEEN ? AND ?
+      ) AS spectacle
+      ON card_spectacle.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT card.hidden
+    ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
+    cards_spectacles = cursor.fetchall()
+    cursor.execute('''
+      SELECT id, date_from, date_to, trigram
+      FROM spectacle
+      WHERE date_from BETWEEN ? AND ?
+      OR date_to BETWEEN ? AND ?
+    ''', (start, stop) * 2)
+    spectacle_dates = cursor.fetchall()
+    return render_template(
+        'cards_followup.jinja2.html',
+        cards_spectacles=cards_spectacles,
+        spectacle_dates=spectacle_dates, start=start, stop=stop,
+        previous=previous, next=next)
+
+
+@app.route('/beepers/followup')
+@app.route('/beepers/followup/<int:year>/<int:month>')
+@authenticated
+def beepers_followup(year=None, month=None):
+    year, month, start, stop, previous, next = get_date_data(year, month)
+    cursor = get_connection().cursor()
+    cursor.execute('''
+      SELECT
+        beeper.id AS beeper_id,
+        beeper.name || '-' || beeper.id AS grouper,
+        beeper.name,
+        beeper.color,
+        spectacle.trigram,
+        spectacle.date_from,
+        spectacle.date_to
+      FROM beeper
+      LEFT JOIN beeper_spectacle
+      ON beeper.id = beeper_spectacle.beeper_id
+      LEFT JOIN (
+        SELECT *
+        FROM spectacle
+        WHERE (date_from IS NULL AND date_to IS NULL)
+        OR date_from BETWEEN ? AND ?
+        OR date_to BETWEEN ? AND ?
+      ) AS spectacle
+      ON beeper_spectacle.spectacle_id = spectacle.id
+      WHERE spectacle.trigram IS NOT NULL OR NOT beeper.hidden
+    ''', (start, stop) * 2)  # Assume that spectacles last less than 1 month
+    beepers_spectacles = cursor.fetchall()
+    cursor.execute('''
+      SELECT id, date_from, date_to, trigram
+      FROM spectacle
+      WHERE date_from BETWEEN ? AND ?
+      OR date_to BETWEEN ? AND ?
+    ''', (start, stop) * 2)
+    spectacle_dates = cursor.fetchall()
+    return render_template(
+        'beepers_followup.jinja2.html',
+        beepers_spectacles=beepers_spectacles,
+        spectacle_dates=spectacle_dates, start=start, stop=stop,
+        previous=previous, next=next)
+
+
 @app.route('/availabilities/<int:artist_id>/<date>/update',
            methods=('POST',))
 @authenticated
@@ -1251,7 +1371,7 @@ def availabilities_update(artist_id, date):
 @app.route('/followup/<type>/<int:id>/<date>/update', methods=('POST',))
 @authenticated
 def followup_update(type, id, date):
-    if type not in ('vehicle', 'makeup', 'sound', 'costume'):
+    if type not in ('vehicle', 'makeup', 'sound', 'costume', 'card', 'beeper'):
         return abort(404)
 
     cursor = get_connection().cursor()
@@ -1706,3 +1826,101 @@ def artist_create():
         return redirect(url_for('artists'))
 
     return render_template('artist_create.jinja2.html')
+
+
+# Credit cards
+@app.route('/cards')
+@authenticated
+def cards():
+    cursor = get_connection().cursor()
+    cursor.execute('SELECT * FROM card ORDER BY name')
+    cards = cursor.fetchall()
+    return render_template('cards.jinja2.html', cards=cards)
+
+
+@app.route('/card/<int:card_id>/update', methods=('GET', 'POST'))
+@authenticated
+def card_update(card_id):
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        parameters = dict(request.form)
+        parameters['id'] = card_id
+        cursor.execute('''
+          UPDATE card
+          SET name = :name, color = :color
+          WHERE id = :id
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        return redirect(url_for('cards', _anchor=f'card-{card_id}'))
+
+    cursor.execute('SELECT * FROM card WHERE id = ?', (card_id,))
+    card = cursor.fetchone() or abort(404)
+    return render_template('card_update.jinja2.html', card=card)
+
+
+@app.route('/card/create', methods=('GET', 'POST'))
+@authenticated
+def card_create():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        parameters = dict(request.form)
+        cursor.execute('''
+          INSERT INTO card (name, color)
+          VALUES (:name, :color)
+        ''', parameters)
+        cursor.connection.commit()
+        flash('La carte bleue a été créée.')
+        return redirect(url_for('cards'))
+
+    return render_template('card_create.jinja2.html')
+
+
+# Make-ups
+@app.route('/beepers')
+@authenticated
+def beepers():
+    cursor = get_connection().cursor()
+    cursor.execute('SELECT * FROM beeper ORDER BY name')
+    beepers = cursor.fetchall()
+    return render_template('beepers.jinja2.html', beepers=beepers)
+
+
+@app.route('/beeper/<int:beeper_id>/update', methods=('GET', 'POST'))
+@authenticated
+def beeper_update(beeper_id):
+    cursor = get_connection().cursor()
+
+    if request.method == 'POST':
+        parameters = dict(request.form)
+        parameters['id'] = beeper_id
+        cursor.execute('''
+          UPDATE beeper
+          SET name = :name, color = :color
+          WHERE id = :id
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Les informations ont été sauvegardées.')
+        return redirect(url_for('beepers', _anchor=f'beeper-{beeper_id}'))
+
+    cursor.execute('SELECT * FROM beeper WHERE id = ?', (beeper_id,))
+    beeper = cursor.fetchone() or abort(404)
+    return render_template('beeper_update.jinja2.html', beeper=beeper)
+
+
+@app.route('/beeper/create', methods=('GET', 'POST'))
+@authenticated
+def beeper_create():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        parameters = dict(request.form)
+        cursor.execute('''
+          INSERT INTO beeper (name, color)
+          VALUES (:name, :color)
+        ''', parameters)
+        cursor.connection.commit()
+        flash('Le bit d’autoroute a été créée.')
+        return redirect(url_for('beepers'))
+
+    return render_template('beeper_create.jinja2.html')

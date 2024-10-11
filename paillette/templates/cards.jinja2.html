@@ -1,0 +1,21 @@
+{% set title = 'Cartes bleues' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2 class="card">{{ title }}</h2>
+
+  <ul class="actions">
+    <li><a class="create" href="{{ url_for('card_create') }}">Ajouter un bip d’autoroute</a></li>
+  </ul>
+
+  <dl>
+    {% for card in cards | rejectattr('hidden') | sort(attribute='name') %}
+      <div id="card-{{ card.id }}">
+        <dt{% if card.color %} style="--data-color: {{ card.color }}"{% endif %}><a href="{{ url_for('card_update', card_id=card.id) }}">{{ card.name }}</a></dt>
+        <dd><a class="update" href="{{ url_for('card_update', card_id=card.id) }}">Éditer</a></dd>
+        <dd><a class="remove" href="{{ url_for('hide', type='card', id=card.id) }}">Supprimer</a></dd>
+      </div>
+    {% endfor %}
+  </dl>
+{% endblock %}

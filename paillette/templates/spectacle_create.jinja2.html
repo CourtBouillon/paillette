@@ -80,6 +80,30 @@
     </div>
     <ul class="item-list"></ul>
 
+    <label>Bips d’autoroute</label>
+    <div>
+      <select data-name="beeper">
+        <option></option>
+        {% for beeper in beepers %}
+        <option value="{{ beeper.id }}">{{ beeper.name }}</option>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
+    <ul class="item-list"></ul>
+
+    <label>Cartes bleues</label>
+    <div>
+      <select data-name="card">
+        <option></option>
+        {% for card in cards %}
+        <option value="{{ card.id }}">{{ card.name }}</option>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
+    <ul class="item-list"></ul>
+
     <h3>Spectacles</h3>
     <datalist id="representations">
       {% for representation in all_representations %}

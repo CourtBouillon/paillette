@@ -1,0 +1,21 @@
+{% set title = 'Bips d’autoroute' %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2 class="beeper">{{ title }}</h2>
+
+  <ul class="actions">
+    <li><a class="create" href="{{ url_for('beeper_create') }}">Ajouter un bip d’autoroute</a></li>
+  </ul>
+
+  <dl>
+    {% for beeper in beepers | rejectattr('hidden') | sort(attribute='name') %}
+      <div id="beeper-{{ beeper.id }}">
+        <dt{% if beeper.color %} style="--data-color: {{ beeper.color }}"{% endif %}><a href="{{ url_for('beeper_update', beeper_id=beeper.id) }}">{{ beeper.name }}</a></dt>
+        <dd><a class="update" href="{{ url_for('beeper_update', beeper_id=beeper.id) }}">Éditer</a></dd>
+        <dd><a class="remove" href="{{ url_for('hide', type='beeper', id=beeper.id) }}">Supprimer</a></dd>
+      </div>
+    {% endfor %}
+  </dl>
+{% endblock %}

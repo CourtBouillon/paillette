@@ -56,6 +56,20 @@
       <dd>Pas de véhicule</dd>
     {% endfor %}
 
+    <dt>Bips d’autoroute</dt>
+    {% for beeper in beepers %}
+      <dd>{{ beeper.name }}</dd>
+    {% else %}
+      <dd>Pas de bip d’autoroute</dd>
+    {% endfor %}
+
+    <dt>Cartes bleues</dt>
+    {% for card in cards %}
+      <dd>{{ card.name }}</dd>
+    {% else %}
+      <dd>Pas de carte bleue</dd>
+    {% endfor %}
+
     <dt>Costumes</dt>
     {% for costume in costumes %}
       <dd>{{ costume.name }}</dd>

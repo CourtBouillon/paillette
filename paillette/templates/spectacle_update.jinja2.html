@@ -138,6 +138,56 @@
       {% endif %}
     </ul>
 
+    <label>Bips d’autoroute</label>
+    <div>
+      <select data-name="beeper">
+        <option></option>
+        {% for beeper in beepers %}
+        <option value="{{ beeper.id }}">{{ beeper.name }}</option>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
+    <ul class="item-list">
+      {% if spectacle.beeper_ids %}
+        {% set beeper_ids = spectacle.beeper_ids.split(',') %}
+        {% for beeper in beepers %}
+          {% if beeper.id | string in beeper_ids %}
+            <li>
+              <input name="beepers" value="{{ beeper.id }}" hidden>
+              {{ beeper.name }}
+              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+            </li>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </ul>
+
+    <label>Cartes bleues</label>
+    <div>
+      <select data-name="card">
+        <option></option>
+        {% for card in cards %}
+        <option value="{{ card.id }}">{{ card.name }}</option>
+        {% endfor %}
+      </select>
+      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+    </div>
+    <ul class="item-list">
+      {% if spectacle.card_ids %}
+        {% set card_ids = spectacle.card_ids.split(',') %}
+        {% for card in cards %}
+          {% if card.id | string in card_ids %}
+            <li>
+              <input name="cards" value="{{ card.id }}" hidden>
+              {{ card.name }}
+              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+            </li>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </ul>
+
     <h3>Spectacles</h3>
     <datalist id="representations">
       {% for representation in all_representations %}

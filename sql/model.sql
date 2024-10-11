@@ -134,3 +134,29 @@ CREATE TABLE vehicle_spectacle (
   vehicle_id INTEGER NOT NULL REFERENCES vehicle(id),
   spectacle_id INTEGER NOT NULL REFERENCES spectacle(id)
 );
+
+CREATE TABLE card (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  color TEXT,
+  hidden BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE card_spectacle (
+  id INTEGER PRIMARY KEY,
+  card_id INTEGER NOT NULL REFERENCES card(id),
+  spectacle_id INTEGER NOT NULL REFERENCES spectacle(id)
+);
+
+CREATE TABLE beeper (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  color TEXT,
+  hidden BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE beeper_spectacle (
+  id INTEGER PRIMARY KEY,
+  beeper_id INTEGER NOT NULL REFERENCES beeper(id),
+  spectacle_id INTEGER NOT NULL REFERENCES spectacle(id)
+);

@@ -524,6 +524,8 @@ button::before {
 }
 
 .artist,
+.beeper,
+.card,
 .costume,
 .create,
 .filter,
@@ -543,6 +545,14 @@ button::before {
 
 .artist::before {
   content: "👩";
+}
+
+.beeper::before {
+  content: "🛣️";
+}
+
+.card::before {
+  content: "💳";
 }
 
 .configuration::before {
@@ -708,6 +718,8 @@ button::before {
 /* Artists, Costumes, Make-up, Persons, Sounds, Vehicles */
 
 #page-artists h2,
+#page-beepers h2,
+#page-cards h2,
 #page-costumes h2,
 #page-makeups h2,
 #page-persons h2,
@@ -717,6 +729,8 @@ button::before {
 }
 
 #page-artists div,
+#page-beepers div,
+#page-cards div,
 #page-costumes div,
 #page-makeups div,
 #page-persons div,
@@ -729,6 +743,8 @@ button::before {
 }
 
 #page-artists div:hover,
+#page-beepers div:hover,
+#page-cards div:hover,
 #page-costumes div:hover,
 #page-makeups div:hover,
 #page-persons div:hover,
@@ -739,6 +755,8 @@ button::before {
 }
 
 #page-artists dl ::before,
+#page-beepers dl ::before,
+#page-cards dl ::before,
 #page-costumes dl ::before,
 #page-makeups dl ::before,
 #page-persons dl ::before,
@@ -750,6 +768,8 @@ button::before {
 }
 
 #page-artists dt a,
+#page-beepers dt a,
+#page-cards dt a,
 #page-costumes dt a,
 #page-makeups dt a,
 #page-persons dt a,
@@ -760,6 +780,8 @@ button::before {
 }
 
 #page-artists div dt,
+#page-beepers div dt,
+#page-cards div dt,
 #page-costumes div dt,
 #page-makeups div dt,
 #page-persons div dt,
@@ -770,6 +792,8 @@ button::before {
 }
 
 #page-artists div dd,
+#page-beepers div dd,
+#page-cards div dd,
 #page-costumes div dd,
 #page-makeups div dd,
 #page-sounds div dd,
@@ -779,6 +803,8 @@ button::before {
 }
 
 #page-artists div dt::before,
+#page-beepers div dt::before,
+#page-cards div dt::before,
 #page-costumes div dt::before,
 #page-makeups div dt::before,
 #page-sounds div dt::before,

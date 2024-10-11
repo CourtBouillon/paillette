@@ -1,0 +1,17 @@
+{% set title = 'Cartes bleues — {}'.format(card.name) %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <form method="post">
+    <label for="name">Nom</label>
+    <input id="name" name="name" value="{{ card.name }}" required>
+
+    <label for"=color">Couleur</label>
+    <input id="color" name="color" type="color" value="{{ card.color or '' }}">
+
+    <input class="button" type="submit" value="Mettre à jour">
+  </form>
+{% endblock %}
