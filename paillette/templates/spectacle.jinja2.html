@@ -70,13 +70,11 @@
     <dd>{{ spectacle.date_to | date_simple }}</dd>
 
     <dt>Boîtes de maquillage</dt>
-    <dd>
-      {% for makeup in makeups %}
-        {{ makeup.name }}
-      {% else %}
-        Non renseigné
-      {% endfor %}
-    </dd>
+    {% for makeup in makeups %}
+      <dd style="color: {{ makeup.color }}">{{ makeup.name }}</dd>
+    {% else %}
+      <dd>Non renseigné</dd>
+    {% endfor %}
 
     {% if representations | length >= 2 %}
       <dt>Spectacles</dt>

@@ -80,13 +80,11 @@
       {% endif %}
 
       <dt>Boîtes de maquillage</dt>
-      <dd>
-        {% for makeup in makeups %}
-          {{ makeup.name }}
-        {% else %}
-          Non renseigné
-        {% endfor %}
-      </dd>
+      {% for makeup in makeups %}
+        <dd style="color: {{ makeup.color }}">{{ makeup.name }}</dd>
+      {% else %}
+        <dd>Non renseigné</dd>
+      {% endfor %}
 
       {% if spectacle.light_comment %}
         <dt>Lumières</dt>
