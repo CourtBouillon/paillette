@@ -194,6 +194,11 @@
         <option value="{{ representation }}" />
       {% endfor %}
     </datalist>
+    <datalist id="artists">
+      {% for artist in all_artists %}
+        <option value="{{ artist.name }}" data-id="{{ artist.id }}" />
+      {% endfor %}
+    </datalist>
 
     <label for="name">Nom</label>
     <div>
@@ -216,13 +221,8 @@
 
         <label>Équipe</label>
         <div>
-          <select data-name="artist">
-            <option></option>
-            {% for artist in all_artists %}
-              <option value="{{ artist.id }}">{{ artist.name }}</option>
-            {% endfor %}
-          </select>
-          <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+          <input data-name="artist" list="artists">
+          <button class="add" type="button" onClick="addArtist(this)">Ajouter</button>
         </div>
         <ul class="artists-list"></ul>
       </li>
@@ -231,7 +231,7 @@
         <li>
           <label>Nom</label>
           <div>
-            <input name="{{ representation.id }}-name" list="representations" value="{{ representation.representation_name }}">
+            <input name="{{ representation.id }}-name" list="representations" value="{{ representation.representation_name or '' }}">
             <button class="delete" type="button" onClick="remove(this.parentNode)">Supprimer</button>
           </div>
 
@@ -247,13 +247,8 @@
 
           <label>Équipe</label>
           <div>
-            <select data-name="{{ representation.id }}-artist">
-              <option></option>
-              {% for artist in all_artists %}
-                <option value="{{ artist.id }}">{{ artist.name }}</option>
-              {% endfor %}
-            </select>
-            <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+            <input list="artists" data-name="{{ representation.id }}-artist">
+            <button class="add" type="button" onClick="addArtist(this)">Ajouter</button>
           </div>
           <ul class="artists-list">
             {% if representation.artist_ids %}
@@ -306,6 +301,37 @@
 
       list.appendChild(li);
       select.value = null;
+    }
+
+    function addArtist(button) {
+      let source = button.previousElementSibling;
+      let value = source.value;
+      if (!value) return;
+      let option = document.querySelector("#artists option[value=\"" + value + "\"]");
+      if (!option) return;
+      let list = button.parentNode.nextElementSibling;
+      let name = source.getAttribute("data-name");
+      let id = option.getAttribute("data-id");
+
+      let li = document.createElement("li");
+
+      let input = document.createElement("input");
+      input.setAttribute("value", id);
+      input.setAttribute("name", name + "s");
+      input.setAttribute("hidden", true);
+      li.appendChild(input);
+
+      li.appendChild(document.createTextNode(value + " "));
+
+      let deleteButton = document.createElement("button");
+      deleteButton.setAttribute("type", "button");
+      deleteButton.setAttribute("class", "delete");
+      deleteButton.setAttribute("onClick", "remove(this)");
+      deleteButton.textContent = "Supprimer";
+      li.appendChild(deleteButton);
+
+      list.appendChild(li);
+      source.value = null;
     }
 
     function addSpectacle() {
