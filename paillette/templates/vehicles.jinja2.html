@@ -11,7 +11,7 @@
 
   <dl>
     {% for vehicle in vehicles | rejectattr('hidden') | sort(attribute='name') %}
-      <div>
+      <div id="vehicle-{{ vehicle.id }}">
         <dt{% if vehicle.color %} style="--data-color: {{ vehicle.color }}"{% endif %}><a href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">{{ vehicle.name }}</a></dt>
         <dd><a class="update" href="{{ url_for('vehicle_update', vehicle_id=vehicle.id) }}">Éditer</a></dd>
         <dd><a class="remove" href="{{ url_for('hide', type='vehicle', id=vehicle.id) }}">Supprimer</a></dd>

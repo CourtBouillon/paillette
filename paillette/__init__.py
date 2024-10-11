@@ -1425,7 +1425,7 @@ def costume_update(costume_id):
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
-        return redirect(url_for('costumes'))
+        return redirect(url_for('costumes', _anchor=f'costume-{costume_id}'))
 
     cursor.execute('SELECT * FROM costume WHERE id = ?', (costume_id,))
     costume = cursor.fetchone() or abort(404)
@@ -1474,7 +1474,7 @@ def makeup_update(makeup_id):
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
-        return redirect(url_for('makeups'))
+        return redirect(url_for('makeups', _anchor=f'makeup-{makeup_id}'))
 
     cursor.execute('SELECT * FROM makeup WHERE id = ?', (makeup_id,))
     makeup = cursor.fetchone() or abort(404)
@@ -1523,7 +1523,7 @@ def sound_update(sound_id):
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
-        return redirect(url_for('sounds'))
+        return redirect(url_for('sounds', _anchor=f'sound-{sound_id}'))
 
     cursor.execute('SELECT * FROM sound WHERE id = ?', (sound_id,))
     sound = cursor.fetchone() or abort(404)
@@ -1584,7 +1584,7 @@ def vehicle_update(vehicle_id):
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
-        return redirect(url_for('vehicles'))
+        return redirect(url_for('vehicles', _anchor=f"vehicle-{ vehicle_id }"))
 
     cursor.execute('SELECT * FROM vehicle WHERE id = ?', (vehicle_id,))
     vehicle = cursor.fetchone() or abort(404)
@@ -1665,7 +1665,7 @@ def artist_update(artist_id):
         ''', parameters)
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
-        return redirect(url_for('artists'))
+        return redirect(url_for('artists', _anchor=f'artist-{artist_id}'))
 
     cursor.execute('''
       SELECT

@@ -11,7 +11,7 @@
 
   <dl>
     {% for makeup in makeups | rejectattr('hidden') | sort(attribute='name') %}
-      <div>
+      <div id="makeup-{{ makeup.id }}">
         <dt{% if makeup.color %} style="--data-color: {{ makeup.color }}"{% endif %}><a href="{{ url_for('makeup_update', makeup_id=makeup.id) }}">{{ makeup.name }}</a></dt>
         <dd><a class="update" href="{{ url_for('makeup_update', makeup_id=makeup.id) }}">Éditer</a></dd>
         <dd><a class="remove" href="{{ url_for('hide', type='makeup', id=makeup.id) }}">Supprimer</a></dd>
