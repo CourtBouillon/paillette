@@ -141,6 +141,6 @@
     <li><a class="remove" href="{{ url_for('spectacle_remove', spectacle_id=spectacle.id) }}">Supprimer le spectacle</a></li>
     <li><a class="send" href="{{ url_for('roadmap_send', spectacle_id=spectacle.id) }}">Envoyer la feuille de route</a></li>
     <li><a class="update" href="{{ url_for('spectacle_update', spectacle_id=spectacle.id) }}">Éditer le spectacle</a></li>
-    <li><a class="add" href="{{ url_for('spectacle_create', spectacle_id=spectacle.id) }}">Dupliquer le spectacle</a></li>
+    <li><a class="copy" href="{{ url_for('spectacle_create', spectacle_id=spectacle.id) }}">Dupliquer le spectacle</a></li>
   </ul>
 {% endblock %}

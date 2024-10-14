@@ -526,6 +526,7 @@ button::before {
 .artist,
 .beeper,
 .card,
+.copy,
 .costume,
 .create,
 .filter,
@@ -538,8 +539,8 @@ button::before {
 .send,
 .show,
 .sound,
-.vehicle,
-.update {
+.update,
+.vehicle {
   font-size: 0;
 }
 
@@ -557,6 +558,10 @@ button::before {
 
 .configuration::before {
   content: "\f0c0";
+}
+
+.copy::before {
+  content: "\f0c5";
 }
 
 .costume::before {
