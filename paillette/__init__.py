@@ -442,8 +442,9 @@ def spectacle(spectacle_id):
 
 
 @app.route('/spectacle/create', methods=('GET', 'POST'))
+@app.route('/spectacle/create/from/<int:spectacle_id>')
 @authenticated
-def spectacle_create():
+def spectacle_create(spectacle_id=None):
     tables = ('sound', 'makeup', 'costume', 'vehicle', 'card', 'beeper')
     cursor = get_connection().cursor()
 
@@ -526,9 +527,17 @@ def spectacle_create():
       ORDER BY id DESC LIMIT 100
     ''')
     all_representations = tuple(row['name'] for row in cursor.fetchall())
+    from_data = {}
+    if spectacle_id is not None:
+        cursor.execute('''
+          SELECT *
+          FROM spectacle
+          WHERE id = ?
+        ''', (spectacle_id,))
+        from_data = cursor.fetchone()
     return render_template(
         'spectacle_create.jinja2.html', all_artists=all_artists,
-        all_representations=all_representations, **data)
+        all_representations=all_representations, from_data=from_data, **data)
 
 
 @app.route('/spectacle/<int:spectacle_id>/update', methods=('GET', 'POST'))

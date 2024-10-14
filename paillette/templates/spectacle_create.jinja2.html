@@ -5,32 +5,32 @@
 {% block content %}
   <h2>{{ title }}</h2>
 
-  <form method="post">
+  <form method="post" action="{{ url_for('spectacle_create') }}">
     <h3>Informations générales</h3>
 
     <label for="place">Lieu</label>
-    <input id="place" name="place" required>
+    <input id="place" name="place" value="{{ from_data.place or '' }}" required>
 
     <label for="event">Évènement</label>
-    <input id="event" name="event" required>
+    <input id="event" name="event" value="{{ from_data.event or '' }}" required>
 
     <label for="date_from">Date de départ</label>
-    <input id="date_from" name="date_from" type="date" required>
+    <input id="date_from" name="date_from" value="{{ from_data.date_from or '' }}" type="date" required>
 
     <label for="date_to">Date de retour</label>
-    <input id="date_to" name="date_to" type="date" required>
+    <input id="date_to" name="date_to" value="{{ from_data.date_to or '' }}" type="date" required>
 
     <label for="travel_time">Temps de transport</label>
-    <input id="travel_time" name="travel_time">
+    <input id="travel_time" name="travel_time" value="{{ from_data.travel_time or '' }}">
 
     <label for="link">Lien</label>
-    <input id="link" name="link">
+    <input id="link" name="link" value="{{ from_data.link or '' }}">
 
     <label for="configuration">Configuration</label>
-    <input id="configuration" name="configuration">
+    <input id="configuration" name="configuration" value="{{ from_data.configuration or '' }}">
 
     <label for="organizer">Organisateur</label>
-    <input id="organizer" name="organizer">
+    <input id="organizer" name="organizer" value="{{ from_data.organizer or '' }}">
 
     <label>Matériel de son</label>
     <div>
@@ -145,7 +145,7 @@
     </ul>
 
     <label for="comment">Commentaire interne</label>
-    <textarea id="comment" name="comment"></textarea>
+    <textarea id="comment" name="comment">{{ from_data.comment or '' }}</textarea>
 
     <input class="button" type="submit" value="Créer">
   </form>
