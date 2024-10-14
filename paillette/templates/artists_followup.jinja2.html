@@ -42,19 +42,20 @@
           {% for i in range(1, stop.day + 1) %}
             {% set day = start.replace(day=i) %}
             {% set day_representation_dates = representation_dates | selectattr('date', 'eq', day) | list %}
-            {% set day_spectacles = spectacles | selectattr('date', 'equalto', day) | list %}
+            {% set day_spectacles = spectacles | selectattr('date', 'eq', day) | list %}
+            {% set day_available = availabilities | selectattr('date', 'eq', day) | selectattr('id', 'eq', artist.artist_id) | first %}
             <td>
               <select onChange="update(this, {{ artist.artist_id }}, '{{ day }}')" data-artist="{{ artist.artist_id }}" data-day="{{ day }}">
                 <option hidden></option>
                 <option value="-"></option>
-                <option {{ "selected" if not day_spectacles and (availabilities | selectattr('date', 'equalto', day) | selectattr('id', 'equalto', artist.artist_id) | selectattr('available', 'equalto', False)) | list }} value="0-">
+                <option {{ "selected" if not day_spectacles and day_available and not day_available.available }} value="0-">
                   0
                 </option>
-                <option {{ "selected" if not day_spectacles and (availabilities | selectattr('date', 'equalto', day) | selectattr('id', 'equalto', artist.artist_id) | selectattr('available', 'equalto', True)) | list }} value="1-">
+                <option {{ "selected" if not day_spectacles and day_available and day_available.available }} value="1-">
                   1
                 </option>
                 {% for representation_date in day_representation_dates %}
-                  <option value="-{{ representation_date.id }}" {{ "selected" if (spectacles | selectattr('date', 'equalto', day) | selectattr('trigram', 'equalto', representation_date.trigram) | list) }}>
+                  <option value="-{{ representation_date.id }}" {{ "selected" if (day_spectacles | selectattr('trigram', 'eq', representation_date.trigram) | first) }}>
                     {{ representation_date.trigram }}
                   </option>
                 {% endfor %}
@@ -63,9 +64,9 @@
                 {%- for spectacle in day_spectacles %}
                   {{ spectacle.trigram }}
                 {%- else -%}
-                  {%- for availability in availabilities | selectattr('date', 'equalto', day) | selectattr('id', 'equalto', artist.artist_id) %}
-                    {{ '1' if availability.available else '0' }}
-                  {% endfor -%}
+                  {%- if day_available %}
+                    {{ '1' if day_available.available else '0' }}
+                  {% endif -%}
                 {% endfor -%}
               </span>
             </td>
