@@ -261,6 +261,16 @@ def date_simple(date_or_string):
     return date_or_string.strftime('%d/%m')
 
 
+@app.template_filter('weeks')
+def weeks(dates, month):
+    weeks = set()
+    for date_ in dates:
+        if not date_ or date_.month != month:
+            continue
+        weeks.add(min(date_.day, 27) // 7 + 1)
+    return weeks
+
+
 @app.template_filter('version')
 def version(url):
     return f'{url}?{app.config["GIT_VERSION"]}'
@@ -400,6 +410,7 @@ def spectacles(year=None, month=None):
         GROUP_CONCAT(DISTINCT replace(makeup.name, ',', ' ')) AS makeups,
         GROUP_CONCAT(DISTINCT replace(beeper.name, ',', ' ')) AS beepers,
         GROUP_CONCAT(DISTINCT replace(card.name, ',', ' ')) AS cards,
+        GROUP_CONCAT(DISTINCT replace(person.name, ',', ' ')) AS artists,
         GROUP_CONCAT(
           DISTINCT replace(representation.name, ',', ' ')) AS representations
       FROM spectacle
@@ -407,6 +418,12 @@ def spectacles(year=None, month=None):
       ON spectacle.id = representation.spectacle_id
       LEFT JOIN representation_date
       ON representation.id = representation_date.representation_id
+      LEFT JOIN artist_representation_date
+      ON representation_date.id = artist_representation_date.representation_date_id
+      LEFT JOIN artist
+      ON artist.id = artist_representation_date.artist_id
+      LEFT JOIN person
+      ON person.id = artist.person_id
       LEFT JOIN vehicle_spectacle
       ON spectacle.id = vehicle_spectacle.spectacle_id
       LEFT JOIN vehicle

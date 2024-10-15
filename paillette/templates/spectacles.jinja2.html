@@ -11,6 +11,14 @@
     <li><a class="next" href="{{ url_for('spectacles', year=next.year, month=next.month) }}">Mois suivant</a></li>
   </ul>
 
+  <ul class="days">
+    <li class="active"><a onClick="showSpectacles(this)">Tout</a></li>
+    <li><a onClick="filterSpectacles(this, 1)">01 – 07</a></li>
+    <li><a onClick="filterSpectacles(this, 2)">08 – 14</a></li>
+    <li><a onClick="filterSpectacles(this, 3)">15 – 21</a></li>
+    <li><a onClick="filterSpectacles(this, 4)">22 – 31</a></li>
+  </ul>
+
   <ul class="actions">
     <li><a class="create" href="{{ url_for('spectacle_create') }}">Ajouter un spectacle</a></li>
   </ul>
@@ -18,7 +26,7 @@
   {% for spectacle in spectacles %}
     {% set dates = (spectacle.first_date, spectacle.last_date) | date_range %}
     {% set travel_dates = (spectacle.date_from, spectacle.date_to) | date_range %}
-    <section>
+    <section class="{% for week in (spectacle.date_from, spectacle.date_to) | weeks(month) %} week-{{ week }}{% endfor %}">
       <h3><a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">{{ '{}, {}'.format(spectacle.place, dates) }}</a></h3>
       <a href="{{ url_for('spectacle', spectacle_id=spectacle.id) }}">
         <dl>
@@ -31,27 +39,67 @@
           </dd>
           <dt class="date">Date</dt>
           <dd>{{ dates | capitalize }}</dd>
+          <dt class="event">Évènement</dt>
+          <dd>{{ spectacle.event }}</dd>
+          <dt class="spectacles">Spectacles</dt>
+          <dd>{{ (spectacle.representations or 'Pas de spectacle').replace(',', ', ') }}</dd>
           <dt class="configuration">Configuration</dt>
-          <dd>{{ spectacle.configuration }}</dd>
+          <dd>
+            <details>
+              <summary>{{ spectacle.configuration }}</summary>
+              {% if spectacle.artists %}
+                <ul>
+                  {% for artist in spectacle.artists.split(',') | sort %}
+                    <li>{{ artist }}</li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                Équipe non renseignée
+              {% endif %}
+            </details>
+          </dd>
+          <dt class="makeup">Boîtes de maquillage</dt>
+          <dd>{{ (spectacle.makeups or 'Non renseigné').replace(',', ', ') }}</dd>
+          <dt class="sound">Sons</dt>
+          <dd>{{ (spectacle.sounds or 'Non renseigné').replace(',', ', ') }}</dd>
           <dt class="vehicle">Trajet</dt>
-          <dd>{{ travel_dates | capitalize }}</dd>
+          <dd>{{ travel_dates | capitalize }} – {{ (spectacle.vehicles or 'Pas de véhicule').replace(',', ', ') }}</dd>
+          <dt class="card">Carte bleue</dt>
+          <dd class="half">{{ (spectacle.cards or 'Pas de CB').replace(',', ', ') }}</dd>
+          <dt class="beeper">Bip d’autoroute</dt>
+          <dd class="half">{{ (spectacle.cards or 'Pas de bip').replace(',', ', ') }}</dd>
+          <dt class="pocket">Pochette</dt>
+          <dd class="half">{{ None }}</dd>
+          <dt class="contract">Contrat</dt>
+          <dd class="half">{{ None }}</dd>
         </dl>
       </a>
-      <dl>
-        <dt>Évènement</dt>
-        <dd>{{ spectacle.event }}</dd>
-
-        <dt>Spectacles</dt>
-        <dd>{{ (spectacle.representations or 'Pas de spectacle').replace(',', ', ') }}</dd>
-
-        <dt>Boîtes de maquillage</dt>
-        <dd>{{ (spectacle.makeups or 'Non renseigné').replace(',', ', ') }}</dd>
-
-        <dt>Véhicules</dt>
-        <dd>{{ (spectacle.vehicles or 'Pas de véhicule').replace(',', ', ') }}</dd>
-      </dl>
     </section>
   {% else %}
     <p>Pas de prestation ce mois-ci.</p>
   {% endfor %}
+
+  <script>
+    function showSpectacles(a) {
+      document.querySelectorAll("main > section").forEach(section => {
+        section.removeAttribute("hidden")
+      })
+      setActive(a)
+    }
+    function filterSpectacles(a, week) {
+      document.querySelectorAll("main > section").forEach(section => {
+        section.setAttribute("hidden", true)
+      })
+      document.querySelectorAll("main > section.week-" + week).forEach(section => {
+        section.removeAttribute("hidden")
+      })
+      setActive(a)
+    }
+    function setActive(a) {
+      Array.from(a.parentElement.parentElement.children).forEach(li => {
+        li.removeAttribute("class")
+      })
+      a.parentElement.setAttribute("class", "active")
+    }
+  </script>
 {% endblock %}

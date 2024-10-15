@@ -93,6 +93,18 @@ ul {
   break-inside: avoid;
 }
 
+li {
+  list-style: none;
+}
+
+details ul {
+  padding: 0;
+}
+
+summary {
+  font-weight: bold;
+}
+
 dd {
   break-before: avoid;
   break-inside: avoid;
@@ -116,10 +128,6 @@ h2,
 
 h3 {
   clear: both;
-}
-
-li {
-  list-style: none;
 }
 
 /* Flash Messages */
@@ -557,7 +565,7 @@ button::before {
 }
 
 .configuration::before {
-  content: "\f0c0";
+  content: "👩";
 }
 
 .copy::before {
@@ -570,6 +578,10 @@ button::before {
 
 .create::before {
   content: "\f196";
+}
+
+.date::before {
+  content: "📅";
 }
 
 .filter::before {
@@ -591,6 +603,10 @@ button::before {
 
 .overview::before {
   content: "\f06e";
+}
+
+.place::before {
+  content: "\f041";
 }
 
 .previous::before {
@@ -620,11 +636,22 @@ button::before {
 
 .vehicle::before {
   content: "🚗";
-/*  content: "\f0d1";*/
 }
 
-#page-spectacles .vehicle::before {
-  content: "\f0d1";
+.contract::before {
+  content: "🪪";
+}
+
+.event::before {
+  content: "🎉";
+}
+
+.pocket::before {
+  content: "📁";
+}
+
+.spectacles::before {
+  content: "✨";
 }
 
 /* Actions */
@@ -640,10 +667,11 @@ button::before {
   top: 5rem;
 }
 
-/* Follow & Time */
+/* Follow, Time, Days */
 
 .follow,
-.time {
+.time,
+.days {
   align-items: center;
   display: flex;
   justify-content: center;
@@ -659,6 +687,19 @@ button::before {
 .follow *::before {
   margin: 0 2em;
   padding: 0.1em 0.25em;
+}
+
+.days li {
+  cursor: pointer;
+  padding: 0 0.5em;
+}
+
+.days a {
+  color: inherit;
+}
+
+.days .active {
+  text-decoration: underline;
 }
 
 /* Login */
@@ -826,25 +867,24 @@ button::before {
   display: none;
 }
 
-#page-spectacles main section {
-  align-items: center;
+#page-spectacles main {
   display: flex;
-  font-size: 10pt;
-  padding: 0.5em 0;
-  width: 100%;
+  flex-wrap: wrap;
 }
 
-#page-spectacles main section ::before {
-  font-size: 1.2rem;
-  margin: 0;
+#page-spectacles main section {
+  box-sizing: border-box;
+  font-size: 10pt;
+  padding: 0.5em;
+  width: 25%;
 }
 
 #page-spectacles main section a {
   background: var(--pink-opacity);
   color: var(--grey);
+  display: block;
   padding: 0.5em;
   transition: 0.5s;
-  width: 25%;
 }
 
 #page-spectacles main section a:hover {
@@ -852,47 +892,48 @@ button::before {
   text-decoration: none;
 }
 
-#page-spectacles main section > dl {
-  columns: 2;
-  margin: -1em 0 0 2em;
-  width: 75%;
-}
-
-#page-spectacles dt {
-  color: var(--grey);
-}
-
 #page-spectacles a dl {
+  display: flex;
+  flex-wrap: wrap;
   margin: 0;
-  overflow: auto;
 }
 
 #page-spectacles a dl dt {
-  clear: both;
-  float: left;
   text-align: center;
   width: 2rem;
 }
 
 #page-spectacles a dl dd {
-  float: right;
-  margin: 2pt 0 0;
+  line-height: 1.6;
   width: calc(100% - 2rem);
 }
 
-.date::before {
-  content: "\f133";
-}
-
-.place::before {
-  content: "\f041";
-}
-
-#page-spectacles .date,
-#page-spectacles .place,
-#page-spectacles .vehicle,
-#page-spectacles .configuration {
+#page-spectacles a dl dt {
   font-size: 0;
+}
+
+#page-spectacles .place {
+  display: none;
+}
+
+#page-spectacles a dl dd:first-of-type {
+  font-size: 1.2em;
+  line-height: 2;
+  width: 100%;
+}
+
+#page-spectacles a dl dd + dd {
+  padding-left: 2rem;
+}
+
+#page-spectacles a dl ::before {
+  font-size: 1.2rem;
+  line-height: 1;
+  margin: 0;
+}
+
+#page-spectacles .half {
+  width: calc(50% - 2rem);
 }
 
 /* Spectacle */
