@@ -17,13 +17,8 @@
         <h1><a href="{{ url_for('spectacles') }}">Gestion des paillettes</a></h1>
 
         <ul>
-          {% if request.endpoint == 'spectacle' and all_dates %}
-            {% set year = all_dates[0][:4] %}
-            {% set month = all_dates[0][5:7] %}
-          {% else %}
-            {% set year = request.view_args.get('year') %}
-            {% set month = request.view_args.get('month') %}
-          {% endif %}
+          {% set year = request.view_args.get('year') %}
+          {% set month = request.view_args.get('month') %}
           <li>
             {% if year and month and request.endpoint != 'spectacles' %}
               <a href="{{ url_for('spectacles', year=year, month=month) }}">

@@ -107,7 +107,7 @@
     width: 100%;
   }
 
-  #page-spectacles main section > a {
+  #page-spectacles main section {
     width: 100%;
   }
   #page-spectacles main section > a dl {
@@ -117,14 +117,16 @@
     display: none;
   }
 
-  #page-spectacle main > dl:first-of-type {
-    font-size: 1.5em;
+  #page-spectacle_create form,
+  #page-spectacle_update form {
+    grid-template-columns: 1fr 1fr;
   }
-  #page-spectacle main > dl:first-of-type > * {
-    line-height: 1.5;
-  }
-  #page-spectacle main > dl + dl {
-    columns: 1;
+  #page-spectacle_create form h3,
+  #page-spectacle_update form h3,
+  #page-spectacle_create form > label:has(textarea, input[type=checkbox]),
+  #page-spectacle_update form > label:has(textarea, input[type=checkbox]) {
+    grid-column: span 2;
+    padding-right: 0;
   }
 
   #page-artists div,

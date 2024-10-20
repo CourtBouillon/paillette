@@ -6,105 +6,6 @@
   <h2>{{ title }}</h2>
 
   <form method="post" action="{{ url_for('spectacle_create') }}">
-    <h3>Informations générales</h3>
-
-    <label for="place">Lieu</label>
-    <input id="place" name="place" value="{{ from_data.place or '' }}" required>
-
-    <label for="event">Évènement</label>
-    <input id="event" name="event" value="{{ from_data.event or '' }}" required>
-
-    <label for="date_from">Date de départ</label>
-    <input id="date_from" name="date_from" value="{{ from_data.date_from or '' }}" type="date" required>
-
-    <label for="date_to">Date de retour</label>
-    <input id="date_to" name="date_to" value="{{ from_data.date_to or '' }}" type="date" required>
-
-    <label for="travel_time">Temps de transport</label>
-    <input id="travel_time" name="travel_time" value="{{ from_data.travel_time or '' }}">
-
-    <label for="link">Lien</label>
-    <input id="link" name="link" value="{{ from_data.link or '' }}">
-
-    <label for="configuration">Configuration</label>
-    <input id="configuration" name="configuration" value="{{ from_data.configuration or '' }}">
-
-    <label for="organizer">Organisateur</label>
-    <input id="organizer" name="organizer" value="{{ from_data.organizer or '' }}">
-
-    <label>Matériel de son</label>
-    <div>
-      <select data-name="sound">
-        <option></option>
-        {% for sound in sounds %}
-        <option value="{{ sound.id }}">{{ sound.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list"></ul>
-
-    <label>Boîtes de maquillage</label>
-    <div>
-      <select data-name="makeup">
-        <option></option>
-        {% for makeup in makeups %}
-        <option value="{{ makeup.id }}">{{ makeup.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list"></ul>
-
-    <label>Costumes</label>
-    <div>
-      <select data-name="costume">
-        <option></option>
-        {% for costume in costumes %}
-        <option value="{{ costume.id }}">{{ costume.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list"></ul>
-
-    <label>Véhicules</label>
-    <div>
-      <select data-name="vehicle">
-        <option></option>
-        {% for vehicle in vehicles %}
-        <option value="{{ vehicle.id }}">{{ vehicle.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list"></ul>
-
-    <label>Bips d’autoroute</label>
-    <div>
-      <select data-name="beeper">
-        <option></option>
-        {% for beeper in beepers %}
-        <option value="{{ beeper.id }}">{{ beeper.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list"></ul>
-
-    <label>Cartes bleues</label>
-    <div>
-      <select data-name="card">
-        <option></option>
-        {% for card in cards %}
-        <option value="{{ card.id }}">{{ card.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list"></ul>
-
-    <h3>Spectacles</h3>
     <datalist id="representations">
       {% for representation in all_representations %}
         <option value="{{ representation }}" />
@@ -116,36 +17,187 @@
       {% endfor %}
     </datalist>
 
-    <label for="name">Nom</label>
-    <div>
-      <input id="name" list="representations" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
-      <button class="add" type="button" onClick="addSpectacle()">Ajouter</button>
-    </div>
+    <h3>Informations générales</h3>
 
-    <ul id="spectacles-list">
-      <li style="display: none">
-        <label>Nom</label>
-        <div>
-          <input name="name" list="representations">
-          <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-        </div>
+    <label>
+      Départ
+      <input name="date_from" type="date" value="{{ from_data.date_from or '' }}" required>
+    </label>
 
-        <label>Dates</label>
-        <div class="dates">
-          <input name="dates" type="date" onInput="addInputIfNeeded(this)">
-        </div>
+    <label>
+      Date de retour
+      <input name="date_to" type="date" value="{{ from_data.date_to or '' }}" required>
+    </label>
 
-        <label>Équipe</label>
-        <div>
-          <input data-name="artist" list="artists">
-          <button class="add" type="button" onClick="addArtist(this)">Ajouter</button>
-        </div>
-        <ul class="artists-list"></ul>
-      </li>
-    </ul>
+    <label>
+      Temps de transport
+      <input name="travel_time" value="{{ from_data.travel_time or '' }}">
+    </label>
 
-    <label for="comment">Commentaire interne</label>
-    <textarea id="comment" name="comment">{{ from_data.comment or '' }}</textarea>
+    <label>
+      Évènement
+      <input name="event" value="{{ from_data.event or '' }}" required>
+    </label>
+
+    <h3>Spectacles, équipes, costumes et matériel</h3>
+
+    <label>
+      Configuration
+      <textarea name="configuration">{{ from_data.configuration or '' }}</textarea>
+    </label>
+
+    <label>
+      Nom
+      <div>
+        <input id="name" list="representations" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
+        <button class="add" type="button" onClick="addSpectacle()">Ajouter</button>
+      </div>
+      <ul id="spectacles-list">
+        <li style="display: none">
+          <label>Nom</label>
+          <div>
+            <input name="name" list="representations">
+            <button class="delete" type="button" onClick="remove(this.parentNode)">Supprimer</button>
+          </div>
+
+          <label>Dates</label>
+          <div class="dates">
+            <input name="dates" type="date" onInput="addInputIfNeeded(this)">
+          </div>
+
+          <label>Équipe</label>
+          <div>
+            <input data-name="artist" list="artists">
+            <button class="add" type="button" onClick="addArtist(this)">Ajouter</button>
+          </div>
+          <ul class="artists-list"></ul>
+        </li>
+      </ul>
+    </label>
+
+    <label>
+      Costumes
+      <div>
+        <select data-name="costume">
+          <option></option>
+          {% for costume in costumes %}
+            <option value="{{ costume.id }}">{{ costume.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+      </ul>
+    </label>
+
+    <label>
+      Matériel de son
+      <div>
+        <select data-name="sound">
+          <option></option>
+          {% for sound in sounds %}
+            <option value="{{ sound.id }}">{{ sound.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+      </ul>
+    </label>
+
+    <label>
+      Boîtes de maquillage
+      <div>
+        <select data-name="makeup">
+          <option></option>
+          {% for makeup in makeups %}
+            <option value="{{ makeup.id }}">{{ makeup.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+      </ul>
+    </label>
+
+    <h3>Informations générales</h3>
+
+    <label>
+      Véhicules
+      <div>
+        <select data-name="vehicle">
+          <option></option>
+          {% for vehicle in vehicles %}
+            <option value="{{ vehicle.id }}">{{ vehicle.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+      </ul>
+    </label>
+
+    <label>
+      Bips d’autoroute
+      <div>
+        <select data-name="beeper">
+          <option></option>
+          {% for beeper in beepers %}
+            <option value="{{ beeper.id }}">{{ beeper.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+      </ul>
+    </label>
+
+    <label>
+      Cartes bleues
+      <div>
+        <select data-name="card">
+          <option></option>
+          {% for card in cards %}
+            <option value="{{ card.id }}">{{ card.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+      </ul>
+    </label>
+
+    <h3>Autres</h3>
+
+    <label>
+      Lieu
+      <input name="place" value="{{ from_data.place or '' }}" required>
+    </label>
+
+    <label>
+      Trigramme
+      <input name="trigram" value="{{ from_data.trigram or '' }}" required>
+    </label>
+
+    <label>
+      Lien
+      <input name="link" value="{{ from_data.link or '' }}">
+    </label>
+
+    <label>
+      Organisateur
+      <input name="organizer" value="{{ from_data.organizer or '' }}">
+    </label>
+
+    <label>
+      <input name="pocket" type="checkbox" {{ 'checked' if from_data.pocket }}>
+      Pochette
+    </label>
+
+    <label>
+      Commentaire interne
+      <textarea name="comment">{{ from_data.comment or '' }}</textarea>
+    </label>
 
     <input class="button" type="submit" value="Créer">
   </form>
@@ -197,6 +249,18 @@
       input.setAttribute("hidden", true);
       li.appendChild(input);
 
+      let label = document.createElement("label");
+      label.setAttribute("title", "Contrat");
+      label.setAttribute("class", "contract");
+      li.appendChild(label);
+
+      input = document.createElement("input");
+      input.setAttribute("name", "artist-contracts");
+      input.setAttribute("value", id);
+      input.setAttribute("type", "checkbox");
+      input.setAttribute("onClick", "changeContract(this)")
+      label.appendChild(input);
+
       li.appendChild(document.createTextNode(value + " "));
 
       let deleteButton = document.createElement("button");
@@ -234,7 +298,16 @@
         }
       );
 
-      newLi.querySelector('input').focus();
+      newLi.querySelector("input").focus();
+    }
+
+    function changeContract(input) {
+      let value = input.getAttribute("value");
+      document.querySelectorAll('[name="artist-contracts"][value="' + value + '"]').forEach(
+        obj => {
+          obj.checked = input.checked;
+        }
+      );
     }
 
     function remove(button) {
@@ -243,7 +316,7 @@
 
     function addInputIfNeeded(input) {
       let parent = input.parentNode;
-      if (![...parent.querySelectorAll('input')].filter(node => !node.value.length).length) {
+      if (![...parent.querySelectorAll("input")].filter(node => !node.value.length).length) {
         let newInput = input.cloneNode();
         newInput.value = null;
         parent.appendChild(newInput);

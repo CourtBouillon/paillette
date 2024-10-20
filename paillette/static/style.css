@@ -128,6 +128,7 @@ h2,
 
 h3 {
   clear: both;
+  font-size: 1.6em;
 }
 
 /* Flash Messages */
@@ -370,10 +371,11 @@ form div[class^="ql"] ol li {
 input,
 select,
 textarea {
+  accent-color: var(--pink);
   background: inherit;
   border: 1px solid var(--pink);
   border-radius: 0;
-  margin: 1em 0;
+  margin-bottom: 1em;
   padding: 1em;
   /* 100% - padding left and right - border left and right */
   width: calc(100% - 2em - 2px);
@@ -405,18 +407,6 @@ input[type="checkbox"] {
   height: 1.2em;
   margin: 0 1em 0 0;
   width: 1.2em;
-}
-
-label,
-#page-spectacles main section > dl dt,
-#page-spectacle dl:nth-of-type(2) dt {
-  border-bottom: 2px solid;
-  border-image-slice: 0 0 7 0;
-  border-image-source: linear-gradient(to right, var(--pink), 1.5em, var(--white), 0%, transparent);
-  color: var(--grey);
-  margin-bottom: 0.2em;
-  padding: 1em 0 0.15em 0;
-  width: 100%;
 }
 
 label:has(+[required])::after {
@@ -492,22 +482,39 @@ button::before {
   margin: 1rem 0;
 }
 
-#page-spectacle_create form div,
-#page-spectacle_update form div {
-  display: flex;
+#page-spectacle_create form,
+#page-spectacle_update form {
+  display: grid;
+  gap: 1em;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   width: 100%;
 }
 
-#page-spectacle_create form .dates,
-#page-spectacle_update form .dates {
-  flex-wrap: wrap;
-  padding: 1em 0;
+#page-spectacle_create form h3,
+#page-spectacle_update form h3 {
+  grid-column: span 4;
+  margin-bottom: 0.5em;
 }
 
-#page-spectacle_create form .dates input,
-#page-spectacle_update form .dates input {
-  margin: 0;
-  width: auto;
+#page-spectacle_create form > label:has(> textarea, > input[type=checkbox]),
+#page-spectacle_update form > label:has(> textarea, > input[type=checkbox]) {
+  grid-column: span 4;
+  padding-right: calc(50% + 1em / 2);
+}
+
+#page-spectacle_create form > label:has(ul),
+#page-spectacle_update form > label:has(ul) {
+  grid-column: span 2;
+}
+
+#page-spectacle_create form > label:has([data-name=beeper], [data-name=card]),
+#page-spectacle_update form > label:has([data-name=beeper], [data-name=card]) {
+  grid-column: span 1;
+}
+
+#page-spectacle_create form div,
+#page-spectacle_update form div {
+  display: flex;
 }
 
 #spectacles-list > li {
@@ -544,6 +551,7 @@ button::before {
 .overview,
 .previous,
 .remove,
+.search,
 .send,
 .show,
 .sound,
@@ -618,6 +626,10 @@ button::before {
   content: "\f1f8";
 }
 
+.search::before {
+  content: "\f002";
+}
+
 .send::before {
   content: "\f016";
 }
@@ -687,6 +699,10 @@ button::before {
 .follow *::before {
   margin: 0 2em;
   padding: 0.1em 0.25em;
+}
+
+.days {
+  margin-top: 0;
 }
 
 .days li {
@@ -863,23 +879,30 @@ button::before {
 
 /* Spectacles */
 
+#page-spectacles_filter h3,
 #page-spectacles h3 {
   display: none;
 }
 
+#page-spectacles_filter h2,
+#page-spectacles_filter form {
+  width: 100%;
+}
+
+#page-spectacles_filter main,
 #page-spectacles main {
   display: flex;
   flex-wrap: wrap;
 }
 
-#page-spectacles main section {
+.spectacle {
   box-sizing: border-box;
   font-size: 10pt;
   padding: 0.5em;
   width: 25%;
 }
 
-#page-spectacles main section a {
+.spectacle a {
   background: var(--pink-opacity);
   color: var(--grey);
   display: block;
@@ -887,104 +910,54 @@ button::before {
   transition: 0.5s;
 }
 
-#page-spectacles main section a:hover {
+.spectacle a:hover {
   background: var(--pink);
   text-decoration: none;
 }
 
-#page-spectacles a dl {
+.spectacle a dl {
   display: flex;
   flex-wrap: wrap;
   margin: 0;
 }
 
-#page-spectacles a dl dt {
+.spectacle a dl dt {
   text-align: center;
   width: 2rem;
 }
 
-#page-spectacles a dl dd {
+.spectacle a dl dd {
   line-height: 1.6;
   width: calc(100% - 2rem);
 }
 
-#page-spectacles a dl dt {
+.spectacle a dl dt {
   font-size: 0;
 }
 
-#page-spectacles .place {
+.spectacle .place {
   display: none;
 }
 
-#page-spectacles a dl dd:first-of-type {
-  font-size: 1.2em;
-  line-height: 2;
+.spectacle a dl dd:first-of-type {
+  font-size: 1.4em;
+  line-height: 2.5;
+  margin-top: -0.25rem;
   width: 100%;
 }
 
-#page-spectacles a dl dd + dd {
+.spectacle a dl dd + dd {
   padding-left: 2rem;
 }
 
-#page-spectacles a dl ::before {
+.spectacle a dl ::before {
   font-size: 1.2rem;
   line-height: 1;
   margin: 0;
 }
 
-#page-spectacles .half {
+.spectacle .half {
   width: calc(50% - 2rem);
-}
-
-/* Spectacle */
-
-#page-spectacle .date,
-#page-spectacle .place,
-#page-spectacle .configuration {
-  font-size: 0;
-}
-
-#page-spectacle main > dl:first-of-type {
-  margin: 0.5em 0;
-  overflow: auto;
-  padding-top: 0.5em;
-}
-
-#page-spectacle main > dl:first-of-type dt {
-  clear: left;
-  float: left;
-  width: 3rem;
-}
-
-#page-spectacle main > dl:first-of-type dd {
-  float: left;
-  width: calc(100% - 3rem);
-}
-
-#page-spectacle main > dl + dl {
-  overflow: auto;
-}
-
-#page-spectacle main > dl + dl {
-  columns: 2;
-}
-
-#page-spectacle dl dl {
-  padding-left: 1rem;
-  margin-right: 10%;
-}
-
-#page-spectacle dl dl dt:first-child::before {
-  content: "•";
-  position: absolute;
-  margin-left: -1.2rem;
-  font-size: 1.2rem;
-  line-height: 1.1;
-}
-
-#page-spectacle main > dl dd + dd dl {
-  border-top: 2px solid var(--pink-opacity);
-  margin-top: 1rem;
 }
 
 

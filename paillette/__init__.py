@@ -238,7 +238,7 @@ def page_not_found(error):
 
 
 @app.template_filter('date_range')
-def date_range(dates):
+def date_range(dates, format='%d/%m'):
     date_from, date_to = dates
     if not all(dates):
         return 'dates indéterminées'
@@ -247,18 +247,20 @@ def date_range(dates):
     if isinstance(date_to, str):
         date_to = datetime.fromisoformat(date_to)
     if date_from == date_to:
-        return f'le {date_simple(date_from)}'
+        return f'le {date_simple(date_from, format)}'
     else:
-        return f'du {date_simple(date_from)} au {date_simple(date_to)}'
+        return (
+            f'du {date_simple(date_from, format)} '
+            f'au {date_simple(date_to, format)}')
 
 
 @app.template_filter('date_simple')
-def date_simple(date_or_string):
+def date_simple(date_or_string, format='%d/%m'):
     if not date_or_string:
         return 'date indéterminée'
     if isinstance(date_or_string, str):
         date_or_string = date.fromisoformat(date_or_string)
-    return date_or_string.strftime('%d/%m')
+    return date_or_string.strftime(format)
 
 
 @app.template_filter('weeks')
@@ -406,6 +408,7 @@ def spectacles(year=None, month=None):
         spectacle.*,
         MIN(date) AS first_date,
         MAX(date) AS last_date,
+        GROUP_CONCAT(DISTINCT contract.artist_id) AS contract_artist_ids,
         GROUP_CONCAT(DISTINCT replace(vehicle.name, ',', ' ')) AS vehicles,
         GROUP_CONCAT(DISTINCT replace(makeup.name, ',', ' ')) AS makeups,
         GROUP_CONCAT(DISTINCT replace(beeper.name, ',', ' ')) AS beepers,
@@ -414,6 +417,8 @@ def spectacles(year=None, month=None):
         GROUP_CONCAT(
           DISTINCT replace(representation.name, ',', ' ')) AS representations
       FROM spectacle
+      LEFT JOIN contract
+      ON spectacle.id = contract.spectacle_id
       LEFT JOIN representation
       ON spectacle.id = representation.spectacle_id
       LEFT JOIN representation_date
@@ -451,11 +456,82 @@ def spectacles(year=None, month=None):
         stop=stop, previous=previous, next=next)
 
 
-@app.route('/spectacle/<int:spectacle_id>')
+@app.route('/spectacles/filter', methods=('GET', 'POST'))
 @authenticated
-def spectacle(spectacle_id):
-    spectacle_data = get_spectacle_data(spectacle_id)
-    return render_template('spectacle.jinja2.html', **spectacle_data)
+def spectacles_filter():
+    if request.method == 'POST':
+        cursor = get_connection().cursor()
+        filter_type = request.form.get('type')
+        sql_request = '''
+          SELECT
+            spectacle.*,
+            MIN(date) AS first_date,
+            MAX(date) AS last_date,
+            GROUP_CONCAT(DISTINCT contract.artist_id) AS contract_artist_ids,
+            GROUP_CONCAT(DISTINCT replace(vehicle.name, ',', ' ')) AS vehicles,
+            GROUP_CONCAT(DISTINCT replace(makeup.name, ',', ' ')) AS makeups,
+            GROUP_CONCAT(DISTINCT replace(beeper.name, ',', ' ')) AS beepers,
+            GROUP_CONCAT(DISTINCT replace(card.name, ',', ' ')) AS cards,
+            GROUP_CONCAT(DISTINCT replace(person.name, ',', ' ')) AS artists,
+            GROUP_CONCAT(
+              DISTINCT replace(representation.name, ',', ' ')) AS representations
+          FROM spectacle
+          LEFT JOIN contract
+          ON spectacle.id = contract.spectacle_id
+          LEFT JOIN representation
+          ON spectacle.id = representation.spectacle_id
+          LEFT JOIN representation_date
+          ON representation.id = representation_date.representation_id
+          LEFT JOIN artist_representation_date
+          ON representation_date.id = artist_representation_date.representation_date_id
+          LEFT JOIN artist
+          ON artist.id = artist_representation_date.artist_id
+          LEFT JOIN person
+          ON person.id = artist.person_id
+          LEFT JOIN vehicle_spectacle
+          ON spectacle.id = vehicle_spectacle.spectacle_id
+          LEFT JOIN vehicle
+          ON vehicle_spectacle.vehicle_id = vehicle.id
+          LEFT JOIN makeup_spectacle
+          ON spectacle.id = makeup_spectacle.spectacle_id
+          LEFT JOIN makeup
+          ON makeup_spectacle.makeup_id = makeup.id
+          LEFT JOIN beeper_spectacle
+          ON spectacle.id = beeper_spectacle.spectacle_id
+          LEFT JOIN beeper
+          ON beeper_spectacle.beeper_id = beeper.id
+          LEFT JOIN card_spectacle
+          ON spectacle.id = card_spectacle.spectacle_id
+          LEFT JOIN card
+          ON card_spectacle.card_id = card.id
+        '''
+        if filter_type == 'city':
+            sql_request += '''
+              WHERE place LIKE :city
+            '''
+        elif filter_type == 'date':
+            if request.form['spectacle_to']:
+                sql_request += '''
+                  WHERE date BETWEEN :spectacle_from AND :spectacle_to
+                '''
+            else:
+                sql_request += '''
+                  WHERE date = :spectacle_from
+                '''
+        sql_request += '''
+          GROUP BY spectacle.id
+          ORDER BY date_from DESC, date_to DESC, place
+        '''
+        if filter_type in ('city', 'date'):
+            cursor.execute(sql_request, request.form)
+            spectacles = cursor.fetchall()
+        else:
+            spectacles = []
+        return render_template(
+            'spectacles_filter.jinja2.html', spectacles=spectacles,
+            **request.form)
+
+    return render_template('spectacles_filter.jinja2.html')
 
 
 @app.route('/spectacle/create', methods=('GET', 'POST'))
@@ -468,14 +544,15 @@ def spectacle_create(spectacle_id=None):
     if request.method == 'POST':
         parameters = dict(request.form)
         parameters['trigram'] = parameters['place'][:3].upper()
+        parameters['pocket'] = 'pocket' in parameters
         cursor.execute('''
           INSERT INTO
             spectacle (
               event, place, travel_time, trigram, date_from, date_to, link,
-              configuration, organizer, comment)
+              configuration, organizer, comment, pocket)
           VALUES
             (:event, :place, :travel_time, :trigram, :date_from, :date_to,
-             :link, :configuration, :organizer, :comment)
+             :link, :configuration, :organizer, :comment, :pocket)
           RETURNING id
         ''', parameters)
         spectacle_id = cursor.fetchone()['id']
@@ -488,6 +565,13 @@ def spectacle_create(spectacle_id=None):
                   VALUES
                     (?, ?)
                 ''', (table_id, spectacle_id))
+
+        contracts = set(request.form.getlist('artist-contracts'))
+        for contract in contracts:
+            cursor.execute('''
+              INSERT INTO contract (spectacle_id, artist_id)
+              VALUES (?, ?)
+            ''', (spectacle_id, contract))
 
         for key, name in request.form.items():
             if not key.endswith('-name'):
@@ -523,7 +607,8 @@ def spectacle_create(spectacle_id=None):
 
         cursor.connection.commit()
         flash('Le spectacle a été ajouté.')
-        return redirect(url_for('spectacle', spectacle_id=spectacle_id))
+        year, month, _ = parameters['date_from'].split('-')
+        return redirect(url_for('spectacles', year=year, month=month))
 
     data = {}
     for table in tables:
@@ -566,6 +651,7 @@ def spectacle_update(spectacle_id):
     if request.method == 'POST':
         parameters = dict(request.form)
         parameters['id'] = spectacle_id
+        parameters['pocket'] = 'pocket' in parameters
         cursor.execute('''
           UPDATE spectacle
           SET
@@ -578,7 +664,8 @@ def spectacle_update(spectacle_id):
             link = :link,
             configuration = :configuration,
             organizer = :organizer,
-            comment = :comment
+            comment = :comment,
+            pocket = :pocket
           WHERE id = :id
         ''', parameters)
 
@@ -630,6 +717,15 @@ def spectacle_update(spectacle_id):
             f'({",".join("?" * len(representation_ids))})',
             tuple(representation_ids))
 
+        cursor.execute(
+            'DELETE FROM contract WHERE spectacle_id = ?', (spectacle_id,))
+        contracts = set(request.form.getlist(f'artist-contracts'))
+        for contract in contracts:
+            cursor.execute('''
+              INSERT INTO contract (spectacle_id, artist_id)
+              VALUES (?, ?)
+            ''', (spectacle_id, contract))
+
         for key, name in request.form.items():
             if not key.endswith('-name'):
                 continue
@@ -664,13 +760,15 @@ def spectacle_update(spectacle_id):
 
         cursor.connection.commit()
         flash('Les informations ont été sauvegardées.')
-        return redirect(url_for('spectacle', spectacle_id=spectacle_id))
+        year, month, _ = parameters['date_from'].split('-')
+        return redirect(url_for('spectacles', year=year, month=month))
 
     cursor.execute('''
       SELECT
         spectacle.*,
-        representation_id AS representation_id,
+        representation.id AS representation_id,
         representation.name AS representation_name,
+        GROUP_CONCAT(DISTINCT contract.artist_id) AS contract_artist_ids,
         GROUP_CONCAT(DISTINCT sound_spectacle.sound_id) AS sound_ids,
         GROUP_CONCAT(DISTINCT makeup_spectacle.makeup_id) AS makeup_ids,
         GROUP_CONCAT(DISTINCT costume_spectacle.costume_id) AS costume_ids,
@@ -682,6 +780,8 @@ def spectacle_update(spectacle_id):
         GROUP_CONCAT(DISTINCT artist_representation_date.artist_id)
           AS artist_ids
       FROM spectacle
+      LEFT JOIN contract
+      ON spectacle.id = contract.spectacle_id
       LEFT JOIN sound_spectacle
       ON spectacle.id = sound_spectacle.spectacle_id
       LEFT JOIN makeup_spectacle
@@ -704,7 +804,7 @@ def spectacle_update(spectacle_id):
         artist_representation_date.representation_date_id
       WHERE spectacle.id = ?
       GROUP BY representation.id
-      ORDER BY representation_name
+      ORDER BY representation.name
     ''', (spectacle_id,))
     representations = cursor.fetchall()
 
@@ -742,7 +842,7 @@ def spectacle_remove(spectacle_id):
           DELETE FROM spectacle
           WHERE id = :spectacle_id
         ''', (spectacle_id,))
-        for table in ('sound', 'makeup', 'costume', 'vehicle'):
+        for table in ('sound', 'makeup', 'costume', 'vehicle', 'card', 'beeper'):
             cursor.execute(f'''
               DELETE FROM {table}_spectacle
               WHERE spectacle_id = :spectacle_id
@@ -766,6 +866,10 @@ def spectacle_remove(spectacle_id):
         ''', representation_date_ids)
         cursor.execute('''
           DELETE FROM representation
+          WHERE spectacle_id = :spectacle_id
+        ''', (spectacle_id,))
+        cursor.execute('''
+          DELETE FROM contract
           WHERE spectacle_id = :spectacle_id
         ''', (spectacle_id,))
         cursor.connection.commit()

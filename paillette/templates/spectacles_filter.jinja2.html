@@ -1,0 +1,100 @@
+{% set title = 'Recherche des spectacles' %}
+{% set filter = session.get('spectacles-filter') %}
+
+{% extends '_layout.jinja2' %}
+
+{% block content %}
+  <h2>{{ title }}</h2>
+
+  <form method="post">
+    <label>
+      Type de recherche
+      <select id="type" name="type" onChange="update()">
+        <option value="city" {{ 'selected' if type == 'city' }}>Par ville</option>
+        <option value="date" {{ 'selected' if type == 'date' }}>Par date</option>
+      </select>
+    </label>
+
+    <fieldset id="city" hidden>
+      <label>Ville <input name="city" value="{{ city or '' }}"></label>
+    </fieldset>
+
+    <fieldset id="date" hidden>
+      <label>Du <input name="spectacle_from" type="date" value="{{ spectacle_from or '' }}"></label>
+      <label>Au <input name="spectacle_to" type="date" value="{{ spectacle_to or '' }}"></label>
+    </fieldset>
+
+    <input class="button" type="submit" value="Rechercher">
+  </form>
+
+  {% if spectacles != undefined %}
+    {% for spectacle in spectacles %}
+      {% set dates = (spectacle.first_date, spectacle.last_date) | date_range('%d/%m/%Y') %}
+      {% set travel_dates = (spectacle.date_from, spectacle.date_to) | date_range('%d/%m/%Y') %}
+      <section class="spectacle">
+        <h3><a href="{{ url_for('spectacle_update', spectacle_id=spectacle.id) }}">{{ spectacle.place }}, {{ dates }}</a></h3>
+        <a href="{{ url_for('spectacle_update', spectacle_id=spectacle.id) }}">
+          <dl>
+            <dt class="place">Lieu</dt>
+            <dd>
+              <strong>{{ spectacle.place }}</strong>
+              {% if spectacle.travel_time %}
+                ({{ spectacle.travel_time }})
+              {% endif %}
+            </dd>
+            <dt class="date">Date</dt>
+            <dd>{{ dates | capitalize }}</dd>
+            <dt class="event">Évènement</dt>
+            <dd>{{ spectacle.event }}</dd>
+            <dt class="spectacles">Spectacles</dt>
+            <dd>{{ (spectacle.representations or 'Pas de spectacle').replace(',', ', ') }}</dd>
+            <dt class="configuration">Configuration</dt>
+            <dd>
+              <details>
+                <summary>{{ spectacle.configuration }}</summary>
+                {% if spectacle.artists %}
+                  <ul>
+                    {% for artist in spectacle.artists.split(',') | sort %}
+                      <li>{{ artist }}</li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  Équipe non renseignée
+                {% endif %}
+              </details>
+            </dd>
+            <dt class="makeup">Boîtes de maquillage</dt>
+            <dd>{{ (spectacle.makeups or 'Non renseigné').replace(',', ', ') }}</dd>
+            <dt class="sound">Sons</dt>
+            <dd>{{ (spectacle.sounds or 'Non renseigné').replace(',', ', ') }}</dd>
+            <dt class="vehicle">Trajet</dt>
+            <dd>{{ travel_dates | capitalize }} – {{ (spectacle.vehicles or 'Pas de véhicule').replace(',', ', ') }}</dd>
+            <dt class="card">Carte bleue</dt>
+            <dd class="half">{{ (spectacle.cards or 'Pas de CB').replace(',', ', ') }}</dd>
+            <dt class="beeper">Bip d’autoroute</dt>
+            <dd class="half">{{ (spectacle.beepers or 'Pas de bip').replace(',', ', ') }}</dd>
+            <dt class="pocket">Pochette</dt>
+            <dd class="half">{{ 'Oui' if spectacle.pocket else 'Non' }}</dd>
+            <dt class="contract">Contrat</dt>
+            <dd class="half">
+              {{ (spectacle.contract_artist_ids.split(',') | length) if spectacle.contract_artist_ids else 0 }} /
+              {{ (spectacle.artists.split(',') | length) if spectacle.artists else 0 }}
+            </dd>
+          </dl>
+        </a>
+      </section>
+    {% else %}
+      <p>Aucun spectacle ne correspond à la recherche.</p>
+    {% endfor %}
+  {% endif %}
+
+  <script>
+    function update() {
+      let select = document.getElementById('type');
+      document.querySelectorAll("fieldset").forEach(
+        obj => obj.id != select.options[select.selectedIndex].value ? obj.setAttribute("hidden", true) : obj.removeAttribute("hidden")
+      );
+    }
+    update();
+  </script>
+{% endblock %}

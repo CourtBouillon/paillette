@@ -9,186 +9,6 @@
   <h2>{{ title }}</h2>
 
   <form method="post">
-    <h3>Informations générales</h3>
-
-    <label for="place">Lieu</label>
-    <input id="place" name="place" value="{{ spectacle.place }}" required>
-
-    <label for="event">Évènement</label>
-    <input id="event" name="event" value="{{ spectacle.event }}" required>
-
-    <label for="date_from">Date de départ</label>
-    <input id="date_from" name="date_from" type="date" value="{{ spectacle.date_from }}" required>
-
-    <label for="date_to">Date de retour</label>
-    <input id="date_to" name="date_to" type="date" value="{{ spectacle.date_to }}" required>
-
-    <label for="trigram">Trigramme</label>
-    <input id="trigram" name="trigram" value="{{ spectacle.trigram }}" required>
-
-    <label for="travel_time">Temps de transport</label>
-    <input id="travel_time" name="travel_time" value="{{ spectacle.travel_time or '' }}">
-
-    <label for="link">Lien</label>
-    <input id="link" name="link" value="{{ spectacle.link or '' }}">
-
-    <label for="configuration">Configuration</label>
-    <input id="configuration" name="configuration" value="{{ spectacle.configuration or '' }}">
-
-    <label for="organizer">Organisateur</label>
-    <input id="organizer" name="organizer" value="{{ spectacle.organizer or '' }}">
-
-    <label>Matériel de son</label>
-    <div>
-      <select data-name="sound">
-        <option></option>
-        {% for sound in sounds %}
-        <option value="{{ sound.id }}">{{ sound.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list">
-      {% if spectacle.sound_ids %}
-        {% set sound_ids = spectacle.sound_ids.split(',') %}
-        {% for sound in sounds %}
-          {% if sound.id | string in sound_ids %}
-            <li>
-              <input name="sounds" value="{{ sound.id }}" hidden>
-              {{ sound.name }}
-              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-            </li>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    </ul>
-
-    <label>Boîtes de maquillage</label>
-    <div>
-      <select data-name="makeup">
-        <option></option>
-        {% for makeup in makeups %}
-        <option value="{{ makeup.id }}">{{ makeup.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list">
-      {% if spectacle.makeup_ids %}
-        {% set makeup_ids = spectacle.makeup_ids.split(',') %}
-        {% for makeup in makeups %}
-          {% if makeup.id | string in makeup_ids %}
-            <li>
-              <input name="makeups" value="{{ makeup.id }}" hidden>
-              {{ makeup.name }}
-              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-            </li>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    </ul>
-
-    <label>Costumes</label>
-    <div>
-      <select data-name="costume">
-        <option></option>
-        {% for costume in costumes %}
-        <option value="{{ costume.id }}">{{ costume.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list">
-      {% if spectacle.costume_ids %}
-        {% set costume_ids = spectacle.costume_ids.split(',') %}
-        {% for costume in costumes %}
-          {% if costume.id | string in costume_ids %}
-            <li>
-              <input name="costumes" value="{{ costume.id }}" hidden>
-              {{ costume.name }}
-              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-            </li>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    </ul>
-
-    <label>Véhicules</label>
-    <div>
-      <select data-name="vehicle">
-        <option></option>
-        {% for vehicle in vehicles %}
-        <option value="{{ vehicle.id }}">{{ vehicle.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list">
-      {% if spectacle.vehicle_ids %}
-        {% set vehicle_ids = spectacle.vehicle_ids.split(',') %}
-        {% for vehicle in vehicles %}
-          {% if vehicle.id | string in vehicle_ids %}
-            <li>
-              <input name="vehicles" value="{{ vehicle.id }}" hidden>
-              {{ vehicle.name }}
-              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-            </li>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    </ul>
-
-    <label>Bips d’autoroute</label>
-    <div>
-      <select data-name="beeper">
-        <option></option>
-        {% for beeper in beepers %}
-        <option value="{{ beeper.id }}">{{ beeper.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list">
-      {% if spectacle.beeper_ids %}
-        {% set beeper_ids = spectacle.beeper_ids.split(',') %}
-        {% for beeper in beepers %}
-          {% if beeper.id | string in beeper_ids %}
-            <li>
-              <input name="beepers" value="{{ beeper.id }}" hidden>
-              {{ beeper.name }}
-              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-            </li>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    </ul>
-
-    <label>Cartes bleues</label>
-    <div>
-      <select data-name="card">
-        <option></option>
-        {% for card in cards %}
-        <option value="{{ card.id }}">{{ card.name }}</option>
-        {% endfor %}
-      </select>
-      <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
-    </div>
-    <ul class="item-list">
-      {% if spectacle.card_ids %}
-        {% set card_ids = spectacle.card_ids.split(',') %}
-        {% for card in cards %}
-          {% if card.id | string in card_ids %}
-            <li>
-              <input name="cards" value="{{ card.id }}" hidden>
-              {{ card.name }}
-              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-            </li>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    </ul>
-
-    <h3>Spectacles</h3>
     <datalist id="representations">
       {% for representation in all_representations %}
         <option value="{{ representation }}" />
@@ -200,79 +20,312 @@
       {% endfor %}
     </datalist>
 
-    <label for="name">Nom</label>
-    <div>
-      <input id="name" list="representations" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
-      <button class="add" type="button" onClick="addSpectacle()">Ajouter</button>
-    </div>
+    <h3>Informations générales</h3>
 
-    <ul id="spectacles-list">
-      <li style="display: none">
-        <label>Nom</label>
-        <div>
-          <input name="name" list="representations">
-          <button class="delete" type="button" onClick="remove(this.parentNode)">Supprimer</button>
-        </div>
+    <label>
+      Départ
+      <input name="date_from" type="date" value="{{ spectacle.date_from }}" required>
+    </label>
 
-        <label>Dates</label>
-        <div class="dates">
-          <input name="dates" type="date" onInput="addInputIfNeeded(this)">
-        </div>
+    <label>
+      Date de retour
+      <input name="date_to" type="date" value="{{ spectacle.date_to }}" required>
+    </label>
 
-        <label>Équipe</label>
-        <div>
-          <input data-name="artist" list="artists">
-          <button class="add" type="button" onClick="addArtist(this)">Ajouter</button>
-        </div>
-        <ul class="artists-list"></ul>
-      </li>
+    <label>
+      Temps de transport
+      <input name="travel_time" value="{{ spectacle.travel_time or '' }}">
+    </label>
 
-      {% for representation in representations %}
-        <li>
+    <label>
+      Évènement
+      <input name="event" value="{{ spectacle.event }}" required>
+    </label>
+
+    <h3>Spectacles, équipes, costumes et matériel</h3>
+
+    <label>
+      Configuration
+      <textarea name="configuration">{{ spectacle.configuration or '' }}</textarea>
+    </label>
+
+    <label>
+      Nom
+      <div>
+        <input id="name" list="representations" onKeyPress="if (event.keyCode == 13) { addSpectacle(); return false }">
+        <button class="add" type="button" onClick="addSpectacle()">Ajouter</button>
+      </div>
+      <ul id="spectacles-list">
+        <li style="display: none">
           <label>Nom</label>
           <div>
-            <input name="{{ representation.id }}-name" list="representations" value="{{ representation.representation_name or '' }}">
+            <input name="name" list="representations">
             <button class="delete" type="button" onClick="remove(this.parentNode)">Supprimer</button>
           </div>
 
           <label>Dates</label>
           <div class="dates">
-            {% if representation.representation_dates %}
-              {% for date in representation.representation_dates.split(',') | sort %}
-                <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)" value="{{ date }}">
-              {% endfor %}
-            {% endif %}
-            <input name="{{ representation.id }}-dates" type="date" onInput="addInputIfNeeded(this)">
+            <input name="dates" type="date" onInput="addInputIfNeeded(this)">
           </div>
 
           <label>Équipe</label>
           <div>
-            <input list="artists" data-name="{{ representation.id }}-artist">
+            <input data-name="artist" list="artists">
             <button class="add" type="button" onClick="addArtist(this)">Ajouter</button>
           </div>
-          <ul class="artists-list">
-            {% if representation.artist_ids %}
-              {% set artist_ids = representation.artist_ids.split(',') %}
-              {% for artist in all_artists %}
-                {% if artist.id | string in artist_ids %}
-                  <li>
-                    <input name="{{ representation.id }}-artists" value="{{ artist.id }}" hidden>
-                    {{ artist.name }}
-                    <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-                  </li>
-                {% endif %}
-              {% endfor %}
-            {% endif %}
-          </ul>
+          <ul class="artists-list"></ul>
         </li>
-      {% endfor %}
-    </ul>
 
-    <label for="comment">Commentaire interne</label>
-    <textarea id="comment" name="comment">{{ spectacle.comment or '' }}</textarea>
+        {% for representation in representations %}
+          {% set contract_artist_ids = (representation.contract_artist_ids or '').split(',') %}
+          <li>
+            <label>Nom</label>
+            <div>
+              <input name="{{ representation.representation_id }}-name" list="representations" value="{{ representation.representation_name or '' }}">
+              <button class="delete" type="button" onClick="remove(this.parentNode)">Supprimer</button>
+            </div>
+
+            <label>Dates</label>
+            <div class="dates">
+              {% if representation.representation_dates %}
+                {% for date in representation.representation_dates.split(',') | sort %}
+                  <input name="{{ representation.representation_id }}-dates" type="date" onInput="addInputIfNeeded(this)" value="{{ date }}">
+                {% endfor %}
+              {% endif %}
+              <input name="{{ representation.representation_id }}-dates" type="date" onInput="addInputIfNeeded(this)">
+            </div>
+
+            <label>Équipe</label>
+            <div>
+              <input list="artists" data-name="{{ representation.representation_id }}-artist">
+              <button class="add" type="button" onClick="addArtist(this)">Ajouter</button>
+            </div>
+            <ul class="artists-list">
+              {% if representation.artist_ids %}
+                {% set artist_ids = representation.artist_ids.split(',') %}
+                {% for artist in all_artists %}
+                  {% if artist.id | string in artist_ids %}
+                    <li>
+                      <input name="{{ representation.representation_id }}-artists" value="{{ artist.id }}" hidden>
+                      <label title="Contrat" class="contract">
+                        <input name="artist-contracts" value="{{ artist.id }}" type="checkbox" onClick="changeContract(this)" {{ 'checked' if artist.id | string in contract_artist_ids }}>
+                      </label>
+                      {{ artist.name }}
+                      <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </ul>
+          </li>
+        {% endfor %}
+      </ul>
+    </label>
+
+    <label>
+      Costumes
+      <div>
+        <select data-name="costume">
+          <option></option>
+          {% for costume in costumes %}
+            <option value="{{ costume.id }}">{{ costume.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+        {% if spectacle.costume_ids %}
+          {% set costume_ids = spectacle.costume_ids.split(',') %}
+          {% for costume in costumes %}
+            {% if costume.id | string in costume_ids %}
+              <li>
+                <input name="costumes" value="{{ costume.id }}" hidden>
+                {{ costume.name }}
+                <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+              </li>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </label>
+
+    <label>
+      Matériel de son
+      <div>
+        <select data-name="sound">
+          <option></option>
+          {% for sound in sounds %}
+            <option value="{{ sound.id }}">{{ sound.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+        {% if spectacle.sound_ids %}
+          {% set sound_ids = spectacle.sound_ids.split(',') %}
+          {% for sound in sounds %}
+            {% if sound.id | string in sound_ids %}
+              <li>
+                <input name="sounds" value="{{ sound.id }}" hidden>
+                {{ sound.name }}
+                <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+              </li>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </label>
+
+    <label>
+      Boîtes de maquillage
+      <div>
+        <select data-name="makeup">
+          <option></option>
+          {% for makeup in makeups %}
+            <option value="{{ makeup.id }}">{{ makeup.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+        {% if spectacle.makeup_ids %}
+          {% set makeup_ids = spectacle.makeup_ids.split(',') %}
+          {% for makeup in makeups %}
+            {% if makeup.id | string in makeup_ids %}
+              <li>
+                <input name="makeups" value="{{ makeup.id }}" hidden>
+                {{ makeup.name }}
+                <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+              </li>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </label>
+
+    <h3>Informations générales</h3>
+
+    <label>
+      Véhicules
+      <div>
+        <select data-name="vehicle">
+          <option></option>
+          {% for vehicle in vehicles %}
+            <option value="{{ vehicle.id }}">{{ vehicle.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+        {% if spectacle.vehicle_ids %}
+          {% set vehicle_ids = spectacle.vehicle_ids.split(',') %}
+          {% for vehicle in vehicles %}
+            {% if vehicle.id | string in vehicle_ids %}
+              <li>
+                <input name="vehicles" value="{{ vehicle.id }}" hidden>
+                {{ vehicle.name }}
+                <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+              </li>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </label>
+
+    <label>
+      Bips d’autoroute
+      <div>
+        <select data-name="beeper">
+          <option></option>
+          {% for beeper in beepers %}
+            <option value="{{ beeper.id }}">{{ beeper.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+        {% if spectacle.beeper_ids %}
+          {% set beeper_ids = spectacle.beeper_ids.split(',') %}
+          {% for beeper in beepers %}
+            {% if beeper.id | string in beeper_ids %}
+              <li>
+                <input name="beepers" value="{{ beeper.id }}" hidden>
+                {{ beeper.name }}
+                <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+              </li>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </label>
+
+    <label>
+      Cartes bleues
+      <div>
+        <select data-name="card">
+          <option></option>
+          {% for card in cards %}
+            <option value="{{ card.id }}">{{ card.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
+      </div>
+      <ul class="item-list">
+        {% if spectacle.card_ids %}
+          {% set card_ids = spectacle.card_ids.split(',') %}
+          {% for card in cards %}
+            {% if card.id | string in card_ids %}
+              <li>
+                <input name="cards" value="{{ card.id }}" hidden>
+                {{ card.name }}
+                <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+              </li>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </label>
+
+    <h3>Autres</h3>
+
+    <label>
+      Lieu
+      <input name="place" value="{{ spectacle.place }}" required>
+    </label>
+
+    <label>
+      Trigramme
+      <input name="trigram" value="{{ spectacle.trigram }}" required>
+    </label>
+
+    <label>
+      Lien
+      <input name="link" value="{{ spectacle.link or '' }}">
+    </label>
+
+    <label>
+      Organisateur
+      <input name="organizer" value="{{ spectacle.organizer or '' }}">
+    </label>
+
+    <label>
+      <input name="pocket" type="checkbox" {{ 'checked' if spectacle.pocket }}>
+      Pochette
+    </label>
+
+    <label>
+      Commentaire interne
+      <textarea name="comment">{{ spectacle.comment or '' }}</textarea>
+    </label>
 
     <input class="button" type="submit" value="Mettre à jour">
   </form>
+
+  <ul class="actions">
+    <li><a class="remove" href="{{ url_for('spectacle_remove', spectacle_id=spectacle.id) }}">Supprimer le spectacle</a></li>
+    <li><a class="copy" href="{{ url_for('spectacle_create', spectacle_id=spectacle.id) }}">Dupliquer le spectacle</a></li>
+    <li><a class="send" href="{{ url_for('roadmap_send', spectacle_id=spectacle.id) }}">Envoyer la feuille de route</a></li>
+  </ul>
 
   <script>
     function addElement(button) {
@@ -321,6 +374,18 @@
       input.setAttribute("hidden", true);
       li.appendChild(input);
 
+      let label = document.createElement("label");
+      label.setAttribute("title", "Contrat");
+      label.setAttribute("class", "contract");
+      li.appendChild(label);
+
+      input = document.createElement("input");
+      input.setAttribute("name", "artist-contracts");
+      input.setAttribute("value", id);
+      input.setAttribute("type", "checkbox");
+      input.setAttribute("onClick", "changeContract(this)")
+      label.appendChild(input);
+
       li.appendChild(document.createTextNode(value + " "));
 
       let deleteButton = document.createElement("button");
@@ -358,7 +423,16 @@
         }
       );
 
-      newLi.querySelector('input').focus();
+      newLi.querySelector("input").focus();
+    }
+
+    function changeContract(input) {
+      let value = input.getAttribute("value");
+      document.querySelectorAll('[name="artist-contracts"][value="' + value + '"]').forEach(
+        obj => {
+          obj.checked = input.checked;
+        }
+      );
     }
 
     function remove(button) {
@@ -367,7 +441,7 @@
 
     function addInputIfNeeded(input) {
       let parent = input.parentNode;
-      if (![...parent.querySelectorAll('input')].filter(node => !node.value.length).length) {
+      if (![...parent.querySelectorAll("input")].filter(node => !node.value.length).length) {
         let newInput = input.cloneNode();
         newInput.value = null;
         parent.appendChild(newInput);

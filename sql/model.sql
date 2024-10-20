@@ -33,7 +33,8 @@ CREATE TABLE spectacle (
   images_comment TEXT,
   sound_comment TEXT,
   light_comment TEXT,
-  comment TEXT
+  comment TEXT,
+  pocket BOOLEAN
 );
 
 CREATE TABLE spectacle_image (
@@ -47,6 +48,12 @@ CREATE TABLE artist (
   person_id INTEGER NOT NULL REFERENCES person(id),
   color TEXT,
   hidden BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE contract (
+  id INTEGER PRIMARY KEY,
+  artist_id INTEGER NOT NULL REFERENCES artist(id),
+  spectacle_id INTEGER NOT NULL REFERENCES spectacle(id)
 );
 
 CREATE TABLE artist_availability (
