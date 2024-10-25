@@ -132,10 +132,26 @@
       return null
     }
 
+    function clearSelect(select) {
+      let value = select.options[select.selectedIndex].text
+      select.value = "-"
+      update(select)
+      previousTd = select.parentElement.previousElementSibling
+      previousSelect = previousTd.querySelector("select")
+      let previousValue = previousSelect.options[previousSelect.selectedIndex].text
+      if (value == previousValue) {
+        clearSelect(previousSelect)
+      }
+    }
+
     function fillRow(event) {
       if (event.ctrlKey || event.metaKey) {
         event.preventDefault()
-        fillSelect(event.target)
+        if (event.target.value == "-" || event.target.value == "") {
+          fillSelect(event.target)
+        } else {
+          clearSelect(event.target)
+        }
       }
     }
 
