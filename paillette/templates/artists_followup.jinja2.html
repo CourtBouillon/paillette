@@ -80,7 +80,7 @@
     function getCount(children) {
       return (
         [...children].filter(
-          child => !['', '0'].includes(child.lastElementChild.textContent.trim())
+          child => !['', '0', '1'].includes(child.lastElementChild.textContent.trim())
         ).length
       )
     }
