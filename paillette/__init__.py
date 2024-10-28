@@ -7,6 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from functools import wraps
+from itertools import groupby
 from locale import LC_ALL, setlocale
 from pathlib import Path
 from smtplib import SMTP_SSL
@@ -1060,12 +1061,20 @@ def artists_followup(year=None, month=None):
         representation_date.id
       WHERE date BETWEEN ? AND ?
     ''', [start, stop] * 2)
-    availabilities = cursor.fetchall()
+    availabilities_by_artist_by_day = {
+        artist: {
+            day: list(availabilities)
+            for day, availabilities
+            in groupby(availabilities, lambda row: row['date'])
+        }
+        for artist, availabilities
+        in groupby(cursor.fetchall(), lambda row: row['id'])
+    }
     query = '''
       SELECT
         artist.id AS artist_id,
         artist.color,
-        person.name || '-' || artist.id AS grouper,
+        lower(person.name) || '-' || artist.id AS grouper,
         person.name,
         spectacle.trigram,
         representation_date.date
@@ -1119,7 +1128,15 @@ def artists_followup(year=None, month=None):
         query += f'AND artist.id IN ({",".join("?" * len(artists))})'
         parameters += artists
     cursor.execute(query, parameters)
-    artists_spectacles = cursor.fetchall()
+    spectacles_by_grouper_by_day = {
+        grouper: {
+            day: list(spectacles)
+            for day, spectacles
+            in groupby(spectacles, lambda row: row['date'])
+        }
+        for grouper, spectacles
+        in groupby(cursor.fetchall(), lambda row: row['grouper'])
+    }
     cursor.execute('''
       SELECT representation_date.id, date, trigram
       FROM spectacle
@@ -1129,12 +1146,17 @@ def artists_followup(year=None, month=None):
       ON representation.id = representation_date.representation_id
       WHERE date BETWEEN ? AND ?
     ''', (start, stop))
-    representation_dates = cursor.fetchall()
+    representation_dates_by_day = {
+        day: list(representations)
+        for day, representations
+        in groupby(cursor.fetchall(), lambda row: row['date'])
+    }
     return render_template(
         'artists_followup.jinja2.html',
-        artists_spectacles=artists_spectacles, availabilities=availabilities,
-        representation_dates=representation_dates, start=start, stop=stop,
-        previous=previous, next=next)
+        spectacles_by_grouper_by_day=spectacles_by_grouper_by_day,
+        availabilities_by_artist_by_day=availabilities_by_artist_by_day,
+        representation_dates_by_day=representation_dates_by_day,
+        start=start, stop=stop, previous=previous, next=next)
 
 
 # Follow-ups

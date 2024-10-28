@@ -32,8 +32,8 @@
       </tr>
     </thead>
     <tbody>
-      {% for (grouper, spectacles) in artists_spectacles | groupby('grouper') %}
-        {% set artist = spectacles[0] %}
+      {% for (grouper, spectacles) in spectacles_by_grouper_by_day.items() | sort %}
+        {% set artist = spectacles.values() | first | first %}
         <tr style="color: {{ artist.color or 'black' }}">
           <th>
             {{ artist.name }}
@@ -41,9 +41,9 @@
           </th>
           {% for i in range(1, stop.day + 1) %}
             {% set day = start.replace(day=i) %}
-            {% set day_representation_dates = representation_dates | selectattr('date', 'eq', day) | list %}
-            {% set day_spectacles = spectacles | selectattr('date', 'eq', day) | list %}
-            {% set day_available = availabilities | selectattr('date', 'eq', day) | selectattr('id', 'eq', artist.artist_id) | first %}
+            {% set day_representation_dates = representation_dates_by_day.get(day, []) %}
+            {% set day_spectacles = spectacles.get(day, []) %}
+            {% set day_available = availabilities_by_artist_by_day.get(artist.artist_id, {}).get(day, []) | first %}
             <td>
               <select onChange="update(this, {{ artist.artist_id }}, '{{ day }}')" data-artist="{{ artist.artist_id }}" data-day="{{ day }}">
                 <option hidden></option>
