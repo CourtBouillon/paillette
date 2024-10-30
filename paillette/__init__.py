@@ -720,7 +720,7 @@ def spectacle_update(spectacle_id):
 
         cursor.execute(
             'DELETE FROM contract WHERE spectacle_id = ?', (spectacle_id,))
-        contracts = set(request.form.getlist(f'artist-contracts'))
+        contracts = set(request.form.getlist('artist-contracts'))
         for contract in contracts:
             cursor.execute('''
               INSERT INTO contract (spectacle_id, artist_id)
@@ -1060,7 +1060,9 @@ def artists_followup(year=None, month=None):
         artist_representation_date.representation_date_id =
         representation_date.id
       WHERE date BETWEEN ? AND ?
+      ORDER BY artist.id, date
     ''', [start, stop] * 2)
+    availabilities = cursor.fetchall()
     availabilities_by_artist_by_day = {
         artist: {
             day: list(availabilities)
@@ -1068,7 +1070,7 @@ def artists_followup(year=None, month=None):
             in groupby(availabilities, lambda row: row['date'])
         }
         for artist, availabilities
-        in groupby(cursor.fetchall(), lambda row: row['id'])
+        in groupby(availabilities, lambda row: row['id'])
     }
     query = '''
       SELECT
@@ -1127,6 +1129,9 @@ def artists_followup(year=None, month=None):
             and filter_start <= row['date'] <= filter_stop}) or (0,)
         query += f'AND artist.id IN ({",".join("?" * len(artists))})'
         parameters += artists
+    query += '''
+      ORDER BY grouper, date
+    '''
     cursor.execute(query, parameters)
     spectacles_by_grouper_by_day = {
         grouper: {
@@ -1145,6 +1150,7 @@ def artists_followup(year=None, month=None):
       JOIN representation_date
       ON representation.id = representation_date.representation_id
       WHERE date BETWEEN ? AND ?
+      ORDER BY date
     ''', (start, stop))
     representation_dates_by_day = {
         day: list(representations)
