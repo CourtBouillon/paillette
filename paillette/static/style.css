@@ -941,8 +941,8 @@ button::before {
 
 .spectacle a dl dd:first-of-type {
   font-size: 1.4em;
-  line-height: 2.5;
-  margin-top: -0.25rem;
+  line-height: 1.1;
+  margin: 0.5em 0;
   width: 100%;
 }
 
