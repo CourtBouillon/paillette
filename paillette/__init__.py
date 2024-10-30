@@ -264,14 +264,19 @@ def date_simple(date_or_string, format='%d/%m'):
     return date_or_string.strftime(format)
 
 
-@app.template_filter('weeks')
-def weeks(dates, month):
-    weeks = set()
-    for date_ in dates:
-        if not date_ or date_.month != month:
-            continue
-        weeks.add(min(date_.day, 27) // 7 + 1)
-    return weeks
+@app.template_filter('month_weeks')
+def month_weeks(days):
+    start, stop = days
+    days = (start.replace(day=i) for i in range(start.day, stop.day + 1))
+    grouped_days = {
+       week: list(days) for week, days in
+       groupby(days, lambda day: date.isocalendar(day).week)}
+    return {week: (days[0], days[-1]) for week, days in grouped_days.items()}
+
+
+@app.template_filter('isoweek')
+def isoweek(day):
+    return date.isocalendar(day).week
 
 
 @app.template_filter('version')

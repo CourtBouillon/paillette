@@ -13,10 +13,13 @@
 
   <ul class="days">
     <li class="active"><a onClick="showSpectacles(this)">Tout</a></li>
-    <li><a onClick="filterSpectacles(this, 1)">01 – 07</a></li>
-    <li><a onClick="filterSpectacles(this, 2)">08 – 14</a></li>
-    <li><a onClick="filterSpectacles(this, 3)">15 – 21</a></li>
-    <li><a onClick="filterSpectacles(this, 4)">22 – 31</a></li>
+    {% for week, (week_start, week_stop) in ((start, stop) | month_weeks).items() %}
+      <li>
+        <a onClick="filterSpectacles(this, {{ week }})">
+          {{ week_start.day }} {% if week_start != week_stop %}– {{ week_stop.day }}{% endif %}
+        </a>
+      </li>
+    {% endfor %}
   </ul>
 
   <ul class="actions">
@@ -27,7 +30,7 @@
   {% for spectacle in spectacles %}
     {% set dates = (spectacle.first_date, spectacle.last_date) | date_range %}
     {% set travel_dates = (spectacle.date_from, spectacle.date_to) | date_range %}
-    <section class="spectacle {% for week in (spectacle.date_from, spectacle.date_to) | weeks(month) %} week-{{ week }}{% endfor %}">
+    <section class="spectacle {% for week in range(spectacle.date_from | isoweek, spectacle.date_to | isoweek + 1) %}week-{{ week }} {% endfor %}">
       <h3><a href="{{ url_for('spectacle_update', spectacle_id=spectacle.id) }}">{{ spectacle.place }}, {{ dates }}</a></h3>
       <a href="{{ url_for('spectacle_update', spectacle_id=spectacle.id) }}">
         <dl>
