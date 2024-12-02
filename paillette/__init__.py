@@ -927,7 +927,7 @@ def roadmap_send(spectacle_id):
         attachments = {f'{place.lower()}.pdf': pdf}
         send_mail(to, subject, content, attachments)
         flash('La feuille de route a été envoyée.')
-        return redirect(url_for('spectacle', spectacle_id=spectacle_id))
+        return redirect(url_for('spectacle_update', spectacle_id=spectacle_id))
 
     cursor = get_connection().cursor()
     cursor.execute('''
