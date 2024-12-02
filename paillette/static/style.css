@@ -1026,19 +1026,15 @@ table {
   width: min-content;
 }
 
-tr:not(:last-of-type) td,
-tbody tr:not(:last-of-type) th,
+tr td,
+tbody th,
 thead th {
   border-bottom: 2px solid var(--pink-opacity);
 }
 
-th:first-of-type {
-  border-left: 0;
-}
-
 td,
 th {
-  border-left: 2px solid var(--pink-opacity);
+  border-right: 2px solid var(--pink-opacity);
   padding: 0.3em;
 }
 
