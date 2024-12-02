@@ -134,16 +134,16 @@
         <button class="add" type="button" onClick="addElement(this)">Ajouter</button>
       </div>
       <ul class="item-list">
+        {% set costumes_by_id = dict(costumes | groupby('id')) %}
         {% if spectacle.costume_ids %}
           {% set costume_ids = spectacle.costume_ids.split(',') %}
-          {% for costume in costumes %}
-            {% if costume.id | string in costume_ids %}
-              <li>
-                <input name="costumes" value="{{ costume.id }}" hidden>
-                {{ costume.name }}
-                <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
-              </li>
-            {% endif %}
+          {% for costume_id in costume_ids %}
+            {% set costume = costumes_by_id[costume_id | int][0] %}
+            <li>
+              <input name="costumes" value="{{ costume.id }}" hidden>
+              {{ costume.name }}
+              <button class="delete" type="button" onClick="remove(this)">Supprimer</button>
+            </li>
           {% endfor %}
         {% endif %}
       </ul>
