@@ -417,6 +417,7 @@ def spectacles(year=None, month=None):
         GROUP_CONCAT(DISTINCT contract.artist_id) AS contract_artist_ids,
         GROUP_CONCAT(DISTINCT replace(vehicle.name, ',', ' ')) AS vehicles,
         GROUP_CONCAT(DISTINCT replace(makeup.name, ',', ' ')) AS makeups,
+        GROUP_CONCAT(DISTINCT replace(sound.name, ',', ' ')) AS sounds,
         GROUP_CONCAT(DISTINCT replace(beeper.name, ',', ' ')) AS beepers,
         GROUP_CONCAT(DISTINCT replace(card.name, ',', ' ')) AS cards,
         GROUP_CONCAT(DISTINCT replace(person.name, ',', ' ')) AS artists,
@@ -443,6 +444,10 @@ def spectacles(year=None, month=None):
       ON spectacle.id = makeup_spectacle.spectacle_id
       LEFT JOIN makeup
       ON makeup_spectacle.makeup_id = makeup.id
+      LEFT JOIN sound_spectacle
+      ON spectacle.id = sound_spectacle.spectacle_id
+      LEFT JOIN sound
+      ON sound_spectacle.sound_id = sound.id
       LEFT JOIN beeper_spectacle
       ON spectacle.id = beeper_spectacle.spectacle_id
       LEFT JOIN beeper
