@@ -782,10 +782,7 @@ def spectacle_update(spectacle_id):
         GROUP_CONCAT(DISTINCT contract.artist_id) AS contract_artist_ids,
         GROUP_CONCAT(DISTINCT sound_spectacle.sound_id) AS sound_ids,
         GROUP_CONCAT(DISTINCT makeup_spectacle.makeup_id) AS makeup_ids,
-        GROUP_CONCAT(
-            DISTINCT costume_spectacle.costume_id
-            ORDER BY costume_spectacle.id
-          ) AS costume_ids,
+        GROUP_CONCAT(DISTINCT costume_spectacle.costume_id) AS costume_ids,
         GROUP_CONCAT(DISTINCT vehicle_spectacle.vehicle_id) AS vehicle_ids,
         GROUP_CONCAT(DISTINCT beeper_spectacle.beeper_id) AS beeper_ids,
         GROUP_CONCAT(DISTINCT card_spectacle.card_id) AS card_ids,
